@@ -1,0 +1,39 @@
+C
+	node:path
+	neighbors:W E
+NWN
+	node:city mc
+	neighbors:N
+N
+	node:city
+	neighbors:NWN NEN
+NEN
+	node:city
+	neighbors:N
+NEE
+	node:field
+	neighbors:NWW
+E
+	node:path
+	neighbors:C
+SEE
+	node:field
+	neighbors:SES
+SES
+	node:field
+	neighbors:SEE
+S
+	node:field
+	neighbors:SWS SES
+SWS
+	node:field
+	neighbors:S SWW
+SWW
+	node:field
+	neighbors:SWS
+W
+	node:path
+	neighbors:C
+NWW
+	node:field
+	neigbors:NEE
