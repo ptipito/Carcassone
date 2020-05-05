@@ -6,6 +6,9 @@
 #include "model/board/constructions.h"
 
 void test_new_city();
+void test_new_path();
+void test_new_garden();
+void test_construction_cmp();
 
 
 #endif // DEF_TEST_CONSTRUCTIONS
