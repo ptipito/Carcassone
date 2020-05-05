@@ -78,36 +78,36 @@ int CP_connect_is_possible(Carc_Playboard_Node* src, CP_Connect_Side connect_sid
     switch(connect_side){
         //TODO: ADAPT the below computation with TILE_NR_LOCATIONS_ON_ONE_EDGE
         case CP_UP:
-            src_locations[0] = CTL_NORTH_WEST_NORTH;
-            neigh_locations[0] = CTL_SOUTH_WEST_SOUTH;
+            src_locations[0] = CTL_NORTH_WEST;
+            neigh_locations[0] = CTL_SOUTH_WEST;
             src_locations[1] = CTL_NORTH;
             neigh_locations[1] = CTL_SOUTH;
-            src_locations[2] = CTL_NORTH_EAST_NORTH;
-            neigh_locations[2] = CTL_SOUTH_EAST_SOUTH;
+            src_locations[2] = CTL_NORTH_EAST;
+            neigh_locations[2] = CTL_SOUTH_EAST;
             break;
         case CP_RIGHT:
-            src_locations[0] = CTL_NORTH_EAST_EAST;
-            neigh_locations[0] = CTL_NORTH_WEST_WEST;
+            src_locations[0] = CTL_EAST_NORTH;
+            neigh_locations[0] = CTL_WEST_NORTH;
             src_locations[1] = CTL_EAST;
             neigh_locations[1] = CTL_WEST;
-            src_locations[2] = CTL_SOUTH_EAST_EAST;
-            neigh_locations[2] = CTL_SOUTH_WEST_WEST;
+            src_locations[2] = CTL_EAST_SOUTH;
+            neigh_locations[2] = CTL_WEST_SOUTH;
             break;
         case CP_DOWN:
-            src_locations[0] = CTL_SOUTH_WEST_SOUTH;
-            neigh_locations[0] = CTL_NORTH_WEST_NORTH;
+            src_locations[0] = CTL_SOUTH_WEST;
+            neigh_locations[0] = CTL_NORTH_WEST;
             src_locations[1] = CTL_SOUTH;
             neigh_locations[1] = CTL_NORTH;
-            src_locations[2] = CTL_SOUTH_EAST_SOUTH;
-            neigh_locations[2] = CTL_NORTH_EAST_NORTH;
+            src_locations[2] = CTL_SOUTH_EAST;
+            neigh_locations[2] = CTL_NORTH_EAST;
             break;
         case CP_LEFT:
-            src_locations[0] = CTL_NORTH_WEST_WEST;
-            neigh_locations[0] = CTL_NORTH_EAST_EAST;
+            src_locations[0] = CTL_WEST_NORTH;
+            neigh_locations[0] = CTL_EAST_NORTH;
             src_locations[1] = CTL_WEST;
             neigh_locations[1] = CTL_EAST;
-            src_locations[2] = CTL_SOUTH_WEST_WEST;
-            neigh_locations[2] = CTL_SOUTH_EAST_EAST;
+            src_locations[2] = CTL_WEST_SOUTH;
+            neigh_locations[2] = CTL_EAST_SOUTH;
             break;
     }
     while(is_possible && (i < TILE_NR_LOCATIONS_ON_ONE_EDGE)){

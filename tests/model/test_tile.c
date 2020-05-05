@@ -1,14 +1,22 @@
 #include "tests/model/test_tile.h"
 
-void test_display_tile(){
-    Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
-    display_tile(*tile);
-    free(tile);
+void test_display_tile(Carc_Tile tile){
+    display_tile(tile);
 }
 
 void test_parse_tile_file(){
     Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
+    Carc_Tile* tile2 = CT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt");
+    printf("*******display start tile*******\n");
     test_display_tile(*tile);
+    printf("\n*******display cloister_path tile*******\n");
+    test_display_tile(*tile2);
+    CT_Free_Tile(tile);
+    CT_Free_Tile(tile2);
+}
+
+void test_turn_tile(){
+    Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
 
     printf("\tTURN RIGHT\n");
     CT_turn(tile,RIGHT);
@@ -40,7 +48,7 @@ void test_tile_cmp(){
     Carc_Tile t3 = *t1,
               t4 = *t1;
     t3.center_connexions[CTL_NORTH] = 1;
-    t4.border_connexions[CTL_NORTH_EAST_NORTH][CTL_NORTH_EAST_EAST] = 1;
+    t4.border_connexions[CTL_NORTH_EAST][CTL_EAST_NORTH] = 1;
 
     int test1 = CT_tile_cmp(*t1,*t1);
     int test2 = CT_tile_cmp(*t1,*t2);

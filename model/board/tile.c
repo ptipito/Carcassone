@@ -16,18 +16,18 @@ void CT_Free_Tile(Carc_Tile* tile){
     if(tile==NULL){
         return;
     }
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_WEST_NORTH));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_WEST));
     CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_EAST_NORTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_EAST_NORTH));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_EAST));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_NORTH));
     CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_EAST_EAST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_EAST_SOUTH));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_SOUTH));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_EAST));
     CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_WEST_SOUTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_WEST_WEST));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_WEST));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_SOUTH));
     CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_WEST_WEST));
+    CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_NORTH));
     CT_Free_Node(CT_get_node_from_loc(tile, CTL_CENTER));
     free(tile);
 }
@@ -61,38 +61,38 @@ CT_Locations CT_get_location_from_string(char* loc){
     if(strcmp(loc,"C")==0){
         result = CTL_CENTER;
     }
-    if(strcmp(loc,"NWW")==0){
-        result = CTL_NORTH_WEST_WEST;
+    if(strcmp(loc,"WN")==0){
+        result = CTL_WEST_NORTH;
     }
-    if(strcmp(loc,"NWN")==0){
-        result = CTL_NORTH_WEST_NORTH;
+    if(strcmp(loc,"NW")==0){
+        result = CTL_NORTH_WEST;
     }
     if(strcmp(loc,"N")==0){
         result = CTL_NORTH;
     }
-    if(strcmp(loc,"NEN")==0){
-        result = CTL_NORTH_EAST_NORTH;
+    if(strcmp(loc,"NE")==0){
+        result = CTL_NORTH_EAST;
     }
-    if(strcmp(loc,"NEE")==0){
-        result = CTL_NORTH_EAST_EAST;
+    if(strcmp(loc,"EN")==0){
+        result = CTL_EAST_NORTH;
     }
     if(strcmp(loc,"E")==0){
         result = CTL_EAST;
     }
-    if(strcmp(loc,"SEE")==0){
-        result = CTL_SOUTH_EAST_EAST;
+    if(strcmp(loc,"ES")==0){
+        result = CTL_EAST_SOUTH;
     }
-    if(strcmp(loc,"SES")==0){
-        result = CTL_SOUTH_EAST_SOUTH;
+    if(strcmp(loc,"SE")==0){
+        result = CTL_SOUTH_EAST;
     }
     if(strcmp(loc,"S")==0){
         result = CTL_SOUTH;
     }
-    if(strcmp(loc,"SWS")==0){
-        result = CTL_SOUTH_WEST_SOUTH;
+    if(strcmp(loc,"SW")==0){
+        result = CTL_SOUTH_WEST;
     }
-    if(strcmp(loc,"SWW")==0){
-        result = CTL_SOUTH_WEST_WEST;
+    if(strcmp(loc,"WS")==0){
+        result = CTL_WEST_SOUTH;
     }
     if(strcmp(loc,"W")==0){
         result = CTL_WEST;
@@ -407,17 +407,17 @@ int CT_tile_cmp(Carc_Tile t1, Carc_Tile t2){
 void display_tile(Carc_Tile tile){
     //Print north edge
     printf(" ");
-    printf("%d",tile.border[CTL_NORTH_WEST_NORTH].node_type);
-    if(tile.border_connexions[CTL_NORTH_WEST_NORTH][CTL_NORTH])
+    printf("%d",tile.border[CTL_NORTH_WEST].node_type);
+    if(tile.border_connexions[CTL_NORTH_WEST][CTL_NORTH])
         printf("-");
     else printf(" ");
     printf("%d",tile.border[CTL_NORTH].node_type);
-    if(tile.border_connexions[CTL_NORTH][CTL_NORTH_EAST_NORTH])
+    if(tile.border_connexions[CTL_NORTH][CTL_NORTH_EAST])
         printf("-");
     else printf(" ");
-    printf("%d\n",tile.border[CTL_NORTH_EAST_NORTH].node_type);
+    printf("%d\n",tile.border[CTL_NORTH_EAST].node_type);
 
-    if(tile.border_connexions[CTL_NORTH_WEST_WEST][CTL_NORTH_WEST_NORTH])
+    if(tile.border_connexions[CTL_WEST_NORTH][CTL_NORTH_WEST])
         printf("/ ");
     else printf("  ");
     printf(" ");
@@ -425,28 +425,27 @@ void display_tile(Carc_Tile tile){
         printf("|");
     else printf(" ");
     printf(" ");
-    if(tile.border_connexions[CTL_NORTH_EAST_NORTH][CTL_NORTH_EAST_EAST])
+    if(tile.border_connexions[CTL_NORTH_EAST][CTL_EAST_NORTH])
         printf(" \\");
     else printf("  ");
     printf("\n");
 
     //Print north west and east corners
-    printf("%d",tile.border[CTL_NORTH_WEST_WEST].node_type);
-    if(tile.border_connexions[CTL_NORTH_WEST_WEST][CTL_NORTH_EAST_EAST])
+    printf("%d",tile.border[CTL_WEST_NORTH].node_type);
+    if(tile.border_connexions[CTL_WEST_NORTH][CTL_EAST_NORTH])
         printf("-----");
     else printf("     ");
-    printf("%d\n",tile.border[CTL_NORTH_EAST_EAST].node_type);
-    printf(" ");
-    if(tile.border_connexions[CTL_NORTH_WEST_WEST][CTL_WEST])
-        printf("|");
-    else printf(" ");
+    printf("%d\n",tile.border[CTL_EAST_NORTH].node_type);
+    if(tile.border_connexions[CTL_WEST_NORTH][CTL_WEST])
+        printf("| ");
+    else printf("  ");
     printf(" ");
     if(tile.center_connexions[CTL_NORTH])
         printf("|");
     else printf(" ");
     printf(" ");
-    if(tile.border_connexions[CTL_NORTH_EAST_EAST][CTL_EAST])
-        printf("|");
+    if(tile.border_connexions[CTL_EAST_NORTH][CTL_EAST])
+        printf(" |");
     else printf(" ");
     printf(" ");
     printf("\n");
@@ -461,26 +460,25 @@ void display_tile(Carc_Tile tile){
         printf("--");
     else printf("  ");
     printf("%d\n",tile.border[CTL_EAST].node_type);
-    printf(" ");
-    if(tile.border_connexions[CTL_WEST][CTL_SOUTH_WEST_WEST])
-        printf("|");
-    else printf(" ");
+    if(tile.border_connexions[CTL_WEST][CTL_WEST_SOUTH])
+        printf("| ");
+    else printf("  ");
     printf(" ");
     if(tile.center_connexions[CTL_SOUTH])
         printf("|");
     else printf(" ");
     printf(" ");
-    if(tile.border_connexions[CTL_EAST][CTL_SOUTH_EAST_EAST])
-        printf("|");
+    if(tile.border_connexions[CTL_EAST][CTL_EAST_SOUTH])
+        printf(" |");
     else printf(" ");
     printf("\n");
 
-    printf("%d",tile.border[CTL_SOUTH_WEST_WEST].node_type);
-    if(tile.border_connexions[CTL_SOUTH_WEST_WEST][CTL_SOUTH_EAST_EAST])
+    printf("%d",tile.border[CTL_WEST_SOUTH].node_type);
+    if(tile.border_connexions[CTL_WEST_SOUTH][CTL_EAST_SOUTH])
         printf("-----");
     else printf("     ");
-    printf("%d\n",tile.border[CTL_SOUTH_EAST_EAST].node_type);
-    if(tile.border_connexions[CTL_SOUTH_WEST_WEST][CTL_SOUTH_WEST_SOUTH])
+    printf("%d\n",tile.border[CTL_EAST_SOUTH].node_type);
+    if(tile.border_connexions[CTL_WEST_SOUTH][CTL_SOUTH_WEST])
         printf("\\ ");
     else printf("  ");
     printf(" ");
@@ -488,19 +486,19 @@ void display_tile(Carc_Tile tile){
         printf("|");
     else printf(" ");
     printf(" ");
-    if(tile.border_connexions[CTL_SOUTH_EAST_EAST][CTL_SOUTH_EAST_SOUTH])
+    if(tile.border_connexions[CTL_EAST_SOUTH][CTL_SOUTH_EAST])
         printf(" /");
     else printf("  ");
     printf("\n");
 
     printf(" ");
-    printf("%d",tile.border[CTL_SOUTH_WEST_SOUTH].node_type);
-    if(tile.border_connexions[CTL_SOUTH_WEST_SOUTH][CTL_SOUTH])
+    printf("%d",tile.border[CTL_SOUTH_WEST].node_type);
+    if(tile.border_connexions[CTL_SOUTH_WEST][CTL_SOUTH])
         printf("-");
     else printf(" ");
     printf("%d",tile.border[CTL_SOUTH].node_type);
-    if(tile.border_connexions[CTL_SOUTH][CTL_SOUTH_EAST_SOUTH])
+    if(tile.border_connexions[CTL_SOUTH][CTL_SOUTH_EAST])
         printf("-");
     else printf(" ");
-    printf("%d\n",tile.border[CTL_SOUTH_EAST_SOUTH].node_type);
+    printf("%d\n",tile.border[CTL_SOUTH_EAST].node_type);
 }

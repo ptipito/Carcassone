@@ -13,9 +13,11 @@
 #define TILE_NR_LOCATIONS 3
 
 //Possible locations on a tile. Each corner is represented by 2 locations to take into account city borders
-typedef enum {CTL_NORTH_WEST_NORTH, CTL_NORTH, CTL_NORTH_EAST_NORTH, CTL_NORTH_EAST_EAST, CTL_EAST,
-              CTL_SOUTH_EAST_EAST, CTL_SOUTH_EAST_SOUTH, CTL_SOUTH, CTL_SOUTH_WEST_SOUTH,
-              CTL_SOUTH_WEST_WEST, CTL_WEST, CTL_NORTH_WEST_WEST, CTL_CENTER
+typedef enum {CTL_NORTH_WEST, CTL_NORTH, CTL_NORTH_EAST,
+                CTL_EAST_NORTH, CTL_EAST, CTL_EAST_SOUTH,
+                CTL_SOUTH_EAST, CTL_SOUTH, CTL_SOUTH_WEST,
+                CTL_WEST_SOUTH, CTL_WEST, CTL_WEST_NORTH,
+                CTL_CENTER
 } CT_Locations;
 
 typedef enum {RIGHT, LEFT, UPDOWN} CT_Turn_Type;
