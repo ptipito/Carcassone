@@ -6,8 +6,6 @@ void CT_Free_Node(Carc_Tile_Node* node){
     }
 }
 
-
-
 Carc_Tile_Node* CT_get_node_from_loc(Carc_Tile* tile, CT_Locations loc){
     if(loc == CTL_CENTER)
         return &(tile->center);
@@ -377,7 +375,7 @@ int CT_Tiles_connect_in(Carc_Tile t1, CT_Locations t1_node_loc, Carc_Tile t2, CT
 }
 
 int CT_tile_node_cmp(Carc_Tile_Node n1, Carc_Tile_Node n2){
-    return CC_construction_cmp(n1.construction,n1.node_type,n2.construction,n2.node_type);
+    return CC_construction_cmp(*(n1.construction),n1.node_type,*(n2.construction),n2.node_type);
 }
 
 int CT_tile_cmp(Carc_Tile t1, Carc_Tile t2){

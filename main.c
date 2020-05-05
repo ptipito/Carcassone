@@ -24,16 +24,11 @@ int main(int argc, char* argv[]){
     Quit(NULL);
 
     SDL_Window* window = SDL_CreateWindow("Carcassone",0,30,1000,500,SDL_WINDOW_OPENGL);
-    printf("window %p\n",window);
     SDL_Event event;
     int done=0;
-    printf("initialize\n");
     Layout layout=new_layout();
     Layout* window_layout = &layout;
-    printf("layout: \n\twindow %p\n\tmap %p\n\tdetails %p\n\ttile size %d\n",window_layout->window,window_layout->map_surface,window_layout->details_surface,window_layout->tile_size);
-    printf("layout address %p\n",window_layout);
     initialize_game_layout(window,window_layout);
-    printf("layout: \n\twindow %p\n\tmap %p\n\tdetails %p\n",window_layout->window,window_layout->map_surface,window_layout->details_surface);
 
     display_grid(window_layout);
 
@@ -66,7 +61,7 @@ int main(int argc, char* argv[]){
     SDL_FreeSurface(cloister);
     SDL_FreeSurface(screen);
     free_layout(window_layout);
-
+    Quit(NULL);
 
     return EXIT_SUCCESS;
 }

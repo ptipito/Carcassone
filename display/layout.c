@@ -2,14 +2,9 @@
 
 Layout new_layout(){
     Layout layout;
-    printf("new layout\n");
-    printf("w");
     layout.window=NULL;
-    printf("d");
     layout.details_surface=NULL;
-    printf("m");
     layout.map_surface=NULL;
-    printf("t");
     layout.map_pos.x = 0;
     layout.map_pos.y = 0;
     layout.details_pos.x = 0;
@@ -70,12 +65,10 @@ void initialize_game_layout(SDL_Window *window, Layout* layout){
     pos.y=map_width;
     SDL_BlitSurface(details_surface,NULL,screen,&pos);
     SDL_UpdateWindowSurface(window);
-    printf("w");
     layout->window=window;
     layout->map_surface=map_surface;
     layout->details_surface=details_surface;
     layout->details_pos.x = screen_w - details_width;
-    printf("layout: \n\twindow %p\n\tmap %p\n\tdetails %p\n\ttile size %d\n",layout->window,layout->map_surface,layout->details_surface,layout->tile_size);
     SDL_FreeSurface(screen);
 }
 
@@ -113,7 +106,6 @@ void display_grid(Layout *layout){
     for(i=1;cur_coord<height;i++){
         cur_coord = i*tile_size;
         line_pos.y=cur_coord;
-        printf("line pos %d %d\n",line_pos.x,line_pos.y);
         blit_on(LP_MAP,horizontal_line,NULL,&line_pos,layout);
     }
 
@@ -135,7 +127,6 @@ void blit_on(Layout_Part part, SDL_Surface *surface, SDL_Rect *src, SDL_Rect *de
             screen_pos = layout->map_pos;
             break;
         case LP_DETAILS:
-            printf("screen to details layout\n");
             screen = layout->details_surface;
             screen_pos = layout->details_pos;
             break;

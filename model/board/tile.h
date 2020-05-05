@@ -2,6 +2,8 @@
 #define DEF_CARC_TILE
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 #include "model/board/constructions.h"
 #include "utils.h"
 

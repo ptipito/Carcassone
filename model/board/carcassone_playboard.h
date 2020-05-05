@@ -41,7 +41,4 @@ CP_Connect_Side CP_get_opposite_side(CP_Connect_Side);
 Carc_Playboard_Location CP_get_neighbor_loc(Carc_Playboard_Location, CP_Connect_Side);
 Carc_Playboard_Node* CP_create_neigh_for(Carc_Playboard_Node*, CP_Connect_Side);
 
-
-
-
 #endif // DEF_CARCASSONE_PLAYBOARD

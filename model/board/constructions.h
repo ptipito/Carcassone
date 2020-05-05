@@ -32,7 +32,8 @@ Carc_Construction* CC_new_city(int, int, Carc_City_Merchandise);
 Carc_Construction* CC_new_path(int);
 Carc_Construction* CC_new_garden();
 
-//TODO define pawn types
+int CC_construction_cmp(Carc_Construction, Carc_Construction_Type, Carc_Construction, Carc_Construction_Type);
+
 
 
 #endif // DEF_CONSTRUCTIONS

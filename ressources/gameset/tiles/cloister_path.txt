@@ -1,0 +1,39 @@
+C
+	cloister
+	neighbors:S
+NWN
+	node:field
+	neighbors:N NWW
+N
+	node:field
+	neighbors:NWN NEN
+NEN
+	node:field
+	neighbors:N NEE
+NEE
+	node:field
+	neighbors:NEE E
+E
+	node:field
+	neighbors:NEE SEE
+SEE
+	node:field
+	neighbors:E SES
+SES
+	node:field
+	neighbors:SEE
+S
+	node:field
+	neighbors:C
+SWS
+	node:field
+	neighbors:S SWW
+SWW
+	node:field
+	neighbors:SWS W
+W
+	node:field
+	neighbors:SWS NWW
+NWW
+	node:field
+	neigbors:W NWN
