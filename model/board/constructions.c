@@ -37,14 +37,14 @@ int CC_construction_cmp(Carc_Construction c1, Carc_Construction_Type type_c1, Ca
     switch(type_c1){
         case CCT_PATH:
             return c1.path.has_lake == c2.path.has_lake;
-            break;
         case CCT_CITY:
             return (c1.city.has_flag == c2.city.has_flag
                     && c1.city.is_cathedral == c2.city.is_cathedral
                     && c1.city.merchandise == c2.city.merchandise);
-            break;
+        case CCT_GARDEN:
+            //the fields in garden do not impact the equality of all gardens
+            return 1;
         default:
             return 1;
-            break;
     }
 }

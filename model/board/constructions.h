@@ -8,18 +8,18 @@ typedef enum {CCM_CORN, CCM_BARREL, CCM_TISSUE, CCM_NONE} Carc_City_Merchandise;
 typedef enum {CCT_PATH, CCT_CITY, CCT_PATH_END, CCT_CLOISTER, CCT_GARDEN, CCT_FIELD} Carc_Construction_Type;
 
 typedef struct {
-    int has_flag : 1;
-    int is_cathedral : 1;
+    int has_flag;
+    int is_cathedral;
     Carc_City_Merchandise merchandise;
 } Carc_City;
 
 typedef struct {
-    int has_lake : 1;
+    int has_lake;
 } Carc_Path;
 
 typedef struct {
-    int field_occupied : 1;
-    int garden_occupied : 1;
+    int field_occupied;
+    int garden_occupied;
 } Carc_Garden;
 
 typedef union {
