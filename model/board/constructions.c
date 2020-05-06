@@ -30,21 +30,28 @@ Carc_Construction* CC_new_garden(){
     return construct;
 }
 
-int CC_construction_cmp(Carc_Construction c1, Carc_Construction_Type type_c1, Carc_Construction c2, Carc_Construction_Type type_c2){
+int CC_construction_cmp(Carc_Construction* c1, Carc_Construction_Type type_c1, Carc_Construction* c2, Carc_Construction_Type type_c2){
     if(type_c1!=type_c2){
-        return 0;
+        return 1;
     }
     switch(type_c1){
         case CCT_PATH:
-            return c1.path.has_lake == c2.path.has_lake;
+            if(c1->path.has_lake == c2->path.has_lake)
+                return 0;
+            else
+                return 1;
         case CCT_CITY:
-            return (c1.city.has_flag == c2.city.has_flag
-                    && c1.city.is_cathedral == c2.city.is_cathedral
-                    && c1.city.merchandise == c2.city.merchandise);
+            if( c1->city.has_flag == c2->city.has_flag
+                && c1->city.is_cathedral == c2->city.is_cathedral
+                && c1->city.merchandise == c2->city.merchandise){
+                return 0;
+            } else{
+                return 1;
+            }
         case CCT_GARDEN:
-            //the fields in garden do not impact the equality of all gardens
-            return 1;
+            //The fields in garden do not impact the equality of all gardens
+            return 0;
         default:
-            return 1;
+            return 0;
     }
 }

@@ -32,7 +32,7 @@ Carc_Construction* CC_new_city(int, int, Carc_City_Merchandise);
 Carc_Construction* CC_new_path(int);
 Carc_Construction* CC_new_garden();
 
-int CC_construction_cmp(Carc_Construction, Carc_Construction_Type, Carc_Construction, Carc_Construction_Type);
+int CC_construction_cmp(Carc_Construction*, Carc_Construction_Type, Carc_Construction*, Carc_Construction_Type);
 
 
 

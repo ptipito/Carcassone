@@ -142,14 +142,12 @@ void CT_set_single_connexion(Carc_Tile* tile, CT_Locations loc, CT_Locations nei
     }
     if(loc == CTL_CENTER){
         tile->center_connexions[neighbor_loc] = 1;
-        //printf("neigh of center: %d-%d=%d\n",loc,neighbor_loc,tile->center_connexions[neighbor_loc]);
     } else if(neighbor_loc == CTL_CENTER){
         tile->center_connexions[loc] = 1;
-        //printf("neigh of center: %d-%d=%d\n",neighbor_loc,loc,tile->center_connexions[loc]);
     } else {
         tile->border_connexions[loc][neighbor_loc] = 1;
+        tile->border_connexions[neighbor_loc][loc] = 1;
     }
-    //printf("\t\t\tset connexion %d - %d\n",loc,neighbor_loc);
 }
 
 void CT_set_node_type(Carc_Tile* tile,CT_Locations loc, Carc_Construction_Type type){
@@ -375,17 +373,18 @@ int CT_Tiles_connect_in(Carc_Tile t1, CT_Locations t1_node_loc, Carc_Tile t2, CT
 }
 
 int CT_tile_node_cmp(Carc_Tile_Node n1, Carc_Tile_Node n2){
-    return CC_construction_cmp(*(n1.construction),n1.node_type,*(n2.construction),n2.node_type);
+    return CC_construction_cmp(n1.construction,n1.node_type,n2.construction,n2.node_type);
 }
 
 int CT_tile_cmp(Carc_Tile t1, Carc_Tile t2){
-    //TODO include compariosn on rotations
+    //TODO include comparison on rotations
     int result, i=0, j=0;
     result = CT_tile_node_cmp(t1.center,t2.center);
     while(result==0 && i<TILE_NR_BORDER_LOCATIONS){
         result = CT_tile_node_cmp(t1.border[i],t2.border[i]);
         i++;
     }
+
     //Test connexions equality
     if(result==0){
         for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
@@ -405,6 +404,7 @@ int CT_tile_cmp(Carc_Tile t1, Carc_Tile t2){
 }
 
 void display_tile(Carc_Tile tile){
+    //TODO display the connections between vertical corners
     //Print north edge
     printf(" ");
     printf("%d",tile.border[CTL_NORTH_WEST].node_type);
