@@ -8,7 +8,7 @@
 int test_initial_tile_creation();
 void test_display_tile();
 void test_parse_tile_file();
-void test_tile_cmp();
+void test_tile_tile_cmp();
 void test_turn_tile();
 void test_new_empty_tile();
 void test_CT_new_node();
@@ -18,6 +18,5 @@ void test_tile_get_node_type_from_str();
 void test_tile_pars_merchandise_type();
 void test_tile_set_single_connexion();
 void test_tiles_connect_in();
-void test_tile_cmp();
 
 #endif // DEF_TEST_TILE

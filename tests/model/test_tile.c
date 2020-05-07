@@ -51,11 +51,13 @@ void test_tile_tile_cmp(){
     t3.center_connexions[CTL_NORTH] = 1;
     t4.border_connexions[CTL_NORTH_EAST][CTL_EAST_NORTH] = 1;
 
-    int test1 = CT_tile_cmp(*t1,*t1);
-    int test2 = CT_tile_cmp(*t1,*t2);
-    int test3 = CT_tile_cmp(*t1,t3);
-    int test4 = CT_tile_cmp(*t1,t4);
-    printf("test_tile_cmp resutls: %d%d%d%d",test1==0,test2==1,test3==1,test4==1);
+    int test1 = CT_tile_cmp(t1,t1);
+    int test2 = CT_tile_cmp(t1,t2);
+    int test3 = CT_tile_cmp(t1,&t3);
+    int test4 = CT_tile_cmp(t1,&t4);
+    int test5 = CT_tile_cmp(NULL,NULL);
+    int test6 = CT_tile_cmp(t1,NULL);
+    printf("test_tile_cmp resutls: %d%d%d%d%d%d",test1==0,test2==1,test3==1,test4==1,test5==0,test6==1);
     CT_Free_Tile(t1);
     CT_Free_Tile(t2);
 
@@ -222,20 +224,6 @@ void test_tiles_connect_in(){
     printf("%d",CT_Tiles_connect_in(*tile1,CTL_SOUTH_WEST,*tile2,CTL_NORTH_WEST)==1);
     printf("%d",CT_Tiles_connect_in(*tile1,CTL_NORTH,*tile2,CTL_SOUTH)==0);
     //TODO: add test with gardens
-
-    CT_Free_Tile(tile1);
-    CT_Free_Tile(tile2);
-}
-
-void test_tile_cmp(){
-    Carc_Tile *tile1 = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
-    Carc_Tile *tile2 = CT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt");
-
-    printf("test_tile_cmp results: ");
-    printf("%d",CT_tile_cmp(*tile1,*tile1)==0);
-    printf("%d",CT_tile_cmp(*tile2,*tile2)==0);
-    printf("%d",CT_tile_cmp(*tile2,*tile1)==1);
-    printf("%d",CT_tile_cmp(*tile1,*tile2)==1);
 
     CT_Free_Tile(tile1);
     CT_Free_Tile(tile2);
