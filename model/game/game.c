@@ -3,11 +3,10 @@
 Carc_Game* CG_initiate_game(char* filename){
     Carc_Game *game = malloc(sizeof(Carc_Game));
     Carc_Tile *start_tile = CT_new_tile_from_file(filename);
-    Carc_Playboard_Node *playboard_first_node = CP_create_playboard(start_tile);
-    Carc_Playboard_Origin *playboard_origin = CP_new_playboard_origin(playboard_first_node);
+    Carc_Playboard_Origin *playboard_origin = CP_init_playboard(start_tile);
 
     game->playboard = playboard_origin;
-    game->playable = CP_initiate_Rim(playboard_first_node);
+    game->playable = CP_initiate_Rim(playboard_origin->node);
 
     return game;
 }

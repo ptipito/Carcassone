@@ -46,11 +46,14 @@ int CP_Rim_insert_playboard_node(CP_Rim* rim, Carc_Playboard_Node* node){
 CP_Rim* CP_initiate_Rim(Carc_Playboard_Node* origin){
     CP_Rim *rim = malloc(sizeof(*rim));
     rim->first = NULL;
-
-    Carc_Playboard_Node *first_node = CP_new_playboard_node(NULL,CP_Location_new(0,1)),
-                        *snd_node = CP_new_playboard_node(NULL,CP_Location_new(1,0)),
-                        *third_node = CP_new_playboard_node(NULL,CP_Location_new(0,-1)),
-                        *fourth_node = CP_new_playboard_node(NULL,CP_Location_new(-1,0));
+    if(origin==NULL){
+        return rim;
+    }
+    Carc_Playboard_Location loc = origin->node_coordinates;
+    Carc_Playboard_Node *first_node = CP_new_playboard_node(NULL,CP_get_neighbor_loc(loc,CP_RIGHT)),
+                        *snd_node = CP_new_playboard_node(NULL,CP_get_neighbor_loc(loc,CP_UP)),
+                        *third_node = CP_new_playboard_node(NULL,CP_get_neighbor_loc(loc,CP_LEFT)),
+                        *fourth_node = CP_new_playboard_node(NULL,CP_get_neighbor_loc(loc,CP_DOWN));
 
     first_node->neighbors[CP_LEFT] = origin;
     snd_node->neighbors[CP_DOWN] = origin;
@@ -166,7 +169,7 @@ int CP_rim_transfer_node_update_one_side(CP_Rim* rim, Carc_Playboard_Node* rim_n
         if(neighbor!=NULL){//The neighboring node is already in the Rim => update its neighbors attribute
             neighbor->neighbors[CP_get_opposite_side(neighbor_side)] = src_node;
         } else {//Create a new node for the rim
-            neighbor = CP_create_neigh_for(src_node,neighbor_side);
+            neighbor = CP_create_rim_neigh_for(src_node,neighbor_side);
             CP_Rim_insert_playboard_node(rim,neighbor);
         }
     } else {//The neighbor is already occupied=>update its neighbors attribute

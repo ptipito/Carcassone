@@ -33,17 +33,28 @@ int CP_Location_cmp(Carc_Playboard_Location l1,Carc_Playboard_Location l2){
     return result;
 }
 
-Carc_Playboard_Node* CP_create_playboard(Carc_Tile* start_tile){
-    int i=0;
-    Carc_Playboard_Node *playboard_origin = malloc(sizeof(Carc_Playboard_Node));
-    playboard_origin->node = start_tile;
-    for(i=0;i<CP_MAX_NEIGHBORS;i++){
-        playboard_origin->neighbors[i]=NULL;
+int CP_node_cmp(Carc_Playboard_Node* n1,Carc_Playboard_Node* n2){
+    int equal=0, different=1, result=equal, i=0, same_neigh=1;
+    if(n1==NULL || n2==NULL){
+        if(n1==n2)
+            result = equal;
+        else
+            result = different;
+    } else{
+        if(CP_Location_cmp(n1->node_coordinates,n2->node_coordinates)!=0){
+            result = different;
+        }
+        if(CT_tile_cmp(n1->node,n2->node)!=0)
+            result = different;
+        while(i<CP_MAX_NEIGHBORS && same_neigh){
+            same_neigh = (n1->neighbors[i]==n2->neighbors[i]);
+            if(!same_neigh){
+                result = 1;
+            }
+            i++;
+        }
     }
-    playboard_origin->node_coordinates.x = 0;
-    playboard_origin->node_coordinates.y = 0;
-
-    return playboard_origin;
+    return result;
 }
 
 Carc_Playboard_Node* CP_new_playboard_node(Carc_Tile* tile, Carc_Playboard_Location coordinates){
@@ -123,11 +134,9 @@ void CP_display_playboard_node(Carc_Playboard_Node node){
     printf("(%d,%d)",node.node_coordinates.x,node.node_coordinates.y);
 }
 
-Carc_Playboard_Origin* CP_new_playboard_origin(Carc_Playboard_Node* origin_node){
-    printf("attribute dynamic memory for origin playboard\n");
+Carc_Playboard_Origin* CP_init_playboard(Carc_Tile* start_tile){
     Carc_Playboard_Origin *origin = malloc(sizeof(*origin));
-    printf("attribute node to origin\n");
-    origin->node = origin_node;
+    origin->node = CP_new_playboard_node(start_tile,CP_Location_new(0,0));
 
     return origin;
 }
@@ -145,12 +154,16 @@ CP_Connect_Side CP_get_opposite_side(CP_Connect_Side side){
     switch(side){
         case CP_UP:
             opp_side = CP_DOWN;
+            break;
         case CP_DOWN:
             opp_side =CP_UP;
+            break;
         case CP_LEFT:
             opp_side = CP_RIGHT;
+            break;
         case CP_RIGHT:
             opp_side = CP_LEFT;
+            break;
     }
     return opp_side;
 }
@@ -178,7 +191,10 @@ Carc_Playboard_Location CP_get_neighbor_loc(Carc_Playboard_Location src, CP_Conn
      return new_location;
 }
 
-Carc_Playboard_Node* CP_create_neigh_for(Carc_Playboard_Node* src_node, CP_Connect_Side neighbor_side){
+Carc_Playboard_Node* CP_create_rim_neigh_for(Carc_Playboard_Node* src_node, CP_Connect_Side neighbor_side){
+    ///Create a new empty node. This new node has in its neighbors the src_node. However the created node being
+    ///empty, it is not referenced in the neighbors attribute of src_node. This function aims to update the rim
+    ///when a new node is played on the playboard.
     Carc_Playboard_Location neighbor_loc = CP_get_neighbor_loc(src_node->node_coordinates,neighbor_side);
     Carc_Playboard_Node* neighbor = CP_new_empty_playboard_node(neighbor_loc);
     //src_node is a neighbor of this new empty node
