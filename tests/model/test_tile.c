@@ -7,6 +7,7 @@ void test_tile_display_tile(Carc_Tile tile){
 void test_tile_parse_tile_file(){
     Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     Carc_Tile* tile2 = CT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt");
+    printf("test_tile_parse_tile_file:\n");
     printf("*******display start tile*******\n");
     display_tile(*tile);
     printf("\n*******display cloister_path tile*******\n");
@@ -17,6 +18,7 @@ void test_tile_parse_tile_file(){
 
 void test_tile_turn_tile(){
     Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
+    printf("test_tile_turn_tile:\n");
     display_tile(*tile);
 
     printf("\tTURN RIGHT\n");
@@ -30,7 +32,6 @@ void test_tile_turn_tile(){
     printf("\tTURN LEFT\n");
     CT_turn(tile,LEFT);
     display_tile(*tile);
-
 
     printf("\tTURN LEFT\n");
     CT_turn(tile,LEFT);
@@ -96,44 +97,48 @@ void test_tile_get_node_from_loc(){
     Carc_Tile* tile = CT_new_tile_from_file("ressources/gamest/tiles/tile1.txt");
     CT_Locations loc = CTL_NORTH_WEST;
     Carc_Tile_Node* node = CT_get_node_from_loc(tile,loc);
+    Carc_Tile_Node* node2 = CT_get_node_from_loc(tile,CTL_CENTER);
     printf("test_get_node_from_loc results: ");
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node2)!=0);
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_NORTH;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_NORTH_EAST;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_EAST_NORTH;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_EAST;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_EAST_SOUTH;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_SOUTH_EAST;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_SOUTH;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_SOUTH_WEST;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_WEST_SOUTH;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_WEST;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_WEST_NORTH;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->border[loc],*node));
+    printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_CENTER;
     node = CT_get_node_from_loc(tile,loc);
-    printf("%d",CT_tile_node_cmp(tile->center,*node));
+    printf("%d",CT_tile_node_cmp(tile->center,*node)==0);
+
+    CT_Free_Tile(tile);
 }
 
 void test_tile_get_loc_from_str(){
@@ -227,4 +232,28 @@ void test_tiles_connect_in(){
 
     CT_Free_Tile(tile1);
     CT_Free_Tile(tile2);
+}
+
+void test_tile_run_all(){
+    test_tile_parse_tile_file();
+    printf("\n");
+    test_tile_turn_tile();
+    printf("\n");
+    test_tile_tile_cmp();
+    printf("\n");
+    test_tile_new_empty_tile();
+    printf("\n");
+    test_tile_CT_new_node();
+    printf("\n");
+    test_tile_get_node_from_loc();
+    printf("\n");
+    test_tile_get_loc_from_str();
+    printf("\n");
+    test_tile_get_node_type_from_str();
+    printf("\n");
+    test_tile_parse_merchandise_type();
+    printf("\n");
+    test_tile_set_single_connexion();
+    printf("\n");
+    test_tiles_connect_in();
 }

@@ -28,7 +28,6 @@ void test_new_path(){
     free(path);
 }
 
-
 void test_new_garden(){
     Carc_Construction *garden = CC_new_garden();
     printf("test_new_garden results: %d", garden->garden.field_occupied==0 && garden->garden.garden_occupied==0);
@@ -85,4 +84,14 @@ void test_construction_cmp(){
     free(path2);
     free(garden1);
     free(garden2);
+}
+
+void test_construction_run_all(){
+    test_new_city();
+    printf("\n");
+    test_new_path();
+    printf("\n");
+    test_new_garden();
+    printf("\n");
+    test_construction_cmp();
 }

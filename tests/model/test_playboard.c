@@ -1,6 +1,7 @@
 #include "tests/model/test_playboard.h"
 
 void test_new_location(){
+    printf("test_new_location results: ");
     Carc_Playboard_Location loc_test;
     int i,j;
     for(i=0;i<20;i++){
@@ -9,10 +10,10 @@ void test_new_location(){
             printf("%d%d",loc_test.x==i,loc_test.y==j);
         }
     }
-    printf("\n");
 }
 
 void test_location_cmp(){
+    printf("test_location_cmp results: ");
     Carc_Playboard_Location loc1 = CP_Location_new(2,3),
                             loc2 = CP_Location_new(2,6),
                             loc3 = CP_Location_new(2,1),
@@ -32,10 +33,10 @@ void test_location_cmp(){
     printf("%d",CP_Location_cmp(loc1,loc1)==0);
     printf("%d",CP_Location_cmp(loc6,loc2)==1);
     printf("%d",CP_Location_cmp(loc4,loc3)==-1);
-    printf("\n");
 }
 
 void test_new_playboard_node(){
+    printf("test_new_playboard_node results: ");
 
     Carc_Tile* test_tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     Carc_Playboard_Location test_loc = CP_Location_new(0,1);
@@ -171,4 +172,24 @@ void test_create_neighbor_for(){
     printf("%d",neigh2!=NULL && neigh2->neighbors[CP_RIGHT]==start_node);
     printf("%d",neigh2!=NULL && !(neigh1->neighbors[CP_UP]==start_node));
     printf("%d",neigh2!=NULL && neigh1->neighbors[CP_DOWN]==start_node);
+}
+
+void test_playboard_run_all(){
+    test_new_location();
+    printf("\n");
+    test_location_cmp();
+    printf("\n");
+    test_new_playboard_node();
+    printf("\n");
+    test_node_cmp();
+    printf("\n");
+    test_connect_is_possible();
+    printf("\n");
+    test_init_playboard();
+    printf("\n");
+    test_get_opposite_side();
+    printf("\n");
+    test_get_neighbor_loc();
+    printf("\n");
+    test_create_neighbor_for();
 }
