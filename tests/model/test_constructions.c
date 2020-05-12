@@ -94,4 +94,5 @@ void test_construction_run_all(){
     test_new_garden();
     printf("\n");
     test_construction_cmp();
+    printf("\n");
 }

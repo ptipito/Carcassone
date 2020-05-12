@@ -3,8 +3,8 @@
 void CP_free_playboard_node(Carc_Playboard_Node* node){
     if(node!=NULL){
         CT_Free_Tile(node->node);
+        free(node);
     }
-    free(node);
 }
 
 Carc_Playboard_Location CP_Location_new(int x, int y){
@@ -59,7 +59,10 @@ int CP_node_cmp(Carc_Playboard_Node* n1,Carc_Playboard_Node* n2){
 
 Carc_Playboard_Node* CP_new_playboard_node(Carc_Tile* tile, Carc_Playboard_Location coordinates){
     int i=0;
-    Carc_Playboard_Node *playboard_node = malloc(sizeof(Carc_Playboard_Node));
+    Carc_Playboard_Node *playboard_node = NULL;
+    while(playboard_node==NULL){
+        playboard_node = malloc(sizeof(Carc_Playboard_Node));
+    }
     playboard_node->node = tile;
     for(i=0;i<CP_MAX_NEIGHBORS;i++){
         playboard_node->neighbors[i]=NULL;
@@ -135,7 +138,10 @@ void CP_display_playboard_node(Carc_Playboard_Node node){
 }
 
 Carc_Playboard_Origin* CP_init_playboard(Carc_Tile* start_tile){
-    Carc_Playboard_Origin *origin = malloc(sizeof(*origin));
+    Carc_Playboard_Origin *origin = NULL;
+    while(origin==NULL){
+        origin = malloc(sizeof(*origin));
+    }
     origin->node = CP_new_playboard_node(start_tile,CP_Location_new(0,0));
 
     return origin;

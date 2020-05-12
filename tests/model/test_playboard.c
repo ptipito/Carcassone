@@ -67,11 +67,11 @@ void test_new_playboard_node(){
 }
 
 void test_node_cmp(){
-    Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
+    printf("test_node_equality results: ");
+    Carc_Tile *tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     Carc_Playboard_Node *n1 = CP_new_playboard_node(NULL,CP_Location_new(0,0)),
                         *n2 = CP_new_playboard_node(tile,CP_Location_new(0,0));
 
-    printf("test_node_equality results: ");
     printf("%d",CP_node_cmp(n1,n2)==1);
     n1->node = tile;
     printf("%d",CP_node_cmp(n1,n2)==0);
@@ -83,16 +83,17 @@ void test_node_cmp(){
     n1->node_coordinates = CP_Location_new(1,2);
     printf("%d",CP_node_cmp(n1,n2)==1);
     n2->node_coordinates = CP_Location_new(1,2);
-    n1->neighbors[1] = malloc(sizeof(Carc_Playboard_Node));
+    n1->neighbors[CP_UP] = CP_new_empty_playboard_node(CP_Location_new(1,3));
     printf("%d",CP_node_cmp(n1,n2)==1);
-    n2->neighbors[1] = malloc(sizeof(Carc_Playboard_Node));
+    n2->neighbors[CP_UP] = CP_new_empty_playboard_node(CP_Location_new(1,3));
     printf("%d",CP_node_cmp(n1,n2)==1);
-    n2->neighbors[1] = n1->neighbors[1];
+    CP_free_playboard_node(n2->neighbors[CP_UP]);
+    n2->neighbors[CP_UP] = n1->neighbors[CP_UP];
     printf("%d",CP_node_cmp(n1,n2)==0);
-
-    CP_free_playboard_node(n1->neighbors[1]);
-    CP_free_playboard_node(n2->neighbors[1]);
+    printf("\n");
+    CP_free_playboard_node(n1->neighbors[CP_UP]);
     CP_free_playboard_node(n1);
+    n2->node=NULL;//avoid double free of tile (n1 and n2 have the same pointer in "node")
     CP_free_playboard_node(n2);
 }
 
@@ -123,16 +124,19 @@ void test_connect_is_possible(){
 }
 
 void test_init_playboard(){
-    Carc_Tile* start_tile = CT_new_tile_from_file("ressources/i=gameset/tiles/tile1.txt");
+    printf("test_init_playboard results: ");
+    Carc_Tile* start_tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     Carc_Playboard_Node* start_node = CP_new_playboard_node(start_tile,CP_Location_new(0,0));
     Carc_Playboard_Origin* playboard = CP_init_playboard(start_tile);
-    printf("test_init_playboard results: ");
+
     printf("%d",playboard != NULL && CP_node_cmp(playboard->node,start_node)==0);
     CP_free_playboard(playboard);
     playboard = CP_init_playboard(NULL);
     printf("%d",playboard != NULL && CP_node_is_empty(*(playboard->node)));
     printf("%d",playboard != NULL && CP_node_cmp(playboard->node,start_node)==1);
+
     CP_free_playboard(playboard);
+    start_node->node = NULL;//Avoiding double free
     CP_free_playboard_node(start_node);
 }
 

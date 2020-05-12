@@ -2,7 +2,8 @@
 
 void CT_Free_Node(Carc_Tile_Node* node){
     if(node!=NULL){
-        free(node->construction);
+        Carc_Construction* tofree=node->construction;
+        free(tofree);
     }
 }
 
@@ -13,47 +14,22 @@ Carc_Tile_Node* CT_get_node_from_loc(Carc_Tile* tile, CT_Locations loc){
 }
 
 void CT_Free_Tile(Carc_Tile* tile){
-    if(tile==NULL){
-        return;
+    if(tile!=NULL){
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_WEST));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_EAST));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_NORTH));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_SOUTH));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_EAST));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_WEST));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_SOUTH));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_NORTH));
+        CT_Free_Node(CT_get_node_from_loc(tile, CTL_CENTER));
     }
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_WEST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_EAST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_NORTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_SOUTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_EAST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_WEST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_SOUTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_NORTH));
-    CT_Free_Node(CT_get_node_from_loc(tile, CTL_CENTER));
     free(tile);
-}
-
-Carc_Tile_Node CT_new_node(Carc_Construction_Type type, Carc_Construction* cons){
-    Carc_Tile_Node node;
-    node.node_type = type;
-    node.construction = cons;
-
-    return node;
-}
-
-Carc_Tile* CT_new_empty_tile(){
-    int i=0,j=0;
-    Carc_Tile* tile = malloc(sizeof(Carc_Tile));
-    for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
-        tile->center_connexions[i]=0;
-        tile->border[i].construction = malloc(sizeof(Carc_Construction));
-        //printf("node cons %d created in %p\n",i,tile->border[i].construction);
-        for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
-            tile->border_connexions[i][j]=0;
-        }
-    }
-    tile->center.construction = malloc(sizeof(Carc_Construction));
-        //printf("node cons 12 created in %p\n",tile->center.construction);
-    return tile;
 }
 
 CT_Locations CT_get_location_from_string(char* loc){
@@ -155,6 +131,33 @@ void CT_set_node_type(Carc_Tile* tile,CT_Locations loc, Carc_Construction_Type t
     node->node_type=type;
 }
 
+Carc_Tile_Node* CT_new_node(Carc_Construction_Type type, Carc_Construction* cons){
+    Carc_Tile_Node* node=NULL;
+    while(node==NULL){
+        node = malloc(sizeof(Carc_Construction));
+    }
+    node->node_type = type;
+    node->construction = cons;
+    return node;
+}
+
+Carc_Tile* CT_new_empty_tile(){
+    int i=0, j=0;
+    Carc_Tile* tile =  NULL;
+    while(tile==NULL){
+        tile = malloc(sizeof(*tile));
+    }
+    for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
+        tile->center_connexions[i]=0;
+        tile->border[i].construction = NULL;
+        for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
+            tile->border_connexions[i][j]=0;
+        }
+    }
+    tile->center.construction = NULL;
+    return tile;
+}
+
 Carc_Tile* CT_new_tile_from_file(char* filename){
     FILE* tile_file = fopen(filename, "r");
     Carc_Tile* tile = CT_new_empty_tile();
@@ -164,29 +167,15 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
     int on_new_node_line=1,
         on_node_type_line=0,
         on_neighbors_line=0,
-        node_type_len=10,
-        cur_loc_len=4,
-        cur_neigh_len=4,
+        node_type_len=20,
+        cur_loc_len=3,
+        cur_neigh_len=3,
         i=0;
-    char *cur_loc=NULL,
-         *node_type=NULL,
-         *cur_neighbor=NULL,
+    char cur_loc[20],
+         node_type[3],
+         cur_neighbor[3],
          cur_char = EOF;
 
-
-    cur_loc = malloc(cur_loc_len*sizeof(char));
-    node_type = malloc(cur_neigh_len*sizeof(char));
-    cur_neighbor = malloc(node_type_len*sizeof(char));
-
-    while(cur_loc==NULL){
-        cur_loc = malloc(cur_loc_len*sizeof(char));
-    }
-    while(node_type==NULL){
-        node_type = malloc(cur_neigh_len*sizeof(char));
-    }
-    while(cur_neighbor==NULL){
-        cur_neighbor = malloc(node_type_len*sizeof(char));
-    }
     for(i=0;i<cur_loc_len;i++){cur_loc[i] = '\0';}
     for(i=0;i<cur_neigh_len;i++){cur_neighbor[i] = '\0';}
     for(i=0;i<node_type_len;i++){node_type[i] = '\0';}
@@ -323,9 +312,6 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
         }
     }while(cur_char!=EOF);
 
-    free(cur_loc);
-    free(node_type);
-    free(cur_neighbor);
     fclose(tile_file);
     return tile;
 }

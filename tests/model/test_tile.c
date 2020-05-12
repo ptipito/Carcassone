@@ -4,10 +4,29 @@ void test_tile_display_tile(Carc_Tile tile){
     display_tile(tile);
 }
 
+void test_tile_new_empty_tile(){
+    printf("test CT_new_empty_tile results: ");
+    int result=1, i=0, j=0;
+    Carc_Tile* tile = CT_new_empty_tile();
+    for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
+        if(tile->center_connexions[i]!=0 || tile->border[i].construction == NULL)
+            result=0;
+
+        for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
+            if(tile->border_connexions[i][j]!=0){
+                result = 0;
+            }
+        }
+    }
+    if(tile->center.construction == NULL)
+        result = 0;
+    printf("%d",result);
+}
+
 void test_tile_parse_tile_file(){
+    printf("test_tile_parse_tile_file: \n");
     Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     Carc_Tile* tile2 = CT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt");
-    printf("test_tile_parse_tile_file:\n");
     printf("*******display start tile*******\n");
     display_tile(*tile);
     printf("\n*******display cloister_path tile*******\n");
@@ -17,8 +36,8 @@ void test_tile_parse_tile_file(){
 }
 
 void test_tile_turn_tile(){
-    Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     printf("test_tile_turn_tile:\n");
+    Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     display_tile(*tile);
 
     printf("\tTURN RIGHT\n");
@@ -45,6 +64,7 @@ void test_tile_turn_tile(){
 }
 
 void test_tile_tile_cmp(){
+    printf("test_tile_cmp resutls: ");
     Carc_Tile *t1 = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt"),
               *t2 = CT_new_empty_tile();
     Carc_Tile t3 = *t1,
@@ -58,47 +78,31 @@ void test_tile_tile_cmp(){
     int test4 = CT_tile_cmp(t1,&t4);
     int test5 = CT_tile_cmp(NULL,NULL);
     int test6 = CT_tile_cmp(t1,NULL);
-    printf("test_tile_cmp resutls: %d%d%d%d%d%d",test1==0,test2==1,test3==1,test4==1,test5==0,test6==1);
+    printf("%d%d%d%d%d%d",test1==0,test2==1,test3==1,test4==1,test5==0,test6==1);
     CT_Free_Tile(t1);
     CT_Free_Tile(t2);
 
 }
 
-void test_tile_new_empty_tile(){
-    int result=1, i=0, j=0;
-    Carc_Tile* tile = CT_new_empty_tile();
-    for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
-        if(tile->center_connexions[i]!=0 || tile->border[i].construction == NULL)
-            result=0;
-
-        for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
-            if(tile->border_connexions[i][j]!=0)
-                result = 0;;
-        }
-    }
-    if(tile->center.construction == NULL)
-        result = 0;;
-    printf("test CT_new_empty_tile results: %d",result);
-}
 
 void test_tile_CT_new_node(){
+    printf("test_CT_new_node_results: ");
     Carc_Construction *city = CC_new_city(1,0,CCM_NONE);
     Carc_Construction *path = CC_new_path(1);
-    Carc_Tile_Node node = CT_new_node(CCT_CITY, city);
+    Carc_Tile_Node* node = CT_new_node(CCT_CITY, city);
 
-    printf("test_CT_new_node_results: ");
-    printf("%d",node.node_type == CCT_CITY && CC_construction_cmp(node.construction, CCT_CITY, city, CCT_CITY)==0);
+    printf("%d",node->node_type == CCT_CITY && CC_construction_cmp(node->construction, CCT_CITY, city, CCT_CITY)==0);
 
     node = CT_new_node(CCT_CITY, city);
-    printf("%d",node.node_type == CCT_CITY && CC_construction_cmp(node.construction, CCT_PATH, path, CCT_PATH)==0);
+    printf("%d",node->node_type == CCT_CITY && CC_construction_cmp(node->construction, CCT_PATH, path, CCT_PATH)==0);
 }
 
 void test_tile_get_node_from_loc(){
+    printf("test_get_node_from_loc results: ");
     Carc_Tile* tile = CT_new_tile_from_file("ressources/gamest/tiles/tile1.txt");
     CT_Locations loc = CTL_NORTH_WEST;
     Carc_Tile_Node* node = CT_get_node_from_loc(tile,loc);
     Carc_Tile_Node* node2 = CT_get_node_from_loc(tile,CTL_CENTER);
-    printf("test_get_node_from_loc results: ");
     printf("%d",CT_tile_node_cmp(tile->border[loc],*node2)!=0);
     printf("%d",CT_tile_node_cmp(tile->border[loc],*node)==0);
     loc = CTL_NORTH;
@@ -217,10 +221,10 @@ void test_tile_set_single_connexion(){
 }
 
 void test_tiles_connect_in(){
+    printf("test_tile_connect_in results: ");
     Carc_Tile *tile1 = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt"),
               *tile2 = CT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt");
 
-    printf("test_tile_connect_in results: ");
     printf("%d",CT_Tiles_connect_in(*tile1,CTL_WEST,*tile1,CTL_EAST)==1);
     printf("%d",CT_Tiles_connect_in(*tile1,CTL_SOUTH,*tile1,CTL_NORTH)==0);
     printf("%d",CT_Tiles_connect_in(*tile1,CTL_WEST_SOUTH,*tile1,CTL_EAST_SOUTH)==1);
@@ -232,6 +236,7 @@ void test_tiles_connect_in(){
 
     CT_Free_Tile(tile1);
     CT_Free_Tile(tile2);
+    printf("end test\n");
 }
 
 void test_tile_run_all(){

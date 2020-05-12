@@ -2,7 +2,10 @@
 
 Carc_Construction* CC_new_city(int has_flag, int is_cathedral, Carc_City_Merchandise merch_type){
     Carc_City city;
-    Carc_Construction *construct = (Carc_Construction*) malloc(sizeof(Carc_Construction));
+    Carc_Construction *construct = NULL;
+    while(construct==NULL){
+        construct = (Carc_Construction*) malloc(sizeof(Carc_Construction));
+    }
 
     city.has_flag = has_flag;
     city.is_cathedral = is_cathedral;
@@ -15,7 +18,10 @@ Carc_Construction* CC_new_city(int has_flag, int is_cathedral, Carc_City_Merchan
 
 Carc_Construction* CC_new_path(int has_lake){
     Carc_Path path;
-    Carc_Construction *construct = (Carc_Construction*) malloc(sizeof(Carc_Construction));
+    Carc_Construction *construct = NULL;
+    while(construct==NULL){
+        construct = (Carc_Construction*) malloc(sizeof(Carc_Construction));
+    }
     path.has_lake = has_lake;
     construct->path = path;
     return construct;
@@ -23,7 +29,10 @@ Carc_Construction* CC_new_path(int has_lake){
 
 Carc_Construction* CC_new_garden(){
     Carc_Garden garden;
-    Carc_Construction *construct = (Carc_Construction*) malloc(sizeof(Carc_Construction));
+    Carc_Construction *construct = NULL;
+    while(construct==NULL){
+        construct = (Carc_Construction*) malloc(sizeof(Carc_Construction));
+    }
     garden.field_occupied = 0;
     garden.garden_occupied = 0;
     construct->garden = garden;
@@ -33,6 +42,9 @@ Carc_Construction* CC_new_garden(){
 int CC_construction_cmp(Carc_Construction* c1, Carc_Construction_Type type_c1, Carc_Construction* c2, Carc_Construction_Type type_c2){
     if(type_c1!=type_c2){
         return 1;
+    }
+    if(c1==NULL || c2==NULL){
+        return !(c1==c2);
     }
     switch(type_c1){
         case CCT_PATH:
