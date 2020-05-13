@@ -9,7 +9,7 @@ void test_tile_new_empty_tile(){
     int result=1, i=0, j=0;
     Carc_Tile* tile = CT_new_empty_tile();
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
-        if(tile->center_connexions[i]!=0 || tile->border[i].construction == NULL)
+        if(tile->center_connexions[i]!=0 || tile->border[i].construction != NULL)
             result=0;
 
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
@@ -18,7 +18,7 @@ void test_tile_new_empty_tile(){
             }
         }
     }
-    if(tile->center.construction == NULL)
+    if(tile->center.construction != NULL)
         result = 0;
     printf("%d",result);
 }
@@ -84,7 +84,6 @@ void test_tile_tile_cmp(){
 
 }
 
-
 void test_tile_CT_new_node(){
     printf("test_CT_new_node_results: ");
     Carc_Construction *city = CC_new_city(1,0,CCM_NONE);
@@ -99,7 +98,7 @@ void test_tile_CT_new_node(){
 
 void test_tile_get_node_from_loc(){
     printf("test_get_node_from_loc results: ");
-    Carc_Tile* tile = CT_new_tile_from_file("ressources/gamest/tiles/tile1.txt");
+    Carc_Tile* tile = CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt");
     CT_Locations loc = CTL_NORTH_WEST;
     Carc_Tile_Node* node = CT_get_node_from_loc(tile,loc);
     Carc_Tile_Node* node2 = CT_get_node_from_loc(tile,CTL_CENTER);
