@@ -30,8 +30,8 @@ typedef struct {
 
 
 typedef struct Carc_Tile {
-    Carc_Tile_Node border[TILE_NR_BORDER_LOCATIONS];
     CT_Locations border_connexions[TILE_NR_BORDER_LOCATIONS][TILE_NR_BORDER_LOCATIONS];
+    Carc_Tile_Node border[TILE_NR_BORDER_LOCATIONS];
     Carc_Tile_Node center;
     CT_Locations center_connexions[TILE_NR_BORDER_LOCATIONS];
 } Carc_Tile;
@@ -43,8 +43,12 @@ Carc_Construction_Type CT_get_node_type_from_str(char*);
 void CT_turn(Carc_Tile*, CT_Turn_Type);
 int CT_Tiles_connect_in(Carc_Tile, CT_Locations, Carc_Tile, CT_Locations);
 void CT_Free_Tile(Carc_Tile*);
-int CT_tile_cmp(Carc_Tile, Carc_Tile);
+int CT_tile_cmp(Carc_Tile*, Carc_Tile*);
 int CT_tile_node_cmp(Carc_Tile_Node, Carc_Tile_Node);
 void display_tile(Carc_Tile);
+Carc_Tile_Node* CT_new_node(Carc_Construction_Type, Carc_Construction*);
+Carc_Tile_Node* CT_get_node_from_loc(Carc_Tile*,CT_Locations);
+Carc_City_Merchandise CT_parse_merchandise(char);
+void CT_set_single_connexion(Carc_Tile*, CT_Locations, CT_Locations);
 
 #endif // DEF_CARC_TILE

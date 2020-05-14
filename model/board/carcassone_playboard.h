@@ -28,17 +28,20 @@ typedef struct Carc_Playboard_Origin{
 } Carc_Playboard_Origin;
 
 
-Carc_Playboard_Node* CP_create_playboard(Carc_Tile*);
 Carc_Playboard_Node* CP_new_playboard_node(Carc_Tile*, Carc_Playboard_Location);
 int CP_connect_is_possible(Carc_Playboard_Node*, CP_Connect_Side, Carc_Playboard_Node*);
 Carc_Playboard_Location CP_Location_new(int, int);
 int CP_Location_cmp(Carc_Playboard_Location, Carc_Playboard_Location);
 void CP_free_playboard_node(Carc_Playboard_Node*);
 void CP_display_playboard_node(Carc_Playboard_Node);
-Carc_Playboard_Origin* CP_new_playboard_origin(Carc_Playboard_Node*);
+Carc_Playboard_Origin* CP_init_playboard(Carc_Tile*);
 CP_Connect_Side CP_get_opposite_side(CP_Connect_Side);
 CP_Connect_Side CP_get_opposite_side(CP_Connect_Side);
 Carc_Playboard_Location CP_get_neighbor_loc(Carc_Playboard_Location, CP_Connect_Side);
-Carc_Playboard_Node* CP_create_neigh_for(Carc_Playboard_Node*, CP_Connect_Side);
+Carc_Playboard_Node* CP_create_rim_neigh_for(Carc_Playboard_Node*, CP_Connect_Side);
+Carc_Playboard_Node* CP_new_empty_playboard_node(Carc_Playboard_Location);
+int CP_node_cmp(Carc_Playboard_Node*, Carc_Playboard_Node*);
+void CP_free_playboard(Carc_Playboard_Origin*);
+int CP_node_is_empty(Carc_Playboard_Node);
 
 #endif // DEF_CARCASSONE_PLAYBOARD
