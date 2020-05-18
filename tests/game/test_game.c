@@ -1,4 +1,4 @@
-#include "tests/model/test_game.h"
+#include "tests/game/test_game.h"
 
 void test_game_initiate(){
     printf("test_game_initiate results: ");
