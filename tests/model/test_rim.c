@@ -134,13 +134,6 @@ void test_rim_initiate(){
     node->node_coordinates = CP_Location_new(12,65);
 }
 
-void test_rim_to_playboard_update_one_side(){
-    Carc_Playboard_Origin *playbiard_origin = CP_init_playboard(CT_new_tile_from_file("ressources/gameset/tiles/tile1.txt"));
-    CP_initiate_Rim(playbiard_origin);
-
-
-}
-
 void test_rim_run_all(){
     test_rim_new_empty();
     printf("\n**********************************************\n");
