@@ -1,39 +1,39 @@
 #include "model/board/tile.h"
 
-void CT_Free_Node(Carc_Tile_Node* node){
+void CBT_free_node(Carc_Tile_Node* node){
     if(node!=NULL){
         Carc_Construction* tofree=node->construction;
         free(tofree);
     }
 }
 
-Carc_Tile_Node* CT_get_node_from_loc(Carc_Tile* tile, CT_Locations loc){
+Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile* tile, Carc_Tile_Location loc){
     if(loc == CTL_CENTER)
         return &(tile->center);
     return &(tile->border[loc]);
 }
 
-void CT_Free_Tile(Carc_Tile* tile){
+void CBT_free_tile(Carc_Tile* tile){
     if(tile!=NULL){
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_WEST));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_NORTH_EAST));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_NORTH));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_EAST_SOUTH));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_EAST));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_SOUTH_WEST));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_SOUTH));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_WEST_NORTH));
-        CT_Free_Node(CT_get_node_from_loc(tile, CTL_CENTER));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_NORTH_WEST));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_NORTH));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_NORTH_EAST));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_EAST_NORTH));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_EAST));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_EAST_SOUTH));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_SOUTH_EAST));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_SOUTH));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_SOUTH_WEST));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_WEST_SOUTH));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_WEST));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_WEST_NORTH));
+        CBT_free_node(CBT_get_node_from_loc(tile, CTL_CENTER));
     }
     free(tile);
 }
 
-CT_Locations CT_get_location_from_string(char* loc){
-    CT_Locations result=CTL_CENTER;
+Carc_Tile_Location CBT_get_location_from_string(char* loc){
+    Carc_Tile_Location result=CTL_CENTER;
     if(strcmp(loc,"C")==0){
         result = CTL_CENTER;
     }
@@ -76,25 +76,25 @@ CT_Locations CT_get_location_from_string(char* loc){
     return result;
 }
 
-Carc_Construction_Type CT_get_node_type_from_str(char* type){
-    Carc_Construction_Type result=CCT_FIELD;
+Carc_Construction_Type CBT_get_node_type_from_str(char* type){
+    Carc_Construction_Type result=CCBT_FIELD;
     if(strcmp(type,"path")==0)
-        result = CCT_PATH;
+        result = CCBT_PATH;
     if(strcmp(type,"path_end")==0)
-        result = CCT_PATH_END;
+        result = CCBT_PATH_END;
     if(strcmp(type,"city")==0)
-        result = CCT_CITY;
+        result = CCBT_CITY;
     if(strcmp(type,"cloister")==0)
-        result = CCT_CLOISTER;
+        result = CCBT_CLOISTER;
     if(strcmp(type,"garden")==0)
-        result = CCT_GARDEN;
+        result = CCBT_GARDEN;
     if(strcmp(type,"field")==0)
-        result = CCT_FIELD;
+        result = CCBT_FIELD;
 
     return result;
 }
 
-Carc_City_Merchandise CT_parse_merchandise(char c){
+Carc_City_Merchandise CBT_parse_merchandise(char c){
     switch(c){
         case 'c':
             return CCM_CORN;
@@ -107,12 +107,12 @@ Carc_City_Merchandise CT_parse_merchandise(char c){
     }
 }
 
-void CT_set_node_const(Carc_Tile* tile, CT_Locations loc, Carc_Construction* construct){
-    Carc_Tile_Node* node = CT_get_node_from_loc(tile,loc);
+void CBT_set_node_const(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Construction* construct){
+    Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
     node->construction = construct;
 }
 
-void CT_set_single_connexion(Carc_Tile* tile, CT_Locations loc, CT_Locations neighbor_loc){
+void CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile_Location neighbor_loc){
     if(loc == neighbor_loc){
         return; //no connexion to self is possible
     }
@@ -126,12 +126,12 @@ void CT_set_single_connexion(Carc_Tile* tile, CT_Locations loc, CT_Locations nei
     }
 }
 
-void CT_set_node_type(Carc_Tile* tile,CT_Locations loc, Carc_Construction_Type type){
-    Carc_Tile_Node* node = CT_get_node_from_loc(tile, loc);
+void CBT_set_node_type(Carc_Tile* tile,Carc_Tile_Location loc, Carc_Construction_Type type){
+    Carc_Tile_Node* node = CBT_get_node_from_loc(tile, loc);
     node->node_type=type;
 }
 
-Carc_Tile_Node* CT_new_node(Carc_Construction_Type type, Carc_Construction* cons){
+Carc_Tile_Node* CBT_new_node(Carc_Construction_Type type, Carc_Construction* cons){
     Carc_Tile_Node* node=NULL;
     while(node==NULL){
         node = malloc(sizeof(Carc_Construction));
@@ -141,7 +141,7 @@ Carc_Tile_Node* CT_new_node(Carc_Construction_Type type, Carc_Construction* cons
     return node;
 }
 
-Carc_Tile* CT_new_empty_tile(){
+Carc_Tile* CBT_new_empty_tile(){
     int i=0, j=0;
     Carc_Tile* tile =  NULL;
     while(tile==NULL){
@@ -158,10 +158,10 @@ Carc_Tile* CT_new_empty_tile(){
     return tile;
 }
 
-Carc_Tile* CT_new_tile_from_file(char* filename){
+Carc_Tile* CBT_new_tile_from_file(char* filename){
     FILE* tile_file = fopen(filename, "r");
-    Carc_Tile* tile = CT_new_empty_tile();
-    CT_Locations loc, neighbor_loc;
+    Carc_Tile* tile = CBT_new_empty_tile();
+    Carc_Tile_Location loc, neighbor_loc;
     Carc_Construction_Type type;
     Carc_Construction *cur_const=NULL;
     int on_new_node_line=1,
@@ -205,29 +205,29 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
                 cur_char = fgetc(tile_file);
             }
             node_type[i] = '\0';
-            type = CT_get_node_type_from_str(node_type);
-            CT_set_node_type(tile,loc,type);
+            type = CBT_get_node_type_from_str(node_type);
+            CBT_set_node_type(tile,loc,type);
             //Set node construction
             switch(type){
-                case CCT_CITY:
-                    cur_const = CC_new_city(0,0,CCM_NONE);
+                case CCBT_CITY:
+                    cur_const = CBC_new_city(0,0,CCM_NONE);
                     break;
-                case CCT_PATH:
-                    cur_const = CC_new_path(0);
+                case CCBT_PATH:
+                    cur_const = CBC_new_path(0);
                     break;
-                case CCT_GARDEN:
-                    cur_const = CC_new_garden();
+                case CCBT_GARDEN:
+                    cur_const = CBC_new_garden();
                     break;
                 default:
                     cur_const = NULL;
                     break;
             }
-            CT_set_node_const(tile, loc, cur_const);
+            CBT_set_node_const(tile, loc, cur_const);
             //Parse node options (if any)
             while(cur_char!='\n' && cur_char != EOF){
                 cur_char = fgetc(tile_file);//on first iteration, this fast pass the first ' ' before the options list
                 switch(type){
-                    case CCT_CITY:
+                    case CCBT_CITY:
                         switch(cur_char){
                             case ' ':
                                 //separate 2 options. Do nothing
@@ -243,13 +243,13 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
                                 cur_char = fgetc(tile_file);
                                 if(isalpha(cur_char)){
                                     //cur_char is supposed to be a letter representing the merchandise. Loop for parsing security
-                                    cur_const->city.merchandise = CT_parse_merchandise(cur_char);
+                                    cur_const->city.merchandise = CBT_parse_merchandise(cur_char);
                                 }
                             default:
                                 break;
                         }
                         break;
-                    case CCT_PATH:
+                    case CCBT_PATH:
                         switch(cur_char){
                             case 'l':
                                 cur_const->path.has_lake = 1;
@@ -284,8 +284,8 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
                     }
                     if(i!=0){//i=0->no neighbor selected
                         cur_neighbor[i] = '\0';
-                        neighbor_loc = CT_get_location_from_string(cur_neighbor);
-                        CT_set_single_connexion(tile, loc, neighbor_loc);
+                        neighbor_loc = CBT_get_location_from_string(cur_neighbor);
+                        CBT_set_single_connexion(tile, loc, neighbor_loc);
                         i=0;//reset index for the potential next neighbor
                     }
                 }
@@ -295,7 +295,7 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
         if(cur_char=='\n'){
             if(on_new_node_line){
                 cur_loc[i] = '\0';
-                loc = CT_get_location_from_string(cur_loc);
+                loc = CBT_get_location_from_string(cur_loc);
                 on_new_node_line = 0;
                 on_node_type_line = 1;
                 on_neighbors_line = 0;
@@ -316,18 +316,18 @@ Carc_Tile* CT_new_tile_from_file(char* filename){
     return tile;
 }
 
-void CT_turn(Carc_Tile *tile, CT_Turn_Type dir){
+void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
     Carc_Tile entry_tile = *tile;
     int transposition_factor=TILE_NR_LOCATIONS_ON_ONE_EDGE,
         previous_location;
     int i=0, j=0;
     switch(dir){
-        case RIGHT:
+        case CCT_RIGHT:
             break;
-        case LEFT:
+        case CCT_LEFT:
             transposition_factor = -transposition_factor;
             break;
-        case UPDOWN:
+        case CCT_UPDOWN:
             transposition_factor *= 2;
             break;
     }
@@ -345,32 +345,32 @@ void CT_turn(Carc_Tile *tile, CT_Turn_Type dir){
     }
 }
 
-int CT_Tiles_connect_in(Carc_Tile t1, CT_Locations t1_node_loc, Carc_Tile t2, CT_Locations t2_node_loc){
-    Carc_Tile_Node *node_t1 = CT_get_node_from_loc(&t1, t1_node_loc),
-                   *node_t2 = CT_get_node_from_loc(&t2, t2_node_loc);
+int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile t2, Carc_Tile_Location t2_node_loc){
+    Carc_Tile_Node *node_t1 = CBT_get_node_from_loc(&t1, t1_node_loc),
+                   *node_t2 = CBT_get_node_from_loc(&t2, t2_node_loc);
 
     if(node_t1->node_type == node_t2->node_type)
         return 1;
-    if((node_t1->node_type == CCT_GARDEN && node_t2->node_type == CCT_FIELD)
-       || (node_t1->node_type == CCT_FIELD && node_t2->node_type == CCT_GARDEN))
+    if((node_t1->node_type == CCBT_GARDEN && node_t2->node_type == CCBT_FIELD)
+       || (node_t1->node_type == CCBT_FIELD && node_t2->node_type == CCBT_GARDEN))
         return 1;
 
     return 0;
 }
 
-int CT_tile_node_cmp(Carc_Tile_Node n1, Carc_Tile_Node n2){
-    return CC_construction_cmp(n1.construction,n1.node_type,n2.construction,n2.node_type);
+int CBT_tile_node_cmp(Carc_Tile_Node n1, Carc_Tile_Node n2){
+    return CBC_construction_cmp(n1.construction,n1.node_type,n2.construction,n2.node_type);
 }
 
-int CT_tile_cmp(Carc_Tile* t1, Carc_Tile* t2){
+int CBT_tile_cmp(Carc_Tile* t1, Carc_Tile* t2){
     //TODO include comparison on rotations
     int result, i=0, j=0;
     if(t1==NULL || t2 == NULL){
         result = !(t1==t2);
     } else{
-        result = CT_tile_node_cmp(t1->center,t2->center);
+        result = CBT_tile_node_cmp(t1->center,t2->center);
         while(result==0 && i<TILE_NR_BORDER_LOCATIONS){
-            result = CT_tile_node_cmp(t1->border[i],t2->border[i]);
+            result = CBT_tile_node_cmp(t1->border[i],t2->border[i]);
             i++;
         }
 
@@ -393,7 +393,7 @@ int CT_tile_cmp(Carc_Tile* t1, Carc_Tile* t2){
     return result;
 }
 
-void display_tile(Carc_Tile tile){
+void CBT_display_tile(Carc_Tile tile){
     //TODO display the connections between vertical corners
     //Print north edge
     printf(" ");

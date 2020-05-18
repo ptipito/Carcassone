@@ -7,7 +7,7 @@
 #define MAX_PAWNS_PER_PLAYER 8
 
 typedef enum {PLAYER_1, PLAYER_2, PLAYER_3, PLAYER_4, PLAYER_5} Carc_Player_ID;
-typedef enum {BLUE, YELLOW, RED, BLACK, GREEN} Carc_Player_Color;
+typedef enum {CPC_BLUE, CPC_YELLOW, CPC_RED, CPC_BLACK, CPC_GREEN} Carc_Player_Color;
 typedef enum {PAWN_NORMAL, PAWN_BISHOP, PAWN_ARCHITECT, PAWN_DOUBLE, PAWN_PIG} Carc_Pawn_Type;
 
 typedef struct {

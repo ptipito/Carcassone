@@ -1,6 +1,6 @@
 #include "model/board/constructions.h"
 
-Carc_Construction* CC_new_city(int has_flag, int is_cathedral, Carc_City_Merchandise merch_type){
+Carc_Construction* CBC_new_city(int has_flag, int is_cathedral, Carc_City_Merchandise merch_type){
     Carc_City city;
     Carc_Construction *construct = NULL;
     while(construct==NULL){
@@ -16,7 +16,7 @@ Carc_Construction* CC_new_city(int has_flag, int is_cathedral, Carc_City_Merchan
     return construct;
 }
 
-Carc_Construction* CC_new_path(int has_lake){
+Carc_Construction* CBC_new_path(int has_lake){
     Carc_Path path;
     Carc_Construction *construct = NULL;
     while(construct==NULL){
@@ -27,7 +27,7 @@ Carc_Construction* CC_new_path(int has_lake){
     return construct;
 }
 
-Carc_Construction* CC_new_garden(){
+Carc_Construction* CBC_new_garden(){
     Carc_Garden garden;
     Carc_Construction *construct = NULL;
     while(construct==NULL){
@@ -39,7 +39,7 @@ Carc_Construction* CC_new_garden(){
     return construct;
 }
 
-int CC_construction_cmp(Carc_Construction* c1, Carc_Construction_Type type_c1, Carc_Construction* c2, Carc_Construction_Type type_c2){
+int CBC_construction_cmp(Carc_Construction* c1, Carc_Construction_Type type_c1, Carc_Construction* c2, Carc_Construction_Type type_c2){
     if(type_c1!=type_c2){
         return 1;
     }
@@ -47,12 +47,12 @@ int CC_construction_cmp(Carc_Construction* c1, Carc_Construction_Type type_c1, C
         return !(c1==c2);
     }
     switch(type_c1){
-        case CCT_PATH:
+        case CCBT_PATH:
             if(c1->path.has_lake == c2->path.has_lake)
                 return 0;
             else
                 return 1;
-        case CCT_CITY:
+        case CCBT_CITY:
             if( c1->city.has_flag == c2->city.has_flag
                 && c1->city.is_cathedral == c2->city.is_cathedral
                 && c1->city.merchandise == c2->city.merchandise){
@@ -60,7 +60,7 @@ int CC_construction_cmp(Carc_Construction* c1, Carc_Construction_Type type_c1, C
             } else{
                 return 1;
             }
-        case CCT_GARDEN:
+        case CCBT_GARDEN:
             //The fields in garden do not impact the equality of all gardens
             return 0;
         default:

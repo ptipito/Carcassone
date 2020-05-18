@@ -6,12 +6,12 @@
 #include "model/board/tile.h"
 
 int test_initial_tile_creation();
-void test_display_tile();
+void test_CBT_display_tile();
 void test_parse_tile_file();
 void test_tile_tile_cmp();
 void test_turn_tile();
 void test_new_empty_tile();
-void test_CT_new_node();
+void test_CBT_new_node();
 void test_get_node_from_loc();
 void test_tile_get_loc_from_str();
 void test_tile_get_node_type_from_str();
