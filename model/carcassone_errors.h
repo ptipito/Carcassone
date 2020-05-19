@@ -8,7 +8,8 @@ typedef enum Carcassone_Error {
     ERR_SDL_INIT,
     ERR_WINDOW_INIT,
     ERR_WINDOW_SURFACE,
-    ERR_MEM_ALLOC
+    ERR_MEM_ALLOC,
+    ERR_STR_BUFFER_LENGTH
 } Carcassone_Error;
 
 

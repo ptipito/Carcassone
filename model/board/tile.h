@@ -4,13 +4,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <string.h>
 #include "model/board/constructions.h"
 #include "utils.h"
+#include "model/carcassone_errors.h"
 
 #define TILE_NR_BORDER_LOCATIONS 12
 #define TILE_NR_EDGES 4
 #define TILE_NR_LOCATIONS_ON_ONE_EDGE 3
 #define TILE_NR_LOCATIONS 3
+#define TILE_FOLDER "ressources/gameset/tiles/"
+#define TILE_FULL_PATH_MAX_LEN 50
 
 //Possible locations on a tile. Each corner is represented by 2 locations to take into account city borders
 typedef enum {CTL_NORTH_WEST, CTL_NORTH, CTL_NORTH_EAST,
@@ -53,5 +57,6 @@ Carc_City_Merchandise CBT_parse_merchandise(char);
 void CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location);
 void CBT_set_node_const(Carc_Tile*, Carc_Tile_Location, Carc_Construction*);
 void CBT_set_node_type(Carc_Tile*,Carc_Tile_Location, Carc_Construction_Type);
+char* CT_get_tile_file_path(char*);
 
 #endif // DEF_CARC_TILE

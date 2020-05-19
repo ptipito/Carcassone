@@ -1,5 +1,17 @@
 #include "model/board/tile.h"
 
+char* CT_get_tile_file_path(char* tile_name){
+    if(strlen(TILE_FOLDER)+strlen(tile_name) > TILE_FULL_PATH_MAX_LEN){
+        fprintf(stderr,"CT_get_tile_file_path error: tile path too long for %s%s\n",TILE_FOLDER,tile_name);
+        exit(ERR_STR_BUFFER_LENGTH);
+    }
+    char* full_path = malloc((TILE_FULL_PATH_MAX_LEN+1)*sizeof(char));//Add an extra char for '\0'
+    full_path[TILE_FULL_PATH_MAX_LEN]='\0';
+    strncpy(full_path,TILE_FOLDER,TILE_FULL_PATH_MAX_LEN);
+    strncat(full_path,tile_name,TILE_FULL_PATH_MAX_LEN - strlen(full_path));
+    return full_path;
+}
+
 void CBT_free_node(Carc_Tile_Node* node){
     if(node!=NULL){
         Carc_Construction* tofree=node->construction;
