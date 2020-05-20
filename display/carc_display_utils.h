@@ -12,15 +12,15 @@
 #define VIEW_CONTROL_FOLDER "ressources/images/"
 #define VIEW_PAWN_FOLDER "ressources/images/"
 
-typedef enum Tile_Size {SMALL_TILE, MEDIUM_TILE, BIG_TILE} Tile_Size;
-typedef enum View_Type {VT_CONTROL, VT_TILE, VT_PAWN} View_Type;
+typedef enum Carc_Tile_Size {SMALL_TILE, MEDIUM_TILE, BIG_TILE} Carc_Tile_Size;
+typedef enum Carc_Utils_View_Type {VT_CONTROL, VT_TILE, VT_PAWN} Carc_Utils_View_Type;
 
-SDL_Rect get_centering_pos(SDL_Surface*, SDL_Surface*);
-SDL_Window* initialize_window();
-void Quit(SDL_Window*);
-int get_tile_size_in_pixels(Tile_Size);
-SDL_Rect get_slot_upper_left(int, int, Tile_Size);
-int pos_in_surface(SDL_Rect, SDL_Surface);
-SDL_Surface* get_view(View_Type, char*);
+SDL_Rect CDUtils_get_centering_pos(SDL_Surface*, SDL_Surface*);
+SDL_Window* CDUtils_initialize_window();
+void CDUtils_quit_sdl(SDL_Window*);
+int CDUtils_get_tile_size_in_pixels(Carc_Tile_Size);
+SDL_Rect CDUtils_get_slot_upper_left(int, int, Carc_Tile_Size);
+int CDUtils_pos_in_surface(SDL_Rect, SDL_Surface);
+SDL_Surface* CDUtils_get_view(Carc_Utils_View_Type, char*);
 
 #endif // DEF_CARC_DISP_UTILS

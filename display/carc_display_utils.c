@@ -1,13 +1,13 @@
 #include "carc_display_utils.h"
 
-SDL_Rect get_centering_pos(SDL_Surface* screen, SDL_Surface* to_center_on_screen){
+SDL_Rect CDUtils_get_centering_pos(SDL_Surface* screen, SDL_Surface* to_center_on_screen){
     SDL_Rect pos;
     pos.x = int_center(screen->w,to_center_on_screen->w);
     pos.y = int_center(screen->h,to_center_on_screen->h);
     return pos;
 }
 
-int get_tile_size_in_pixels(Tile_Size size){
+int CDUtils_get_tile_size_in_pixels(Carc_Tile_Size size){
     int result = 0;
     switch(size){
         case SMALL_TILE:
@@ -23,7 +23,7 @@ int get_tile_size_in_pixels(Tile_Size size){
     return result;
 }
 
-SDL_Window* initialize_window(){
+SDL_Window* CDUtils_initialize_window(){
     SDL_Window *window=NULL;
     if(SDL_Init(SDL_INIT_VIDEO)!=0){
         SDL_Log("Error on SDL init: %s\n",SDL_GetError());
@@ -37,7 +37,7 @@ SDL_Window* initialize_window(){
     return window;
 }
 
-void Quit(SDL_Window* window){
+void CDUtils_quit_sdl(SDL_Window* window){
     if(window!=NULL){
         SDL_DestroyWindow(window);
     }
@@ -46,8 +46,8 @@ void Quit(SDL_Window* window){
 
 //Returns the upper left corner of the slot containing (x,y)
 //(width and height potentially used later for movable map)
-SDL_Rect get_slot_upper_left(int x, int y, Tile_Size tile_size){
-    int block_size=get_tile_size_in_pixels(tile_size);
+SDL_Rect CDUtils_get_slot_upper_left(int x, int y, Carc_Tile_Size tile_size){
+    int block_size=CDUtils_get_tile_size_in_pixels(tile_size);
     SDL_Rect result;
 
     result.x = (x/block_size)*block_size;
@@ -56,7 +56,7 @@ SDL_Rect get_slot_upper_left(int x, int y, Tile_Size tile_size){
     return result;
 }
 
-int pos_in_surface(SDL_Rect pos, SDL_Surface surface){
+int CDUtils_pos_in_surface(SDL_Rect pos, SDL_Surface surface){
     int result=1;
     if(pos.x < 0 || pos.y < 0)
         result = 0;
@@ -66,7 +66,7 @@ int pos_in_surface(SDL_Rect pos, SDL_Surface surface){
     return result;
 }
 
-SDL_Surface* get_view(View_Type type, char* filename){
+SDL_Surface* CDUtils_get_view(Carc_Utils_View_Type type, char* filename){
     char path_of_tile_view[IMAGE_PATH_MAX_LEN+1] = {'\0'};
     int folder_len=0;
     switch(type){

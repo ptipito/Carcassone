@@ -1,7 +1,7 @@
 #include "layout.h"
 
-Layout* new_layout(){
-    Layout* layout = malloc(sizeof(*layout));
+Carc_Layout* CDL_new_layout(){
+    Carc_Layout* layout = malloc(sizeof(*layout));
     layout->window = NULL;
     layout->details_surface = NULL;
     layout->map_surface = NULL;
@@ -14,14 +14,14 @@ Layout* new_layout(){
     return layout;
 }
 
-void initialize_game_layout(SDL_Window *window, Layout* layout){
+void CDL_initialize_game_layout(SDL_Window *window, Carc_Layout* layout){
     SDL_Surface *screen = SDL_GetWindowSurface(window);
     if(screen==NULL){
         SDL_Log("Window screen couldn't be fetched: %s\n",SDL_GetError());
         carcassone_error_quit(ERR_WINDOW_SURFACE,NULL);
     }
     int screen_w=screen->w, screen_h=screen->h;
-    int details_width=4*get_tile_size_in_pixels(MEDIUM_TILE);
+    int details_width=4*CDUtils_get_tile_size_in_pixels(MEDIUM_TILE);
     int map_width=screen_w-details_width;
     SDL_Rect pos, border_pos;
     SDL_Surface *map_surface=NULL,
@@ -49,7 +49,7 @@ void initialize_game_layout(SDL_Window *window, Layout* layout){
     layout->details_pos.x = screen_w - details_width;
 }
 
-void free_layout(Layout *layout){
+void CDL_free_layout(Carc_Layout *layout){
     if(layout!=NULL){
         SDL_FreeSurface(layout->map_surface);
         SDL_FreeSurface(layout->details_surface);
@@ -59,7 +59,7 @@ void free_layout(Layout *layout){
 }
 
 //Function to blit the surface on the layout surface at the dest coordinate
-void blit_on(Layout_Part part, SDL_Surface *surface, SDL_Rect *src, SDL_Rect *dest, Layout *layout){
+void CDL_blit_on(Carc_Layout_Part part, SDL_Surface *surface, SDL_Rect *src, SDL_Rect *dest, Carc_Layout *layout){
     SDL_Surface *screen=NULL,
                 *window_screen=NULL;
     SDL_Rect screen_pos;

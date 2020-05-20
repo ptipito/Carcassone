@@ -2,21 +2,21 @@
 #define DEF_LAYOUT
 #include "display/carc_display_utils.h"
 
-typedef enum Layout_Part {LP_MAP, LP_DETAILS} Layout_Part;
-typedef struct Layout{
+typedef enum Carc_Layout_Part {LP_MAP, LP_DETAILS} Carc_Layout_Part;
+typedef struct Carc_Layout{
     SDL_Window *window;
     //The window is split into two areas: the playboard (or map) and the details area (player pawns, current tile, etc...)
     SDL_Surface *map_surface,
                 *details_surface;
-    int map_details_border_size;
-    SDL_Rect map_pos,//position of map_surface in the window
-             details_pos;//position of the details surface in the window
-    Tile_Size tile_size;//Current zoom display
-} Layout;
+    SDL_Rect map_pos,
+             details_pos;
+    int map_details_border_size;//Border size between both surfaces. The border is drawn on details_surface
+    Carc_Tile_Size tile_size;//Current zoom display
+} Carc_Layout;
 
-Layout* new_layout();
-void initialize_game_layout(SDL_Window*, Layout*);
-void free_layout(Layout*);
-void blit_on(Layout_Part, SDL_Surface*, SDL_Rect*, SDL_Rect*, Layout*);
+Carc_Layout* CDL_new_layout();
+void CDL_initialize_game_layout(SDL_Window*, Carc_Layout*);
+void CDL_free_layout(Carc_Layout*);
+void CDL_blit_on(Carc_Layout_Part, SDL_Surface*, SDL_Rect*, SDL_Rect*, Carc_Layout*);
 
 #endif // DEF_LAYOUT

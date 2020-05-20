@@ -1,7 +1,7 @@
 #include "map_surface.h"
 
-void display_grid(Layout *layout){
-    int tile_size=get_tile_size_in_pixels(layout->tile_size);
+void CDMap_display_grid(Carc_Layout *layout){
+    int tile_size=CDUtils_get_tile_size_in_pixels(layout->tile_size);
     int width = layout->map_surface->w;
     int height = layout->map_surface->h;
     int i=0, cur_coord=0;
@@ -17,7 +17,7 @@ void display_grid(Layout *layout){
     for(i=1;cur_coord<width;i++){
         cur_coord = i*tile_size;
         line_pos.x=cur_coord;
-        blit_on(LP_MAP,vertical_line,NULL,&line_pos,layout);
+        CDL_blit_on(LP_MAP,vertical_line,NULL,&line_pos,layout);
     }
     //Create & Display hoizontal lines
     line_pos.x=0;
@@ -25,7 +25,7 @@ void display_grid(Layout *layout){
     for(i=1;cur_coord<height;i++){
         cur_coord = i*tile_size;
         line_pos.y=cur_coord;
-        blit_on(LP_MAP,horizontal_line,NULL,&line_pos,layout);
+        CDL_blit_on(LP_MAP,horizontal_line,NULL,&line_pos,layout);
     }
 
     SDL_UpdateWindowSurface(layout->window);
@@ -35,9 +35,9 @@ void display_grid(Layout *layout){
     SDL_FreeSurface(vertical_line);
 }
 
-void map_insert_tile(SDL_Surface *surface, int x, int y, Layout *layout){
-    SDL_Rect pos=get_slot_upper_left(x,y,layout->tile_size);
-    if(pos_in_surface(pos, *(layout->map_surface)))
-        blit_on(LP_MAP,surface,NULL,&pos,layout);
+void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout){
+    SDL_Rect pos=CDUtils_get_slot_upper_left(x,y,layout->tile_size);
+    if(CDUtils_pos_in_surface(pos, *(layout->map_surface)))
+        CDL_blit_on(LP_MAP,surface,NULL,&pos,layout);
 }
 
