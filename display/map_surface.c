@@ -17,7 +17,7 @@ void CDMap_display_grid(Carc_Layout *layout){
     for(i=1;cur_coord<width;i++){
         cur_coord = i*tile_size;
         line_pos.x=cur_coord;
-        CDL_blit_on(LP_MAP,vertical_line,NULL,&line_pos,layout);
+        CDMap_blit_on(vertical_line,NULL,&line_pos,layout);
     }
     //Create & Display hoizontal lines
     line_pos.x=0;
@@ -25,7 +25,7 @@ void CDMap_display_grid(Carc_Layout *layout){
     for(i=1;cur_coord<height;i++){
         cur_coord = i*tile_size;
         line_pos.y=cur_coord;
-        CDL_blit_on(LP_MAP,horizontal_line,NULL,&line_pos,layout);
+        CDMap_blit_on(horizontal_line,NULL,&line_pos,layout);
     }
 
     SDL_UpdateWindowSurface(layout->window);
@@ -38,6 +38,9 @@ void CDMap_display_grid(Carc_Layout *layout){
 void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout){
     SDL_Rect pos=CDUtils_get_slot_upper_left(x,y,layout->tile_size);
     if(CDUtils_pos_in_surface(pos, *(layout->map_surface)))
-        CDL_blit_on(LP_MAP,surface,NULL,&pos,layout);
+        CDMap_blit_on(surface,NULL,&pos,layout);
 }
 
+void CDMap_blit_on(SDL_Surface *surface, SDL_Rect *src, SDL_Rect *dest, Carc_Layout *layout){
+    CDL_blit_on(LP_MAP,surface,src,dest,layout);
+}

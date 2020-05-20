@@ -88,4 +88,7 @@ SDL_Surface* CDUtils_get_view(Carc_Utils_View_Type type, char* filename){
     return IMG_Load(path_of_tile_view);
 }
 
-
+void CDUtils_set_rect_coord(SDL_Rect* rect, int x, int y){
+    rect->x = x;
+    rect->y = y;
+}
