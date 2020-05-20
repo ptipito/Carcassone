@@ -223,14 +223,14 @@ void details_show_tile_turn_controls(Layout* layout, SDL_Rect tile_pos){
     SDL_Surface* control = get_view(VT_CONTROL,"turn_left.jpg");
     if(control!=NULL){
         pos.x = tile_pos.x - control->w - padding_with_tile;
-        pos.y += int_center(tile_size,control->h);
+        pos.y = tile_pos.y - control->h/3;//int_center(tile_size,control->h);
         blit_on(LP_DETAILS,control,NULL,&pos,layout);
     }
 
     if(control!=NULL){
         control = get_view(VT_CONTROL,"turn_right.jpg");
         pos.x = tile_pos.x + tile_size + padding_with_tile;
-        pos.y = tile_pos.y + int_center(tile_size,control->h);
+        pos.y = tile_pos.y - control->h/3;// + int_center(tile_size,control->h);
         blit_on(LP_DETAILS,control,NULL,&pos,layout);
     }
 
