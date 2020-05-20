@@ -20,8 +20,7 @@ int main(int argc, char* argv[]){
     SDL_Window* window = CDUtils_initialize_window();
     SDL_Event event;
     int done=0;
-    Carc_Layout* window_layout = CDL_new_layout();
-    CDL_initialize_game_layout(window,window_layout);
+    Carc_Layout* window_layout = CDL_initialize_game_layout(window);
 
     CDMap_display_grid(window_layout);
 
