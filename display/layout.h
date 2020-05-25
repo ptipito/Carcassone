@@ -15,7 +15,7 @@ typedef struct Carc_Layout{
 } Carc_Layout;
 
 Carc_Layout* CDL_new_layout();
-void CDL_initialize_game_layout(SDL_Window*, Carc_Layout*);
+Carc_Layout* CDL_initialize_game_layout(SDL_Window*);
 void CDL_free_layout(Carc_Layout*);
 void CDL_blit_on(Carc_Layout_Part, SDL_Surface*, SDL_Rect*, SDL_Rect*, Carc_Layout*);
 

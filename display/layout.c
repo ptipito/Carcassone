@@ -14,7 +14,8 @@ Carc_Layout* CDL_new_layout(){
     return layout;
 }
 
-void CDL_initialize_game_layout(SDL_Window *window, Carc_Layout* layout){
+Carc_Layout* CDL_initialize_game_layout(SDL_Window *window){
+    Carc_Layout* layout=CDL_new_layout();
     SDL_Surface *screen = SDL_GetWindowSurface(window);
     if(screen==NULL){
         SDL_Log("Window screen couldn't be fetched: %s\n",SDL_GetError());
@@ -47,6 +48,8 @@ void CDL_initialize_game_layout(SDL_Window *window, Carc_Layout* layout){
     layout->map_surface=map_surface;
     layout->details_surface=details_surface;
     layout->details_pos.x = screen_w - details_width;
+
+    return layout;
 }
 
 void CDL_free_layout(Carc_Layout *layout){

@@ -9,7 +9,7 @@
 #include "utils.h"
 #define IMAGE_PATH_MAX_LEN 60
 #define VIEW_TILE_FOLDER "ressources/images/"
-#define VIEW_CONTROL_FOLDER "ressources/images/"
+#define VIEW_CONTROL_FOLDER "ressources/images/details/"
 #define VIEW_PAWN_FOLDER "ressources/images/"
 
 typedef enum Carc_Tile_Size {SMALL_TILE, MEDIUM_TILE, BIG_TILE} Carc_Tile_Size;
