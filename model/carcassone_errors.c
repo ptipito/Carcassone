@@ -13,6 +13,7 @@ int carcassone_error_quit(Carcassone_Error err, SDL_Window *window){
             SDL_Quit();
             break;
         default:
+            SDL_Quit();
             break;
     }
     exit(err);
