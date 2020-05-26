@@ -4,7 +4,6 @@
 #include "model/board/carcassone_playboard.h"
 #include "model/player/player.h"
 
-typedef enum {PAWN_NORMAL, PAWN_BISHOP, PAWN_ARCHITECT, PAWN_DOUBLE, PAWN_PIG} Carc_Pawn_Type;
 
 typedef struct {
     Carc_Pawn_Type type;

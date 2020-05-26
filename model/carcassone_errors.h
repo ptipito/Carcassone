@@ -9,7 +9,8 @@ typedef enum Carcassone_Error {
     ERR_WINDOW_INIT,
     ERR_WINDOW_SURFACE,
     ERR_MEM_ALLOC,
-    ERR_STR_BUFFER_LENGTH
+    ERR_STR_BUFFER_LENGTH,
+    ERR_NB_PLAYERS
 } Carcassone_Error;
 
 

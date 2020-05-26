@@ -1,12 +1,31 @@
 #include "model/game/game.h"
 
-Carc_Game* CGG_initiate_game(char* filename){
+Carc_Game* CGG_initiate_game(char* filename, int nb_players){
     Carc_Game *game = malloc(sizeof(Carc_Game));
+    if(game==NULL){
+        fprintf(stderr,"ERROR: couldn't allocate memory for new game object\n");
+        carcassone_error_quit(ERR_MEM_ALLOC,NULL);
+    }
+    if(nb_players <= 1 || nb_players > NB_MAX_PLAYERS){
+        fprintf(stderr,"ERROR: game cannot be created for %d players. This game must be played by 2 to %d players\n"
+                      ,nb_players, NB_MAX_PLAYERS);
+        return NULL;
+    }
     Carc_Tile *start_tile = CBT_new_tile_from_file(filename);
     Carc_Playboard_Origin *playboard_origin = CBP_init_playboard(start_tile);
+    int i=0;
 
     game->playboard = playboard_origin;
     game->playable = CBRim_initiate(playboard_origin->node);
+
+    game->players[0] = NULL;//Index 0 never used. Only indices from 1 are used, so that they are aligned with player IDs
+    for(i=1;i<=nb_players;i++){
+        game->players[i] = CPPlayer_init_player(i,i-1);//color enum starts at 0 while player id enum starts at 1
+    }
+    //Set non existing players to NULL
+    for(i=nb_players+1;i<=NB_MAX_PLAYERS;i++){
+        game->players[i] = NULL;
+    }
 
     return game;
 }
@@ -15,8 +34,13 @@ void CGG_free_game(Carc_Game* game){
     if(game!=NULL){
         CBP_free_playboard(game->playboard);
         CBRim_free(game->playable);
+        int i;
+        for(i=0;i<=NB_MAX_PLAYERS;i++){
+            CPPlayer_free_player(game->players[i]);
+        }
     }
     free(game);
+    game = NULL;
 }
 
 int CGG_rim_to_playboard_update_one_side(Carc_Rim* rim, Carc_Playboard_Location coord, Carc_Playboard_Node* playboard_node, Carc_Playboard_Connect_Side neighbor_side){

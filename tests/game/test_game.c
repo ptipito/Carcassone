@@ -3,15 +3,16 @@
 void test_game_initiate(){
     printf("test_game_initiate results: ");
     char* start_tile_str = CT_get_tile_file_path("tile1.txt");
-    Carc_Game* game = CGG_initiate_game(start_tile_str);
+    int i, boolean=1;
 
+    //Test playboard and rim init properly
+    Carc_Game* game = CGG_initiate_game(start_tile_str,2);
     Carc_Playboard_Origin* origin = CBP_init_playboard(CBT_new_tile_from_file(start_tile_str));
     printf("%d",CBP_node_cmp(game->playboard->node,origin->node)==0);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,1))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,-1))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(-1,0))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(1,0))!=NULL);
-
     int rim_length = 0;
     Carc_Rim_Element* current = game->playable->first;
     while(current!=NULL){
@@ -21,16 +22,33 @@ void test_game_initiate(){
 
     printf("%d",rim_length==4);
 
+    //Test players init properly
+    printf("%d",game->players!=NULL);
+    for(i=0;i<NB_MAX_PLAYERS;i++){
+        if(i==0 || i > 2){
+            boolean = boolean && game->players[i]==NULL;
+        } else{
+            boolean = boolean && game->players[i]->id==i && game->players[i]->color==i-1;
+        }
+    }
+    printf("%d",boolean);
+
+    //Test creating with invalid number of players
+    printf("\n");
+    printf("%d\n",CGG_initiate_game(start_tile_str,1)==NULL);
+    printf("%d\n",CGG_initiate_game(start_tile_str,0)==NULL);
+    printf("%d\n",CGG_initiate_game(start_tile_str,NB_MAX_PLAYERS+1)==NULL);
+
     CGG_free_game(game);
     free(start_tile_str);
 }
 
 void test_game_rim_to_playboard_update_one_side(){
-    printf("test_game_initiate results: ");
+    printf("test_game_rim_to_playboard_update_one_side results: ");
     int update_result=0;
     char *tile1_path = CT_get_tile_file_path("tile1.txt"),
          *cloister_tile_path = CT_get_tile_file_path("cloister_path.txt");
-    Carc_Game* game = CGG_initiate_game(tile1_path);
+    Carc_Game* game = CGG_initiate_game(tile1_path,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),
                                                           play_in),
@@ -71,10 +89,10 @@ void test_game_rim_to_playboard_update_one_side(){
 }
 
 void test_game_node_transfer_rim_to_playboard(){
-    printf("test_game_initiate results:\n");
+    printf("test_game_node_transfer_rim_to_playboard results:\n");
     int update_result=0;
     char* tile1_path = CT_get_tile_file_path("tile1.txt");
-    Carc_Game* game = CGG_initiate_game(tile1_path);
+    Carc_Game* game = CGG_initiate_game(tile1_path,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt"),
                                                           play_in),
@@ -116,7 +134,7 @@ void test_game_play_tile_in(){
     printf("test_game_play_tile_in results: ");
     char *start_tile_str = CT_get_tile_file_path("tile1.txt"),
          *cloister_tile_str = CT_get_tile_file_path("cloister_path.txt");
-    Carc_Game* game = CGG_initiate_game(start_tile_str);
+    Carc_Game* game = CGG_initiate_game(start_tile_str,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Tile *cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
     Carc_Playboard_Node *origin_node = CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_str),CBP_Location_new(0,0)),
@@ -175,8 +193,8 @@ void test_game_play_tile_in(){
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(-1,-1))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(1,-1))!=NULL);
 
-    CGG_free_game(game);
     CBP_free_playboard_node(game->playboard->node->neighbors[CPCS_DOWN]);//To be removed when CBP_free_playboard is complete
+    CGG_free_game(game);
     CBP_free_playboard_node(origin_node);
     free(start_tile_str);
     free(cloister_tile_str);
