@@ -1,4 +1,4 @@
-#include "tests/model/test_tile.h"
+#include "tests/board/test_tile.h"
 
 void test_tile_CBT_display_tile(Carc_Tile tile){
     CBT_display_tile(tile);

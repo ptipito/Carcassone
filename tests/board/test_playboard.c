@@ -1,4 +1,4 @@
-#include "tests/model/test_playboard.h"
+#include "tests/board/test_playboard.h"
 
 void test_new_location(){
     printf("test_new_location results: ");

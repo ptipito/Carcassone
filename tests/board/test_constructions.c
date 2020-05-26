@@ -1,4 +1,4 @@
-#include "tests/model/test_constructions.h"
+#include "tests/board/test_constructions.h"
 
 void test_new_city(){
     int i=0;

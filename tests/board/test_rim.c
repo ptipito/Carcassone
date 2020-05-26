@@ -1,4 +1,4 @@
-#include "tests/model/test_rim.h"
+#include "tests/board/test_rim.h"
 
 void test_rim_new_empty(){
     printf("test_rim_new_empty results: ");
