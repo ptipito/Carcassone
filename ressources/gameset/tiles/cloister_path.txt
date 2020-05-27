@@ -23,7 +23,7 @@ SE
 	node:field
 	neighbors:ES
 S
-	node:field
+	node:path
 	neighbors:C
 SW
 	node:field
