@@ -176,10 +176,10 @@ void test_get_neighbor_loc(){
 }
 
 void test_create_neighbor_for(){
+    printf("test_get_neighbor_loc results: ");
     char* tile_path = CT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node* start_node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0));
     Carc_Playboard_Node* neigh1 = CBP_create_rim_neigh_for(start_node,CPCS_UP);
-    printf("test_get_neighbor_loc results: ");
     printf("%d",neigh1!=NULL && neigh1->neighbors[CPCS_DOWN]==start_node);
     Carc_Playboard_Node* neigh2 = CBP_create_rim_neigh_for(start_node,CPCS_LEFT);
     printf("%d",neigh2!=NULL && neigh2->neighbors[CPCS_RIGHT]==start_node);
@@ -187,22 +187,102 @@ void test_create_neighbor_for(){
     printf("%d",neigh2!=NULL && neigh1->neighbors[CPCS_DOWN]==start_node);
 }
 
+void test_playboard_add_pawn_in(){
+    printf("test_playboard_add_pawn_in results: ");
+    char* tile_start_str=CT_get_tile_file_path("tile1.txt");
+    Carc_Playboard_Node *node_empty=CBP_new_empty_playboard_node(CBP_Location_new(0,2)),
+              *node_start=CBP_new_playboard_node(CBT_new_tile_from_file(tile_start_str),CBP_Location_new(0,0));
+    Carc_Pawn* pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
+
+    //Tile init without pawn tested in tile init tests
+    //Test cannot add pawn on NULL node
+    printf("%d\n",CBP_add_pawn_in(pawn,NULL,CTL_CENTER)==-1);
+    //Test adding pawn on empty node
+    printf("%d\n",CBP_add_pawn_in(pawn,node_empty,CTL_CENTER)==-1);
+    //Test adding on center
+    printf("%d",CBP_add_pawn_in(pawn,node_start,CTL_CENTER)==0
+                && CBT_get_node_from_loc(node_start->node,CTL_CENTER)->pawn!=NULL);
+    //Test adding on edge
+    printf("%d\n",CBP_add_pawn_in(pawn,node_start,CTL_NORTH_EAST)==0
+                && CBT_get_node_from_loc(node_start->node,CTL_NORTH_EAST)->pawn!=NULL);
+    //Test when player does not have pawns
+    pawn->owner->nb_pawns[PAWN_NORMAL] = 0;
+    printf("%d",CBP_add_pawn_in(pawn,node_start,CTL_SOUTH)==-1
+                && CBT_get_node_from_loc(node_start->node,CTL_SOUTH)->pawn==NULL);
+
+    free(tile_start_str);
+    CBP_free_playboard_node(node_empty);
+    CBP_free_playboard_node(node_start);
+    CPPlayer_free_player(pawn->owner);
+    CPPawn_free_pawn(pawn);
+}
+
+void test_playboard_rm_pawn_in(){
+    printf("test_playboard_rm_pawn_in results: ");
+    char* tile_start_str=CT_get_tile_file_path("tile1.txt");
+    Carc_Playboard_Node *node_empty=CBP_new_empty_playboard_node(CBP_Location_new(0,2)),
+              *node_start=CBP_new_playboard_node(CBT_new_tile_from_file(tile_start_str),CBP_Location_new(0,0));
+    Carc_Pawn *pawn1=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
+              *pawn2=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_2,CPC_BLUE),PAWN_NORMAL);
+
+    //Test remove pawn from NULL node
+    printf("%d\n",CBP_rm_pawn_in(NULL,CTL_CENTER)==-1);
+    printf("%d\n",CBP_rm_pawn_in(NULL,CTL_NORTH)==-1);
+
+    //Test remove pawn from empty node
+    printf("%d\n",CBP_rm_pawn_in(node_empty,CTL_CENTER)==-1);
+    printf("%d\n",CBP_rm_pawn_in(node_empty,CTL_NORTH)==-1);
+
+    //Test remove pawn when no pawn on the location for this node
+    printf("%d\n",CBP_rm_pawn_in(node_start,CTL_CENTER)==-1);
+    printf("%d\n",CBP_rm_pawn_in(node_start,CTL_NORTH)==-1);
+
+    //Test remove pawn when player already at max
+    node_start->node->center.pawn = pawn1;
+    node_start->node->border[CTL_NORTH].pawn = pawn2;
+    printf("%d\n",CBP_rm_pawn_in(node_start,CTL_CENTER)==-1
+                && node_start->node->center.pawn==pawn1);
+    printf("%d\n",CBP_rm_pawn_in(node_start,CTL_NORTH)==-1
+                && node_start->node->border[CTL_NORTH].pawn==pawn2);
+
+    //Test remove pawn when player not at max
+    pawn1->owner->nb_pawns[PAWN_NORMAL]--;
+    pawn2->owner->nb_pawns[PAWN_NORMAL]--;
+    printf("%d",CBP_rm_pawn_in(node_start,CTL_CENTER)==0
+                && node_start->node->center.pawn==NULL);
+    printf("%d",CBP_rm_pawn_in(node_start,CTL_NORTH)==0
+                && node_start->node->border[CTL_NORTH].pawn==NULL);
+
+    free(tile_start_str);
+    CBP_free_playboard_node(node_empty);
+    CBP_free_playboard_node(node_start);
+    CPPlayer_free_player(pawn1->owner);
+    CPPlayer_free_player(pawn2->owner);
+    CPPawn_free_pawn(pawn1);
+    CPPawn_free_pawn(pawn2);
+}
+
 void test_playboard_run_all(){
     test_new_location();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_location_cmp();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_new_playboard_node();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_node_cmp();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_connect_is_possible();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_init_playboard();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_get_opposite_side();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_get_neighbor_loc();
-    printf("\n");
+    printf("\n***********************************************\n");
     test_create_neighbor_for();
+    printf("\n***********************************************\n");
+    test_playboard_add_pawn_in();
+    printf("\n***********************************************\n");
+    test_playboard_rm_pawn_in();
+    printf("\n***********************************************\n");
 }

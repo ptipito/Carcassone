@@ -9,7 +9,9 @@ void test_tile_new_empty_tile(){
     int result=1, i=0, j=0;
     Carc_Tile* tile = CBT_new_empty_tile();
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
-        if(tile->center_connexions[i]!=0 || tile->border[i].construction != NULL)
+        if(tile->center_connexions[i]!=0
+           || tile->border[i].construction != NULL
+           || tile->border[i].pawn != NULL)
             result=0;
 
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
@@ -18,7 +20,7 @@ void test_tile_new_empty_tile(){
             }
         }
     }
-    if(tile->center.construction != NULL)
+    if(tile->center.construction != NULL || tile->center.pawn != NULL)
         result = 0;
     printf("%d",result);
 }
@@ -97,16 +99,16 @@ void test_tile_CBT_new_node(){
     Carc_Construction *path = CBC_new_path(1);
     Carc_Tile_Node* node = CBT_new_node(CCBT_CITY, city);
 
-    printf("%d",node->node_type == CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_CITY, city, CCBT_CITY)==0);
+    printf("%d",node->pawn==NULL && node->node_type==CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_CITY, city, CCBT_CITY)==0);
 
     node = CBT_new_node(CCBT_CITY, city);
-    printf("%d",node->node_type == CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_PATH, path, CCBT_PATH)==0);
+    printf("%d",node->pawn==NULL && node->node_type==CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_PATH, path, CCBT_PATH)==0);
 }
 
 void test_tile_get_node_from_loc(){
     printf("test_get_node_from_loc results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
-    Carc_Tile* tile = CBT_new_tile_from_file(tile_path);
+    char *tile_path = CT_get_tile_file_path("tile1.txt");
+    Carc_Tile *tile = CBT_new_tile_from_file(tile_path);
     Carc_Tile_Location loc = CTL_NORTH_WEST;
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
     Carc_Tile_Node* node2 = CBT_get_node_from_loc(tile,CTL_CENTER);
@@ -148,6 +150,12 @@ void test_tile_get_node_from_loc(){
     loc = CTL_CENTER;
     node = CBT_get_node_from_loc(tile,loc);
     printf("%d",CBT_tile_node_cmp(tile->center,*node)==0);
+
+    //Test on null tile
+    node = CBT_get_node_from_loc(NULL,CTL_CENTER);
+    printf("%d",node==NULL);
+    node = CBT_get_node_from_loc(NULL,CTL_NORTH);
+    printf("%d",node==NULL);
 
     CBT_free_tile(tile);
     free(tile_path);
@@ -265,6 +273,75 @@ void test_tile_get_tile_file_path(){
     free(s);
 }
 
+void test_tile_add_pawn(){
+    printf("test_tile_add_pawn results: ");
+    char* tile_start_str=CT_get_tile_file_path("tile1.txt");
+    Carc_Tile *tile_empty=CBT_new_empty_tile(),
+              *tile_start=CBT_new_tile_from_file(tile_start_str);
+    Carc_Pawn* pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
+
+    //Tile init without pawn tested in tile init tests
+    //Test cannot add pawn on NULL tile
+    printf("%d",CBT_add_pawn(pawn,NULL,CTL_CENTER)==-1);
+    //Test adding pawn on empty node
+    printf("%d",CBT_add_pawn(pawn,tile_empty,CTL_CENTER)==0);
+    //Test adding on center
+    printf("%d",CBT_add_pawn(pawn,tile_start,CTL_CENTER)==0
+                && CBT_get_node_from_loc(tile_start,CTL_CENTER)->pawn!=NULL);
+    //Test adding on edge
+    printf("%d",CBT_add_pawn(pawn,tile_start,CTL_NORTH_EAST)==0
+                && CBT_get_node_from_loc(tile_start,CTL_NORTH_EAST)->pawn!=NULL);
+    //Test when player does not have pawns
+    pawn->owner->nb_pawns[PAWN_NORMAL] = 0;
+    printf("%d",CBT_add_pawn(pawn,tile_start,CTL_SOUTH)==-1
+                && CBT_get_node_from_loc(tile_start,CTL_SOUTH)->pawn==NULL);
+
+    free(tile_start_str);
+    CBT_free_tile(tile_empty);
+    CBT_free_tile(tile_start);
+    CPPlayer_free_player(pawn->owner);
+    CPPawn_free_pawn(pawn);
+}
+
+void test_tile_rm_pawn(){
+    printf("test_tile_rm_pawn results: ");
+    char* tile_start_str=CT_get_tile_file_path("tile1.txt");
+    Carc_Tile *tile_start=CBT_new_tile_from_file(tile_start_str);
+    Carc_Pawn *pawn1=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
+              *pawn2=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_2,CPC_BLUE),PAWN_NORMAL);
+
+    //Test remove pawn from empty tile
+    printf("%d",CBT_rm_pawn(NULL,CTL_CENTER)==-1);
+    printf("%d",CBT_rm_pawn(NULL,CTL_NORTH)==-1);
+
+    //Test remove pawn when no pawn on the node
+    printf("%d",CBT_rm_pawn(tile_start,CTL_CENTER)==-1);
+    printf("%d",CBT_rm_pawn(tile_start,CTL_NORTH)==-1);
+
+    //Test remove pawn when player already at max
+    tile_start->center.pawn = pawn1;
+    tile_start->border[CTL_NORTH].pawn = pawn2;
+    printf("%d\n",CBT_rm_pawn(tile_start,CTL_CENTER)==-1
+                && tile_start->center.pawn==pawn1);
+    printf("%d\n",CBT_rm_pawn(tile_start,CTL_NORTH)==-1
+                && tile_start->border[CTL_NORTH].pawn==pawn2);
+
+    //Test remove pawn when player not at max
+    pawn1->owner->nb_pawns[PAWN_NORMAL]--;
+    pawn2->owner->nb_pawns[PAWN_NORMAL]--;
+    printf("%d",CBT_rm_pawn(tile_start,CTL_CENTER)==0
+                && tile_start->center.pawn==NULL);
+    printf("%d",CBT_rm_pawn(tile_start,CTL_NORTH)==0
+                && tile_start->border[CTL_NORTH].pawn==NULL);
+
+    CPPlayer_free_player(pawn1->owner);
+    CPPlayer_free_player(pawn2->owner);
+    CPPawn_free_pawn(pawn1);
+    CPPawn_free_pawn(pawn2);
+    free(tile_start_str);
+    CBT_free_tile(tile_start);
+}
+
 void test_tile_run_all(){
     test_tile_parse_tile_file();
     printf("\n");
@@ -289,5 +366,9 @@ void test_tile_run_all(){
     test_tiles_connect_in();
     printf("\n");
     test_tile_get_tile_file_path();
+    printf("\n");
+    test_tile_add_pawn();
+    printf("\n");
+    test_tile_rm_pawn();
     printf("\n");
 }

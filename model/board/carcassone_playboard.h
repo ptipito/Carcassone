@@ -42,5 +42,7 @@ Carc_Playboard_Node* CBP_new_empty_playboard_node(Carc_Playboard_Location);
 int CBP_node_cmp(Carc_Playboard_Node*, Carc_Playboard_Node*);
 void CBP_free_playboard(Carc_Playboard_Origin*);
 int CBP_node_is_empty(Carc_Playboard_Node);
+int CBP_add_pawn_in(Carc_Pawn*, Carc_Playboard_Node*, Carc_Tile_Location);
+int CBP_rm_pawn_in(Carc_Playboard_Node*, Carc_Tile_Location);
 
 #endif // DEF_CARCASSONE_PLAYBOARD

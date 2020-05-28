@@ -14,12 +14,16 @@ char* CT_get_tile_file_path(char* tile_name){
 
 void CBT_free_node(Carc_Tile_Node* node){
     if(node!=NULL){
-        Carc_Construction* tofree=node->construction;
-        free(tofree);
+        free(node->construction);
+        CPPawn_free_pawn(node->pawn);
     }
 }
 
 Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile* tile, Carc_Tile_Location loc){
+    if(tile==NULL){
+        fprintf(stderr, "ERROR: cannot get node for loc %d for NULL tile\n",loc);
+        return NULL;
+    }
     if(loc == CTL_CENTER)
         return &(tile->center);
     return &(tile->border[loc]);
@@ -150,6 +154,7 @@ Carc_Tile_Node* CBT_new_node(Carc_Construction_Type type, Carc_Construction* con
     }
     node->node_type = type;
     node->construction = cons;
+    node->pawn = NULL;
     return node;
 }
 
@@ -162,11 +167,13 @@ Carc_Tile* CBT_new_empty_tile(){
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
         tile->center_connexions[i]=0;
         tile->border[i].construction = NULL;
+        tile->border[i].pawn = NULL;
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
             tile->border_connexions[i][j]=0;
         }
     }
     tile->center.construction = NULL;
+    tile->center.pawn = NULL;
     return tile;
 }
 
@@ -308,6 +315,7 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
             if(on_new_node_line){
                 cur_loc[i] = '\0';
                 loc = CBT_get_location_from_string(cur_loc);
+                CBT_get_node_from_loc(tile,loc)->pawn = NULL;
                 on_new_node_line = 0;
                 on_node_type_line = 1;
                 on_neighbors_line = 0;
@@ -371,11 +379,13 @@ int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile
 }
 
 int CBT_tile_node_cmp(Carc_Tile_Node n1, Carc_Tile_Node n2){
+    ///Comparison on structure level, without considering pawn info. Returns 0 if equality
     return CBC_construction_cmp(n1.construction,n1.node_type,n2.construction,n2.node_type);
 }
 
 int CBT_tile_cmp(Carc_Tile* t1, Carc_Tile* t2){
-    //TODO include comparison on rotations
+    ///Comparison on structure level, without considering pawn info
+    ///TODO include comparison on rotations
     int result, i=0, j=0;
     if(t1==NULL || t2 == NULL){
         result = !(t1==t2);
@@ -503,4 +513,49 @@ void CBT_display_tile(Carc_Tile tile){
         printf("-");
     else printf(" ");
     printf("%d\n",tile.border[CTL_SOUTH_EAST].node_type);
+
+    //Pawn info
+    printf("Has pawns in: ");
+    int i;
+    for(i=0;i<TILE_NR_LOCATIONS-1;i++){
+        if(tile.border[i].pawn!=NULL){
+            printf("%d ",i);
+        }
+    }
+    if(tile.center.pawn!=NULL){
+        printf("%d",CTL_CENTER);
+    }
+    printf("\n");
 }
+
+int CBT_add_pawn(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
+    int res=0;
+    Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
+    if(node==NULL){
+        fprintf(stderr, "ERROR: cannot add pawn to NULL tile node\n");
+        res = -1;
+    } else{
+        res = CPPawn_play(pawn);
+        if(res==0){
+            node->pawn = pawn;
+        }
+    }
+    return res;
+}
+
+int CBT_rm_pawn(Carc_Tile* tile, Carc_Tile_Location loc){
+    int res=0;
+    Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
+    if(node==NULL){
+        fprintf(stderr, "ERROR: cannot remove pawn from NULL tile node\n");
+        res = -1;
+    } else{
+        res = CPPawn_send_back(node->pawn);
+        //Set that no pawn on the tile
+        if(res==0){
+            node->pawn = NULL;
+        }
+    }
+    return res;
+}
+

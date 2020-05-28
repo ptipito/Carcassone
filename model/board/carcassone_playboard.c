@@ -207,4 +207,24 @@ Carc_Playboard_Node* CBP_create_rim_neigh_for(Carc_Playboard_Node* src_node, Car
     neighbor->neighbors[CBP_get_opposite_side(neighbor_side)] = src_node;
     return neighbor;
 }
+int CBP_add_pawn_in(Carc_Pawn* pawn, Carc_Playboard_Node* node, Carc_Tile_Location loc_in_tile){
+    int res=0;
+    if(node==NULL){
+        res = -1;
+        fprintf(stderr, "ERROR: cannot add pawn to NULL playboard node\n");
+    } else{
+        res = CBT_add_pawn(pawn, node->node,loc_in_tile);
+    }
+    return res;
+}
 
+int CBP_rm_pawn_in(Carc_Playboard_Node* node, Carc_Tile_Location loc_in_tile){
+    int res=0;
+    if(node==NULL){
+        res = -1;
+        fprintf(stderr, "ERROR: cannot remove pawn from NULL playboard node\n");
+    } else{
+        res = CBT_rm_pawn(node->node,loc_in_tile);
+    }
+    return res;
+}

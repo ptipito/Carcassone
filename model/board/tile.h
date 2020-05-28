@@ -8,6 +8,7 @@
 #include "model/board/constructions.h"
 #include "utils.h"
 #include "model/carcassone_errors.h"
+#include "model/player/pawn.h"
 
 #define TILE_NR_BORDER_LOCATIONS 12
 #define TILE_NR_EDGES 4
@@ -30,6 +31,7 @@ typedef enum {CCT_RIGHT, CCT_LEFT, CCT_UPDOWN} CBT_Turn_Type;
 typedef struct {
     Carc_Construction_Type node_type;
     Carc_Construction* construction;
+    Carc_Pawn* pawn;
 } Carc_Tile_Node;
 
 
@@ -58,5 +60,7 @@ void CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location
 void CBT_set_node_const(Carc_Tile*, Carc_Tile_Location, Carc_Construction*);
 void CBT_set_node_type(Carc_Tile*,Carc_Tile_Location, Carc_Construction_Type);
 char* CT_get_tile_file_path(char*);
+int CBT_add_pawn(Carc_Pawn*, Carc_Tile*, Carc_Tile_Location);
+int CBT_rm_pawn(Carc_Tile*, Carc_Tile_Location);
 
 #endif // DEF_CARC_TILE

@@ -2,8 +2,7 @@
 #define DEF_PLAYER
 #include <stdlib.h>
 #include <stdio.h>
-#include "model/board/tile.h"
-#include "model/board/carcassone_playboard.h"
+#include <string.h>
 #include "model/carcassone_errors.h"
 
 #define PLAYER_USERNAME_MAX_LEN 20
@@ -29,7 +28,9 @@ typedef struct {
 
 Carc_Player* CPPlayer_init_player(Carc_Player_ID id, Carc_Player_Color color);
 void CPPlayer_free_player(Carc_Player*);
-void CPPlayer_add_points(Carc_Player*, int);
+int CPPlayer_add_points(Carc_Player*, int);
 int CPPlayer_add_to_nb_pawns(Carc_Player* player, Carc_Pawn_Type pawn_type, int delta);
+int CPPlayer_get_nb_pawns(Carc_Player*, Carc_Pawn_Type);
+int CPPlayer_can_play_pawn(Carc_Player*, Carc_Pawn_Type);
 
 #endif // DEF_PLAYER
