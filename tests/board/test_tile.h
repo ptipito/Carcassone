@@ -19,6 +19,8 @@ void test_tile_pars_merchandise_type();
 void test_tile_set_single_connexion();
 void test_tiles_connect_in();
 void test_tile_get_tile_file_path();
+void test_tile_add_pawn();
+void test_tile_rm_pawn();
 void test_tile_run_all();
 
 #endif // DEF_TEST_TILE

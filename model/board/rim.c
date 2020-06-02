@@ -58,21 +58,22 @@ int CBRim_insert_playboard_node(Carc_Rim* rim, Carc_Playboard_Node* node){
     return inserted;
 }
 
-Carc_Rim* CBRim_initiate(Carc_Playboard_Node* origin){
+Carc_Rim* CBRim_initiate(Carc_Playboard_Node** origin){
     Carc_Rim *rim = CB_Rim_new_empty();
-    if(origin==NULL){
+    if(origin==NULL || *origin==NULL){
         return rim;
     }
-    Carc_Playboard_Location loc = origin->node_coordinates;
+    Carc_Playboard_Location loc = (*origin)->node_coordinates;
+
     Carc_Playboard_Node *first_node = CBP_new_playboard_node(NULL,CBP_get_neighbor_loc(loc,CPCS_RIGHT)),
                         *snd_node = CBP_new_playboard_node(NULL,CBP_get_neighbor_loc(loc,CPCS_UP)),
                         *third_node = CBP_new_playboard_node(NULL,CBP_get_neighbor_loc(loc,CPCS_LEFT)),
                         *fourth_node = CBP_new_playboard_node(NULL,CBP_get_neighbor_loc(loc,CPCS_DOWN));
 
-    first_node->neighbors[CPCS_LEFT] = origin;
-    snd_node->neighbors[CPCS_DOWN] = origin;
-    third_node->neighbors[CPCS_RIGHT] = origin;
-    fourth_node->neighbors[CPCS_UP] = origin;
+    CBP_set_neighbor(first_node,CPCS_LEFT,origin);
+    CBP_set_neighbor(snd_node,CPCS_DOWN,origin);
+    CBP_set_neighbor(third_node,CPCS_RIGHT,origin);
+    CBP_set_neighbor(fourth_node,CPCS_UP,origin);
 
     CBRim_insert_playboard_node(rim,first_node);
     CBRim_insert_playboard_node(rim,snd_node);

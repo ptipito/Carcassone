@@ -1,4 +1,4 @@
-#include "tests/model/test_rim.h"
+#include "tests/board/test_rim.h"
 
 void test_rim_new_empty(){
     printf("test_rim_new_empty results: ");
@@ -57,7 +57,7 @@ void test_rim_remove_first(){
     char* tile_path = CT_get_tile_file_path("tile1.txt");
     Carc_Tile *start_tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Node *playboard_first_node = CBP_init_playboard(start_tile)->node;
-    Carc_Rim *rim = CBRim_initiate(playboard_first_node);
+    Carc_Rim *rim = CBRim_initiate(&playboard_first_node);
     CBRim_display(rim);
     printf("remove first\n");
     printf("Rim is now:\n");
@@ -108,12 +108,12 @@ void test_rim_remove_by_node_coordinates(){
 }
 
 void test_rim_find_by_location(){
-    printf("CB_Rim_find_by_location results: \n");
+    printf("CB_Rim_find_by_location results: ");
     char* tile_path = CT_get_tile_file_path("tile1.txt");
     Carc_Tile *start_tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Origin *playboard_origin = CBP_init_playboard(start_tile);
     Carc_Playboard_Node *playboard_first_node = playboard_origin->node;
-    Carc_Rim* rim = CBRim_initiate(playboard_first_node);
+    Carc_Rim* rim = CBRim_initiate(&playboard_first_node);
 
     Carc_Playboard_Node* test_node;
     Carc_Playboard_Location test_loc = CBP_Location_new(0,1);
@@ -136,14 +136,30 @@ void test_rim_find_by_location(){
 }
 
 void test_rim_initiate(){
+    printf("test_rim_initiate results: ");
     char* tile_path = CT_get_tile_file_path("tile1.txt");
-    Carc_Playboard_Node *node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0));
-    Carc_Rim *rim = CBRim_initiate(node);
-    int success = 1;
-    success = success && CBRim_remove_by_node_coordinates(rim,CBP_Location_new(0,1));
+    Carc_Playboard_Node *node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0)),
+                        *null_node = NULL;
+    Carc_Rim *rim = CBRim_initiate(&node),
+             *rim_empty = CBRim_initiate(NULL),
+             *rim_empty2 = CBRim_initiate(&null_node);
 
-    node->node_coordinates = CBP_Location_new(12,65);
+    //Test if the value pointed by the input is null
+    printf("%d",rim_empty!=NULL && rim_empty->first==NULL);
+    printf("%d",rim_empty2!=NULL && rim_empty2->first==NULL);
+
+    printf("%d",rim!=NULL);
+    printf("%d",node==*(rim->first->node->neighbors[CPCS_LEFT]));
+    printf("%d",node==*(rim->first->next->node->neighbors[CPCS_DOWN]));
+    printf("%d",node==*(rim->first->next->next->node->neighbors[CPCS_RIGHT]));
+    printf("%d",node==*(rim->first->next->next->next->node->neighbors[CPCS_UP]));
+    printf("%d",NULL==rim->first->next->next->next->next);
+
+
     free(tile_path);
+    CBP_free_playboard_node(node);
+    CBRim_free(rim);
+    CBRim_free(rim_empty);
 }
 
 void test_rim_run_all(){
@@ -156,5 +172,7 @@ void test_rim_run_all(){
     test_rim_remove_by_node_coordinates();
     printf("\n**********************************************\n");
     test_rim_find_by_location();
+    printf("\n**********************************************\n");
+    test_rim_initiate();
     printf("\n**********************************************\n");
 }

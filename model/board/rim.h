@@ -19,7 +19,7 @@ typedef struct Carc_Rim{
 
 Carc_Rim* CB_Rim_new_empty();
 int CBRim_insert_playboard_node(Carc_Rim*, Carc_Playboard_Node*);
-Carc_Rim* CBRim_initiate(Carc_Playboard_Node*);
+Carc_Rim* CBRim_initiate(Carc_Playboard_Node**);
 void CBRim_remove_first(Carc_Rim*);
 int CBRim_remove_by_node_coordinates(Carc_Rim*, Carc_Playboard_Location);
 void CBRim_free(Carc_Rim*);

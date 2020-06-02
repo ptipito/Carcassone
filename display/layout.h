@@ -1,29 +1,22 @@
 #ifndef DEF_LAYOUT
 #define DEF_LAYOUT
-#include <stdlib.h>
-#include <stdio.h>
-#include <SDL2/SDL.h>
-#include "model/carcassone_errors.h"
+#include "display/carc_display_utils.h"
 
-typedef enum Tile_Size {SMALL_TILE, MEDIUM_TILE, BIG_TILE} Tile_Size;
-typedef struct Layout{
+typedef enum Carc_Layout_Part {LP_MAP, LP_DETAILS} Carc_Layout_Part;
+typedef struct Carc_Layout{
     SDL_Window *window;
+    //The window is split into two areas: the playboard (or map) and the details area (player pawns, current tile, etc...)
     SDL_Surface *map_surface,
                 *details_surface;
     SDL_Rect map_pos,
              details_pos;
-    Tile_Size tile_size;
-} Layout;
-typedef enum Layout_Part {LP_MAP, LP_DETAILS} Layout_Part;
+    int map_details_border_size;//Border size between both surfaces. The border is drawn on details_surface
+    Carc_Tile_Size tile_size;//Current zoom display
+} Carc_Layout;
 
-Layout new_layout();
-int get_tile_size_in_pixels(Tile_Size);
-void initialize_game_layout(SDL_Window*, Layout*);
-void display_grid(Layout*);
-void free_layout(Layout*);
-void blit_on(Layout_Part, SDL_Surface*, SDL_Rect*, SDL_Rect*, Layout*);
-SDL_Rect get_slot_upper_left(int, int, Tile_Size);
-void map_insert_tile(SDL_Surface*, int, int, Layout*);
-int pos_in_surface(SDL_Rect, SDL_Surface);
+Carc_Layout* CDL_new_layout();
+Carc_Layout* CDL_initialize_game_layout(SDL_Window*);
+void CDL_free_layout(Carc_Layout*);
+void CDL_blit_on(Carc_Layout_Part, SDL_Surface*, SDL_Rect*, SDL_Rect*, Carc_Layout*);
 
 #endif // DEF_LAYOUT

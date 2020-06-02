@@ -19,7 +19,7 @@ typedef struct Carc_Playboard_Node Carc_Playboard_Node;
 struct Carc_Playboard_Node {
     Carc_Tile* node;
     Carc_Playboard_Location node_coordinates;//Needed for display of the tile on the map
-    Carc_Playboard_Node* neighbors[CBP_MAX_NEIGHBORS];//Array of neighbors from up to left (clockwise ordered)
+    Carc_Playboard_Node** neighbors[CBP_MAX_NEIGHBORS];//Array of neighbors from up to left (clockwise ordered)
 };
 
 //Represents the playboard as a graph. Points on the origin of the playboard
@@ -29,6 +29,9 @@ typedef struct Carc_Playboard_Origin{
 
 
 Carc_Playboard_Node* CBP_new_playboard_node(Carc_Tile*, Carc_Playboard_Location);
+Carc_Playboard_Node* CBP_get_neighbor(Carc_Playboard_Node*, Carc_Playboard_Connect_Side);
+int CBP_set_neighbor(Carc_Playboard_Node*, Carc_Playboard_Connect_Side, Carc_Playboard_Node**);
+int CBP_is_neighbor_null(Carc_Playboard_Node*, Carc_Playboard_Connect_Side);
 int CBP_connect_is_possible(Carc_Playboard_Node*, Carc_Playboard_Connect_Side, Carc_Playboard_Node*);
 Carc_Playboard_Location CBP_Location_new(int, int);
 int CBP_Location_cmp(Carc_Playboard_Location, Carc_Playboard_Location);
@@ -37,10 +40,12 @@ void CBP_display_playboard_node(Carc_Playboard_Node);
 Carc_Playboard_Origin* CBP_init_playboard(Carc_Tile*);
 Carc_Playboard_Connect_Side CBP_get_opposite_side(Carc_Playboard_Connect_Side);
 Carc_Playboard_Location CBP_get_neighbor_loc(Carc_Playboard_Location, Carc_Playboard_Connect_Side);
-Carc_Playboard_Node* CBP_create_rim_neigh_for(Carc_Playboard_Node*, Carc_Playboard_Connect_Side);
+Carc_Playboard_Node* CBP_create_rim_neigh_for(Carc_Playboard_Node**, Carc_Playboard_Connect_Side);
 Carc_Playboard_Node* CBP_new_empty_playboard_node(Carc_Playboard_Location);
 int CBP_node_cmp(Carc_Playboard_Node*, Carc_Playboard_Node*);
 void CBP_free_playboard(Carc_Playboard_Origin*);
 int CBP_node_is_empty(Carc_Playboard_Node);
+int CBP_add_pawn_in(Carc_Pawn*, Carc_Playboard_Node*, Carc_Tile_Location);
+int CBP_rm_pawn_in(Carc_Playboard_Node*, Carc_Tile_Location);
 
 #endif // DEF_CARCASSONE_PLAYBOARD

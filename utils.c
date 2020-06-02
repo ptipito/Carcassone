@@ -5,3 +5,7 @@ int positive_modulo(int n, int mod){
         mod = -mod;
     return (((n % mod) + mod) % mod);
 }
+
+int int_center(int x, int y){
+    return (x-y)/2;
+}
