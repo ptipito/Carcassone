@@ -1,9 +1,5 @@
 #include "display/map_surface.h"
 #include "display/details_surface.h"
-#include "tests/model/test_tile.h"
-#include "model/board/carcassone_playboard.h"
-#include "model/board/rim.h"
-#include "tests/model/test_playboard.h"
 /*
 This file is not yet the real main and serves as testing for SDL display.
 For the time being is there no link between the model files and the functionalities available through the main
