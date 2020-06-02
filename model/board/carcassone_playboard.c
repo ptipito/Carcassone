@@ -7,6 +7,47 @@ void CBP_free_playboard_node(Carc_Playboard_Node* node){
     }
 }
 
+Carc_Playboard_Node* CBP_get_neighbor(Carc_Playboard_Node* node, Carc_Playboard_Connect_Side side){
+    //printf("in cbp_get_neigh %p %d\n",node,side);
+    if(node==NULL){
+        fprintf(stderr,"WARNING: tried to access neighbor of NULL node (CBP_get_neighbor)\n");
+        return NULL;
+    }
+    //printf("\tget neigh\n");
+    Carc_Playboard_Node** neighbor_pointer = node->neighbors[side];
+    //printf("\tcheck if null\n");
+    if(neighbor_pointer==NULL){
+        return NULL;
+    }
+    //printf("\tderef\n");
+    return (*neighbor_pointer);
+}
+
+int CBP_set_neighbor(Carc_Playboard_Node* src, Carc_Playboard_Connect_Side side, Carc_Playboard_Node** dest){
+    ///Set the value of the pointer in in the neighbors array of src in position side. NOT the pointer itself.
+    if(src==NULL){
+        fprintf(stderr,"WARNING: tried to set neighbor of NULL node (CBP_set_neighbor)\n");
+        return -1;
+    }
+    if(src->neighbors[side]==NULL){
+        src->neighbors[side] = malloc(sizeof(*(src->neighbors[side])));
+    }
+    src->neighbors[side] = dest;
+    return 0;
+}
+
+int CBP_is_neighbor_null(Carc_Playboard_Node* src, Carc_Playboard_Connect_Side side){
+    ///Set the value of the pointer in in the neighbors array of src in position side. NOT the pointer itself.
+    if(src==NULL){
+        fprintf(stderr,"WARNING: tried to access neighbor of NULL node (CBP_is_neighbor_null)\n");
+        return -1;
+    }
+    if(src->neighbors[side]==NULL || CBP_get_neighbor(src,side)==NULL){
+        return 1;
+    }
+    return 0;
+}
+
 Carc_Playboard_Location CBP_Location_new(int x, int y){
     Carc_Playboard_Location loc;
     loc.x = x;
@@ -34,27 +75,28 @@ int CBP_Location_cmp(Carc_Playboard_Location l1,Carc_Playboard_Location l2){
 }
 
 int CBP_node_cmp(Carc_Playboard_Node* n1,Carc_Playboard_Node* n2){
-    int equal=0, different=1, result=equal, i=0, same_neigh=1;
+    int equal=0, different=1, i=0, same_neigh=1;
+    //printf("\n in node cmp\n");
     if(n1==NULL || n2==NULL){
         if(n1==n2)
-            result = equal;
+            return equal;
         else
-            result = different;
+            return different;
     } else{
         if(CBP_Location_cmp(n1->node_coordinates,n2->node_coordinates)!=0){
-            result = different;
+            return different;
         }
         if(CBT_tile_cmp(n1->node,n2->node)!=0)
-            result = different;
+            return different;
         while(i<CBP_MAX_NEIGHBORS && same_neigh){
-            same_neigh = (n1->neighbors[i]==n2->neighbors[i]);
+            same_neigh = (CBP_get_neighbor(n1,i)==CBP_get_neighbor(n2,i));
             if(!same_neigh){
-                result = 1;
+                return different;
             }
             i++;
         }
     }
-    return result;
+    return equal;
 }
 
 Carc_Playboard_Node* CBP_new_playboard_node(Carc_Tile* tile, Carc_Playboard_Location coordinates){
@@ -197,16 +239,17 @@ Carc_Playboard_Location CBP_get_neighbor_loc(Carc_Playboard_Location src, Carc_P
      return new_location;
 }
 
-Carc_Playboard_Node* CBP_create_rim_neigh_for(Carc_Playboard_Node* src_node, Carc_Playboard_Connect_Side neighbor_side){
+Carc_Playboard_Node* CBP_create_rim_neigh_for(Carc_Playboard_Node** src_node, Carc_Playboard_Connect_Side neighbor_side){
     ///Create a new empty node. This new node has in its neighbors the src_node. However the created node being
     ///empty, it is not referenced in the neighbors attribute of src_node. This function aims to update the rim
     ///when a new node is played on the playboard. The returned node should be added to a rim.
-    Carc_Playboard_Location neighbor_loc = CBP_get_neighbor_loc(src_node->node_coordinates,neighbor_side);
+    Carc_Playboard_Location neighbor_loc = CBP_get_neighbor_loc((*src_node)->node_coordinates,neighbor_side);
     Carc_Playboard_Node* neighbor = CBP_new_empty_playboard_node(neighbor_loc);
     //src_node is a neighbor of this new empty node
-    neighbor->neighbors[CBP_get_opposite_side(neighbor_side)] = src_node;
+    CBP_set_neighbor(neighbor,CBP_get_opposite_side(neighbor_side),src_node);
     return neighbor;
 }
+
 int CBP_add_pawn_in(Carc_Pawn* pawn, Carc_Playboard_Node* node, Carc_Tile_Location loc_in_tile){
     int res=0;
     if(node==NULL){

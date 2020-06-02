@@ -16,5 +16,8 @@ void test_get_opposite_side();
 void test_get_neighbor_loc();
 void test_create_neighbor_for();
 void test_playboard_run_all();
+void test_playboard_get_neighbor();
+void test_playboard_set_neighbor();
+void test_playboard_is_neigh_null();
 
 #endif // DEF_TEST_PLAYBOARD

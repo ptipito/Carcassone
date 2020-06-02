@@ -12,6 +12,63 @@ void test_new_location(){
     }
 }
 
+void test_playboard_get_neighbor(){
+    printf("test_playboard_get_neighbor results: ");
+    Carc_Playboard_Node *empty_node = CBP_new_empty_playboard_node(CBP_Location_new(0,0)),
+                        *node = CBP_new_playboard_node(NULL,CBP_Location_new(0,1));
+
+    printf("%d",CBP_get_neighbor(NULL,CPCS_UP)==NULL);
+    printf("%d",CBP_get_neighbor(empty_node,CPCS_UP)==NULL);
+    printf("%d",CBP_get_neighbor(empty_node,CPCS_DOWN)==NULL);
+    printf("%d",CBP_get_neighbor(empty_node,CPCS_LEFT)==NULL);
+    printf("%d",CBP_get_neighbor(empty_node,CPCS_RIGHT)==NULL);
+    node->neighbors[CPCS_DOWN] = malloc(sizeof(Carc_Playboard_Node**));
+    *(node->neighbors[CPCS_DOWN]) = empty_node;
+    printf("%d",CBP_get_neighbor(node,CPCS_DOWN)==empty_node);
+
+    CBP_free_playboard_node(empty_node);
+    CBP_free_playboard_node(node);
+}
+
+void test_playboard_set_neighbor(){
+    printf("test_playboard_set_neighbor results: ");
+    Carc_Playboard_Node *empty_node = CBP_new_empty_playboard_node(CBP_Location_new(0,0)),
+                        *node = CBP_new_playboard_node(NULL,CBP_Location_new(0,1));
+
+    printf("%d\n",CBP_set_neighbor(NULL,CPCS_UP,&node)==-1);
+    printf("%d\n",CBP_set_neighbor(empty_node,CPCS_UP,&node)==0
+                    && *(empty_node->neighbors[CPCS_UP])==node);
+    node->neighbors[CPCS_DOWN] = malloc(sizeof(Carc_Playboard_Node**));
+    node->neighbors[CPCS_UP] = malloc(sizeof(Carc_Playboard_Node**));
+    node->neighbors[CPCS_LEFT] = malloc(sizeof(Carc_Playboard_Node**));
+    node->neighbors[CPCS_RIGHT] = malloc(sizeof(Carc_Playboard_Node**));
+    printf("%d",CBP_set_neighbor(node,CPCS_DOWN,&empty_node)==0
+                    && *(node->neighbors[CPCS_DOWN])==empty_node);
+    printf("%d",CBP_set_neighbor(node,CPCS_UP,&empty_node)==0
+                    && *(node->neighbors[CPCS_UP])==empty_node);
+    printf("%d",CBP_set_neighbor(node,CPCS_LEFT,&empty_node)==0
+                    && *(node->neighbors[CPCS_LEFT])==empty_node);
+    printf("%d",CBP_set_neighbor(node,CPCS_RIGHT,&empty_node)==0
+                    && *(node->neighbors[CPCS_RIGHT])==empty_node);
+
+    CBP_free_playboard_node(empty_node);
+    CBP_free_playboard_node(node);
+}
+
+void test_playboard_is_neigh_null(){
+    printf("test_playboard_set_neighbor results: ");
+    Carc_Playboard_Node *empty_node = CBP_new_empty_playboard_node(CBP_Location_new(0,0)),
+                        *node = CBP_new_playboard_node(NULL,CBP_Location_new(0,1));
+
+    printf("%d",CBP_is_neighbor_null(NULL,CPCS_RIGHT)==-1);
+    printf("%d",CBP_is_neighbor_null(empty_node,CPCS_RIGHT)==1);
+    CBP_set_neighbor(empty_node,CPCS_RIGHT,&node);
+    printf("%d",CBP_is_neighbor_null(empty_node,CPCS_RIGHT)==0);
+
+    CBP_free_playboard_node(empty_node);
+    CBP_free_playboard_node(node);
+}
+
 void test_location_cmp(){
     printf("test_location_cmp results: ");
     Carc_Playboard_Location loc1 = CBP_Location_new(2,3),
@@ -86,15 +143,17 @@ void test_node_cmp(){
     n1->node_coordinates = CBP_Location_new(1,2);
     printf("%d",CBP_node_cmp(n1,n2)==1);
     n2->node_coordinates = CBP_Location_new(1,2);
-    n1->neighbors[CPCS_UP] = CBP_new_empty_playboard_node(CBP_Location_new(1,3));
+    Carc_Playboard_Node* new_node = CBP_new_empty_playboard_node(CBP_Location_new(1,3));
+    CBP_set_neighbor(n1,CPCS_UP,&new_node);
     printf("%d",CBP_node_cmp(n1,n2)==1);
-    n2->neighbors[CPCS_UP] = CBP_new_empty_playboard_node(CBP_Location_new(1,3));
+    Carc_Playboard_Node* new_node2 = CBP_new_empty_playboard_node(CBP_Location_new(1,3));
+    CBP_set_neighbor(n2,CPCS_UP,&new_node2);
     printf("%d",CBP_node_cmp(n1,n2)==1);
-    CBP_free_playboard_node(n2->neighbors[CPCS_UP]);
-    n2->neighbors[CPCS_UP] = n1->neighbors[CPCS_UP];
+    CBP_free_playboard_node(CBP_get_neighbor(n2,CPCS_UP));
+    CBP_set_neighbor(n2,CPCS_UP,n1->neighbors[CPCS_UP]);
     printf("%d",CBP_node_cmp(n1,n2)==0);
     printf("\n");
-    CBP_free_playboard_node(n1->neighbors[CPCS_UP]);
+    CBP_free_playboard_node(CBP_get_neighbor(n1,CPCS_UP));
     CBP_free_playboard_node(n1);
     n2->node=NULL;//avoid double free of tile (n1 and n2 have the same pointer in "node")
     CBP_free_playboard_node(n2);
@@ -176,15 +235,15 @@ void test_get_neighbor_loc(){
 }
 
 void test_create_neighbor_for(){
-    printf("test_get_neighbor_loc results: ");
+    printf("test_create_neighbor_for results: ");
     char* tile_path = CT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node* start_node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0));
-    Carc_Playboard_Node* neigh1 = CBP_create_rim_neigh_for(start_node,CPCS_UP);
-    printf("%d",neigh1!=NULL && neigh1->neighbors[CPCS_DOWN]==start_node);
-    Carc_Playboard_Node* neigh2 = CBP_create_rim_neigh_for(start_node,CPCS_LEFT);
-    printf("%d",neigh2!=NULL && neigh2->neighbors[CPCS_RIGHT]==start_node);
-    printf("%d",neigh2!=NULL && !(neigh1->neighbors[CPCS_UP]==start_node));
-    printf("%d",neigh2!=NULL && neigh1->neighbors[CPCS_DOWN]==start_node);
+    Carc_Playboard_Node* neigh1 = CBP_create_rim_neigh_for(&start_node,CPCS_UP);
+    printf("%d",neigh1!=NULL && CBP_get_neighbor(neigh1,CPCS_DOWN)==start_node);
+    Carc_Playboard_Node* neigh2 = CBP_create_rim_neigh_for(&start_node,CPCS_LEFT);
+    printf("%d",neigh2!=NULL && CBP_get_neighbor(neigh2,CPCS_RIGHT)==start_node);
+    printf("%d",neigh2!=NULL && !(CBP_get_neighbor(neigh1,CPCS_UP)==start_node));
+    printf("%d",neigh2!=NULL && CBP_get_neighbor(neigh1,CPCS_DOWN)==start_node);
 }
 
 void test_playboard_add_pawn_in(){
@@ -285,4 +344,11 @@ void test_playboard_run_all(){
     printf("\n***********************************************\n");
     test_playboard_rm_pawn_in();
     printf("\n***********************************************\n");
+    test_playboard_get_neighbor();
+    printf("\n***********************************************\n");
+    test_playboard_set_neighbor();
+    printf("\n***********************************************\n");
+    test_playboard_is_neigh_null();
+    printf("\n***********************************************\n");
+
 }
