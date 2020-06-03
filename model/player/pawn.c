@@ -63,7 +63,7 @@ int CPPawn_play(Carc_Pawn* pawn){
         fprintf(stderr,"ERROR: cannot play a pawn NULL. (CPPawn_play)\n");
         return res;
     }
-    if(CPPlayer_get_nb_pawns(pawn->owner,pawn->type)>0){
+    if(CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1){
         CPPlayer_add_to_nb_pawns(pawn->owner,pawn->type,-1);
         res = 0;
     } else {

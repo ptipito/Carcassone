@@ -50,33 +50,33 @@ void test_construction_cmp(){
         city1 = CBC_new_city(has_flag[i],is_cathedral[i],merch_type[i]);
         for(j=i;j<6;j++){
             if(i==j){
-                result = (CBC_construction_cmp(city1, CCBT_CITY, city1, CCBT_CITY) == 0);
+                result = (CBC_construction_cmp(city1, CBCT_CITY, city1, CBCT_CITY) == 0);
             } else {
                 city2 = CBC_new_city(has_flag[j],is_cathedral[j],merch_type[j]);
-                result = (CBC_construction_cmp(city1, CCBT_CITY, city2, CCBT_CITY) == 1);
+                result = (CBC_construction_cmp(city1, CBCT_CITY, city2, CBCT_CITY) == 1);
             }
             printf("%d", result);
         }
     }
-    printf("%d",CBC_construction_cmp(path1,CCBT_PATH, city1, CCBT_CITY)==1);
-    printf("%d",CBC_construction_cmp(path1,CCBT_PATH, garden1, CCBT_GARDEN)==1);
-    printf("%d",CBC_construction_cmp(garden1, CCBT_GARDEN, city1, CCBT_CITY)==1);
+    printf("%d",CBC_construction_cmp(path1,CBCT_PATH, city1, CBCT_CITY)==1);
+    printf("%d",CBC_construction_cmp(path1,CBCT_PATH, garden1, CBCT_GARDEN)==1);
+    printf("%d",CBC_construction_cmp(garden1, CBCT_GARDEN, city1, CBCT_CITY)==1);
 
-    printf("%d",CBC_construction_cmp(garden1, CCBT_GARDEN, garden2, CCBT_GARDEN)==0);
+    printf("%d",CBC_construction_cmp(garden1, CBCT_GARDEN, garden2, CBCT_GARDEN)==0);
     garden1->garden.field_occupied=1;
-    printf("%d",CBC_construction_cmp(garden1, CCBT_GARDEN, garden2, CCBT_GARDEN)==0);
+    printf("%d",CBC_construction_cmp(garden1, CBCT_GARDEN, garden2, CBCT_GARDEN)==0);
     garden2->garden.garden_occupied=1;
-    printf("%d",CBC_construction_cmp(garden1, CCBT_GARDEN, garden2, CCBT_GARDEN)==0);
+    printf("%d",CBC_construction_cmp(garden1, CBCT_GARDEN, garden2, CBCT_GARDEN)==0);
     garden1->garden.garden_occupied=1;
     garden2->garden.field_occupied=1;
-    printf("%d",CBC_construction_cmp(garden1, CCBT_GARDEN, garden2, CCBT_GARDEN)==0);
+    printf("%d",CBC_construction_cmp(garden1, CBCT_GARDEN, garden2, CBCT_GARDEN)==0);
 
-    printf("%d",CBC_construction_cmp(path1, CCBT_PATH, path1, CCBT_PATH)==0);
-    printf("%d",CBC_construction_cmp(path1, CCBT_PATH, path2, CCBT_PATH)==1);
-    printf("%d",CBC_construction_cmp(path2, CCBT_PATH, path2, CCBT_PATH)==0);
+    printf("%d",CBC_construction_cmp(path1, CBCT_PATH, path1, CBCT_PATH)==0);
+    printf("%d",CBC_construction_cmp(path1, CBCT_PATH, path2, CBCT_PATH)==1);
+    printf("%d",CBC_construction_cmp(path2, CBCT_PATH, path2, CBCT_PATH)==0);
 
-    printf("%d",CBC_construction_cmp(NULL,CCBT_CLOISTER, NULL, CCBT_CLOISTER)==0);
-    printf("%d",CBC_construction_cmp(NULL,CCBT_CLOISTER, path2, CCBT_PATH_END)==1);
+    printf("%d",CBC_construction_cmp(NULL,CBCT_CLOISTER, NULL, CBCT_CLOISTER)==0);
+    printf("%d",CBC_construction_cmp(NULL,CBCT_CLOISTER, path2, CBCT_PATH_END)==1);
 
     free(city1);
     free(city2);

@@ -102,19 +102,19 @@ int CBT_is_valid_loc(Carc_Tile_Location loc){
 }
 
 Carc_Construction_Type CBT_get_node_type_from_str(char* type){
-    Carc_Construction_Type result=CCBT_FIELD;
+    Carc_Construction_Type result=CBCT_FIELD;
     if(strcmp(type,"path")==0)
-        result = CCBT_PATH;
+        result = CBCT_PATH;
     if(strcmp(type,"path_end")==0)
-        result = CCBT_PATH_END;
+        result = CBCT_PATH_END;
     if(strcmp(type,"city")==0)
-        result = CCBT_CITY;
+        result = CBCT_CITY;
     if(strcmp(type,"cloister")==0)
-        result = CCBT_CLOISTER;
+        result = CBCT_CLOISTER;
     if(strcmp(type,"garden")==0)
-        result = CCBT_GARDEN;
+        result = CBCT_GARDEN;
     if(strcmp(type,"field")==0)
-        result = CCBT_FIELD;
+        result = CBCT_FIELD;
 
     return result;
 }
@@ -243,13 +243,13 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
             CBT_set_node_type(tile,loc,type);
             //Set node construction
             switch(type){
-                case CCBT_CITY:
+                case CBCT_CITY:
                     cur_const = CBC_new_city(0,0,CCM_NONE);
                     break;
-                case CCBT_PATH:
+                case CBCT_PATH:
                     cur_const = CBC_new_path(0);
                     break;
-                case CCBT_GARDEN:
+                case CBCT_GARDEN:
                     cur_const = CBC_new_garden();
                     break;
                 default:
@@ -261,7 +261,7 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
             while(cur_char!='\n' && cur_char != EOF){
                 cur_char = fgetc(tile_file);//on first iteration, this fast pass the first ' ' before the options list
                 switch(type){
-                    case CCBT_CITY:
+                    case CBCT_CITY:
                         switch(cur_char){
                             case ' ':
                                 //separate 2 options. Do nothing
@@ -283,7 +283,7 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
                                 break;
                         }
                         break;
-                    case CCBT_PATH:
+                    case CBCT_PATH:
                         switch(cur_char){
                             case 'l':
                                 cur_const->path.has_lake = 1;
@@ -388,8 +388,8 @@ int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile
         return 1;
     if(node_t1->node_type == node_t2->node_type)
         return 1;
-    if((node_t1->node_type == CCBT_GARDEN && node_t2->node_type == CCBT_FIELD)
-       || (node_t1->node_type == CCBT_FIELD && node_t2->node_type == CCBT_GARDEN))
+    if((node_t1->node_type == CBCT_GARDEN && node_t2->node_type == CBCT_FIELD)
+       || (node_t1->node_type == CBCT_FIELD && node_t2->node_type == CBCT_GARDEN))
         return 1;
 
     return 0;

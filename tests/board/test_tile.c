@@ -97,12 +97,12 @@ void test_tile_CBT_new_node(){
     printf("test_CBT_new_node_results: ");
     Carc_Construction *city = CBC_new_city(1,0,CCM_NONE);
     Carc_Construction *path = CBC_new_path(1);
-    Carc_Tile_Node* node = CBT_new_node(CCBT_CITY, city);
+    Carc_Tile_Node* node = CBT_new_node(CBCT_CITY, city);
 
-    printf("%d",node->pawn==NULL && node->node_type==CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_CITY, city, CCBT_CITY)==0);
+    printf("%d",node->pawn==NULL && node->node_type==CBCT_CITY && CBC_construction_cmp(node->construction, CBCT_CITY, city, CBCT_CITY)==0);
 
-    node = CBT_new_node(CCBT_CITY, city);
-    printf("%d",node->pawn==NULL && node->node_type==CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_PATH, path, CCBT_PATH)==0);
+    node = CBT_new_node(CBCT_CITY, city);
+    printf("%d",node->pawn==NULL && node->node_type==CBCT_CITY && CBC_construction_cmp(node->construction, CBCT_PATH, path, CBCT_PATH)==0);
 }
 
 void test_tile_is_valid_loc(){
@@ -202,17 +202,17 @@ void test_tile_get_loc_from_str(){
 
 void test_tile_get_node_type_from_str(){
     printf("test_tile_get_node_type_from_str results: ");
-    printf("%d",CBT_get_node_type_from_str("path")==CCBT_PATH);
-    printf("%d",CBT_get_node_type_from_str("path_end")==CCBT_PATH_END);
-    printf("%d",CBT_get_node_type_from_str("city")==CCBT_CITY);
-    printf("%d",CBT_get_node_type_from_str("cloister")==CCBT_CLOISTER);
-    printf("%d",CBT_get_node_type_from_str("garden")==CCBT_GARDEN);
-    printf("%d",CBT_get_node_type_from_str("field")==CCBT_FIELD);
+    printf("%d",CBT_get_node_type_from_str("path")==CBCT_PATH);
+    printf("%d",CBT_get_node_type_from_str("path_end")==CBCT_PATH_END);
+    printf("%d",CBT_get_node_type_from_str("city")==CBCT_CITY);
+    printf("%d",CBT_get_node_type_from_str("cloister")==CBCT_CLOISTER);
+    printf("%d",CBT_get_node_type_from_str("garden")==CBCT_GARDEN);
+    printf("%d",CBT_get_node_type_from_str("field")==CBCT_FIELD);
     //Test for invalid strings
-    printf("%d",CBT_get_node_type_from_str("fied")==CCBT_FIELD);
-    printf("%d",CBT_get_node_type_from_str("")==CCBT_FIELD);
-    printf("%d",CBT_get_node_type_from_str("hvcb")==CCBT_FIELD);
-    printf("%d",CBT_get_node_type_from_str("  ")==CCBT_FIELD);
+    printf("%d",CBT_get_node_type_from_str("fied")==CBCT_FIELD);
+    printf("%d",CBT_get_node_type_from_str("")==CBCT_FIELD);
+    printf("%d",CBT_get_node_type_from_str("hvcb")==CBCT_FIELD);
+    printf("%d",CBT_get_node_type_from_str("  ")==CBCT_FIELD);
 }
 
 void test_tile_parse_merchandise_type(){

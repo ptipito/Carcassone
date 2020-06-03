@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 typedef enum {CCM_CORN, CCM_BARREL, CCM_TISSUE, CCM_NONE} Carc_City_Merchandise;
-typedef enum {CCBT_PATH, CCBT_CITY, CCBT_PATH_END, CCBT_CLOISTER, CCBT_GARDEN, CCBT_FIELD} Carc_Construction_Type;
+typedef enum {CBCT_PATH, CBCT_CITY, CBCT_PATH_END, CBCT_CLOISTER, CBCT_GARDEN, CBCT_FIELD} Carc_Construction_Type;
 
 typedef struct {
     int has_flag;
