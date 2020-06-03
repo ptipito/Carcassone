@@ -137,7 +137,7 @@ void test_game_play_tile_in(){
          *cloister_tile_str = CT_get_tile_file_path("cloister_path.txt");
     Carc_Game* game = CGG_initiate_game(start_tile_str,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
-    Carc_Tile *cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
+    Carc_Tile* cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
     Carc_Playboard_Node *origin_node = CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_str),CBP_Location_new(0,0)),
                         *curr_node=NULL;
     Carc_Playboard_Node* node_played = CGG_play_tile_in(game,play_in,cloister_tile);
@@ -201,6 +201,51 @@ void test_game_play_tile_in(){
     free(cloister_tile_str);
 }
 
+void test_game_play_pawn_in(){
+    printf("test_game_play_pawn_in results: \n");
+    char *start_tile_str=CT_get_tile_file_path("tile1.txt");
+    Carc_Tile* start_tile=CBT_new_tile_from_file(start_tile_str);
+    Carc_Player* player=CPPlayer_init_player(PLAYER_1,CPC_BLACK);
+    Carc_Pawn* pawn=NULL;
+    Carc_Tile_Location loc=CTL_CENTER;
+    printf("loc=%d",loc);
+    //Test if player or tile null
+    printf("Test player is null: ");
+    pawn = CGG_play_pawn_in(NULL,PAWN_NORMAL,start_tile,loc);
+    printf("\tTest result: %d\n",pawn==NULL);
+    printf("Test tile is null: ");
+    pawn = CGG_play_pawn_in(NULL,PAWN_NORMAL,start_tile,loc);
+    printf("\tTest result: %d\n",pawn==NULL);
+    CPPawn_free_pawn(pawn);
+
+    //Test player cannot play
+    printf("Test cannot play this pawn type: \n");
+    player->nb_pawns[PAWN_ARCHITECT] = 0;
+    pawn = CGG_play_pawn_in(player,PAWN_ARCHITECT,start_tile,loc);
+    printf("\tTest result: %d\n",pawn==NULL);
+    CPPawn_free_pawn(pawn);
+
+    //Test invalid loc input
+    printf("Test invalid loc input: \n");
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_tile,68);
+    printf("\tTest result: %d\n",pawn==NULL);
+    CPPawn_free_pawn(pawn);
+
+    //Test when inputs allow to play
+    printf("Test when playing is ok: ");
+    pawn = CGG_play_pawn_in(player, PAWN_NORMAL, start_tile, CTL_CENTER);
+    printf("%d",pawn!=NULL && player->nb_pawns[PAWN_NORMAL]==NB_NORMAL_PAWNS_PER_PLAYER-1
+                && start_tile->center.pawn == pawn);
+    CPPawn_free_pawn(pawn);
+    pawn = CGG_play_pawn_in(player, PAWN_NORMAL, start_tile, CTL_SOUTH_WEST);
+    printf("%d",pawn!=NULL && player->nb_pawns[PAWN_NORMAL]==NB_NORMAL_PAWNS_PER_PLAYER-2
+                && start_tile->border[CTL_SOUTH_WEST].pawn == pawn);
+    CPPawn_free_pawn(pawn);
+
+    CPPlayer_free_player(player);
+    free(start_tile_str);
+}
+
 void test_game_run_all(){
     test_game_initiate();
     printf("\n*******************************\n");
@@ -209,5 +254,7 @@ void test_game_run_all(){
     test_game_node_transfer_rim_to_playboard();
     printf("\n*******************************\n");
     test_game_play_tile_in();
+    printf("\n*******************************\n");
+    test_game_play_pawn_in();
     printf("\n*******************************\n");
 }

@@ -56,11 +56,12 @@ void CBT_display_tile(Carc_Tile);
 Carc_Tile_Node* CBT_new_node(Carc_Construction_Type, Carc_Construction*);
 Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile*,Carc_Tile_Location);
 Carc_City_Merchandise CBT_parse_merchandise(char);
-void CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location);
+int CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location);
 void CBT_set_node_const(Carc_Tile*, Carc_Tile_Location, Carc_Construction*);
 void CBT_set_node_type(Carc_Tile*,Carc_Tile_Location, Carc_Construction_Type);
 char* CT_get_tile_file_path(char*);
 int CBT_add_pawn(Carc_Pawn*, Carc_Tile*, Carc_Tile_Location);
 int CBT_rm_pawn(Carc_Tile*, Carc_Tile_Location);
+int CBT_is_valid_loc(Carc_Tile_Location);
 
 #endif // DEF_CARC_TILE

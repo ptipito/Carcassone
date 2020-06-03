@@ -50,9 +50,6 @@ int CGG_rim_to_playboard_update_one_side(Carc_Rim* rim, Carc_Playboard_Location 
     ///This function aims to check on one side if the neighboring node already exists either on the playboard or in the rim in order to perform
     ///the relevant updates (neighbor references for nodes as well as updating existing node in the rim to include this new neighbor expanding the
     ///rim with a new node on this side)
-    Carc_Playboard_Node* node_val=NULL;
-    if(playboard_node!=NULL)
-        node_val=*playboard_node;
     if(rim==NULL || playboard_node==NULL || *playboard_node==NULL){
         fprintf(stderr,"Wrong use of CB_rim_to_playboard_update_one_side: an input is null\n");
         return 1;
@@ -80,10 +77,7 @@ int CGG_rim_to_playboard_update_one_side(Carc_Rim* rim, Carc_Playboard_Location 
     } else {
         //The neighbor is already on the playboard=>update its neighbors attribute
         CBP_set_neighbor(*playboard_node,neighbor_side,rim_node->neighbors[neighbor_side]);
-        Carc_Playboard_Node* neigh = CBP_get_neighbor(rim_node,neighbor_side);
-        Carc_Playboard_Connect_Side opp = CBP_get_opposite_side(neighbor_side);
         CBP_set_neighbor(CBP_get_neighbor(rim_node,neighbor_side),CBP_get_opposite_side(neighbor_side),playboard_node);
-
     }
     return 0;
 }
@@ -166,4 +160,18 @@ Carc_Playboard_Node* CGG_play_tile_in(Carc_Game* game, Carc_Playboard_Location l
     return NULL;
 }
 
+Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_Tile* tile, Carc_Tile_Location loc_on_tile){
+    Carc_Pawn* pawn=NULL;
+    if(tile==NULL){
+        fprintf(stderr,"ERROR: cannot have null tile input in CGG_play_pawn_in\n");
+    } else if(CPPlayer_can_play_pawn(player,pawn_type)==1){
+        pawn = CPPawn_new_pawn(player,pawn_type);
+        if(CBT_add_pawn(pawn, tile, loc_on_tile)!=0){
+            //The pawn can't be played
+            CPPawn_free_pawn(pawn);
+            pawn = NULL;
+        }
+    }
+    return pawn;
+}
 

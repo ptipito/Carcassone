@@ -105,6 +105,24 @@ void test_tile_CBT_new_node(){
     printf("%d",node->pawn==NULL && node->node_type==CCBT_CITY && CBC_construction_cmp(node->construction, CCBT_PATH, path, CCBT_PATH)==0);
 }
 
+void test_tile_is_valid_loc(){
+    printf("test_tile_is_valid_loc results: ");
+    printf("%d",CBT_is_valid_loc(CTL_CENTER)==1);
+    printf("%d",CBT_is_valid_loc(CTL_NORTH_WEST)==1);
+    printf("%d",CBT_is_valid_loc(CTL_NORTH)==1);
+    printf("%d",CBT_is_valid_loc(CTL_NORTH_EAST)==1);
+    printf("%d",CBT_is_valid_loc(CTL_EAST_NORTH)==1);
+    printf("%d",CBT_is_valid_loc(CTL_EAST)==1);
+    printf("%d",CBT_is_valid_loc(CTL_EAST_SOUTH)==1);
+    printf("%d",CBT_is_valid_loc(CTL_SOUTH_WEST)==1);
+    printf("%d",CBT_is_valid_loc(CTL_SOUTH)==1);
+    printf("%d",CBT_is_valid_loc(CTL_SOUTH_EAST)==1);
+    printf("%d",CBT_is_valid_loc(CTL_WEST_SOUTH)==1);
+    printf("%d",CBT_is_valid_loc(CTL_WEST)==1);
+    printf("%d",CBT_is_valid_loc(CTL_WEST_NORTH)==1);
+
+}
+
 void test_tile_get_node_from_loc(){
     printf("test_get_node_from_loc results: ");
     char *tile_path = CT_get_tile_file_path("tile1.txt");
@@ -285,6 +303,9 @@ void test_tile_add_pawn(){
     printf("%d",CBT_add_pawn(pawn,NULL,CTL_CENTER)==-1);
     //Test adding pawn on empty node
     printf("%d",CBT_add_pawn(pawn,tile_empty,CTL_CENTER)==0);
+    //Test adding pawn on invalid Carc_Tile_Location value
+    printf("%d",CBT_add_pawn(pawn,tile_start,255)==-1);
+    printf("%d",CBT_add_pawn(pawn,tile_start,-1)==-1);
     //Test adding on center
     printf("%d",CBT_add_pawn(pawn,tile_start,CTL_CENTER)==0
                 && CBT_get_node_from_loc(tile_start,CTL_CENTER)->pawn!=NULL);
@@ -352,6 +373,8 @@ void test_tile_run_all(){
     test_tile_new_empty_tile();
     printf("\n");
     test_tile_CBT_new_node();
+    printf("\n");
+    test_tile_is_valid_loc();
     printf("\n");
     test_tile_get_node_from_loc();
     printf("\n");

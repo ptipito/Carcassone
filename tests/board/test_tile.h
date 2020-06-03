@@ -12,6 +12,7 @@ void test_tile_tile_cmp();
 void test_turn_tile();
 void test_new_empty_tile();
 void test_CBT_new_node();
+void test_tile_is_valid_loc();
 void test_get_node_from_loc();
 void test_tile_get_loc_from_str();
 void test_tile_get_node_type_from_str();

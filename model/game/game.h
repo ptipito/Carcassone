@@ -22,5 +22,6 @@ void CGG_free_game(Carc_Game*);
 int CGG_rim_to_playboard_update_one_side(Carc_Rim*, Carc_Playboard_Location, Carc_Playboard_Node**, Carc_Playboard_Connect_Side);
 int CGG_node_transfer_rim_to_playboard(Carc_Game*,Carc_Playboard_Location, Carc_Playboard_Node**);
 Carc_Playboard_Node* CGG_play_tile_in(Carc_Game*, Carc_Playboard_Location, Carc_Tile*);
+Carc_Pawn* CGG_play_pawn_in(Carc_Player*, Carc_Pawn_Type, Carc_Tile*, Carc_Tile_Location);
 
 #endif // DEF_CARC_GAME

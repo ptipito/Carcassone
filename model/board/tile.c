@@ -24,9 +24,14 @@ Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile* tile, Carc_Tile_Location loc){
         fprintf(stderr, "ERROR: cannot get node for loc %d for NULL tile\n",loc);
         return NULL;
     }
-    if(loc == CTL_CENTER)
-        return &(tile->center);
-    return &(tile->border[loc]);
+    if(CBT_is_valid_loc(loc)){
+        if(loc == CTL_CENTER)
+            return &(tile->center);
+        return &(tile->border[loc]);
+    } else{
+        fprintf(stderr, "ERROR: loc %d is invalid\n",loc);
+        return NULL;
+    }
 }
 
 void CBT_free_tile(Carc_Tile* tile){
@@ -49,7 +54,7 @@ void CBT_free_tile(Carc_Tile* tile){
 }
 
 Carc_Tile_Location CBT_get_location_from_string(char* loc){
-    Carc_Tile_Location result=CTL_CENTER;
+    Carc_Tile_Location result=-1;
     if(strcmp(loc,"C")==0){
         result = CTL_CENTER;
     }
@@ -92,6 +97,10 @@ Carc_Tile_Location CBT_get_location_from_string(char* loc){
     return result;
 }
 
+int CBT_is_valid_loc(Carc_Tile_Location loc){
+    return 0<= loc && loc <= CTL_CENTER;
+}
+
 Carc_Construction_Type CBT_get_node_type_from_str(char* type){
     Carc_Construction_Type result=CCBT_FIELD;
     if(strcmp(type,"path")==0)
@@ -128,9 +137,13 @@ void CBT_set_node_const(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Constructi
     node->construction = construct;
 }
 
-void CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile_Location neighbor_loc){
+int  CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile_Location neighbor_loc){
+    if(CBT_is_valid_loc(loc)==0 || CBT_is_valid_loc(neighbor_loc)==0){
+        fprintf(stderr,"WARNING: single connexion not set as one of the locations is invalid\n");
+        return -1;
+    }
     if(loc == neighbor_loc){
-        return; //no connexion to self is possible
+        return -1; //no connexion to self is possible
     }
     if(loc == CTL_CENTER){
         tile->center_connexions[neighbor_loc] = 1;
@@ -140,11 +153,13 @@ void CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile
         tile->border_connexions[loc][neighbor_loc] = 1;
         tile->border_connexions[neighbor_loc][loc] = 1;
     }
+    return 0;
 }
 
-void CBT_set_node_type(Carc_Tile* tile,Carc_Tile_Location loc, Carc_Construction_Type type){
+void CBT_set_node_type(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Construction_Type type){
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile, loc);
-    node->node_type=type;
+    if(node!=NULL)
+        node->node_type=type;
 }
 
 Carc_Tile_Node* CBT_new_node(Carc_Construction_Type type, Carc_Construction* cons){
@@ -369,6 +384,8 @@ int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile
     Carc_Tile_Node *node_t1 = CBT_get_node_from_loc(&t1, t1_node_loc),
                    *node_t2 = CBT_get_node_from_loc(&t2, t2_node_loc);
 
+    if(node_t1==NULL || node_t2==NULL)
+        return 1;
     if(node_t1->node_type == node_t2->node_type)
         return 1;
     if((node_t1->node_type == CCBT_GARDEN && node_t2->node_type == CCBT_FIELD)
