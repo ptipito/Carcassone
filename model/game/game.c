@@ -175,3 +175,23 @@ Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_
     return pawn;
 }
 
+int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
+    ///Function to consider if a pawn can be played in a given location. It is based on
+    ///CBT_node_type_matches_pawn_type and add special rules, such as is the global
+    ///construction already occupied or when to play the architect
+    int allowed_to_play=0;
+    if(tile==NULL){
+        fprintf(stderr,"ERROR: cannot play pawn on null tile (CGG_can_play_pawn_in)\n");
+        return allowed_to_play;
+    }
+    Carc_Tile_Node* node=CBT_get_node_from_loc(tile,loc);
+    if(CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1
+       && CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1){
+        ///TODO: complete once the construction at global level are implemented
+        ///Add check if construction occupied
+        ///Add architect rule
+        allowed_to_play = 1;
+    }
+    return allowed_to_play;
+}
+

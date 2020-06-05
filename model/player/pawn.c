@@ -42,7 +42,7 @@ int CPPawn_send_back(Carc_Pawn* pawn){
     ///Send a pawn back into its player's hand
     int res=0;
     if(pawn==NULL){
-        fprintf(stderr, "ERROR: cannot send NULL pawnd back to a player \n");
+        fprintf(stderr, "ERROR: cannot send NULL pawn back to a player \n");
         res = -1;
     } else{
         res = CPPlayer_add_to_nb_pawns(pawn->owner,pawn->type,1);
@@ -68,7 +68,7 @@ int CPPawn_play(Carc_Pawn* pawn){
         res = 0;
     } else {
         fprintf(stderr,"ERROR: cannot play a pawn of type %d for player %d, because the player does not have any available pawn of type %d. (CPPawn_play)\n"
-                , pawn->type,pawn->owner->id,pawn->type);
+                ,pawn->type,pawn->owner->id,pawn->type);
     }
     return res;
 }

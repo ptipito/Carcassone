@@ -195,9 +195,9 @@ void test_tile_get_loc_from_str(){
     printf("%d",CBT_get_location_from_string("WN")==CTL_WEST_NORTH);
     printf("%d",CBT_get_location_from_string("C")==CTL_CENTER);
     //Test for invalid strings
-    printf("%d",CBT_get_location_from_string("i")==CTL_CENTER);
-    printf("%d",CBT_get_location_from_string("")==CTL_CENTER);
-    printf("%d",CBT_get_location_from_string("P")==CTL_CENTER);
+    printf("%d",CBT_get_location_from_string("i")==-1);
+    printf("%d",CBT_get_location_from_string("")==-1);
+    printf("%d",CBT_get_location_from_string("P")==-1);
 }
 
 void test_tile_get_node_type_from_str(){
@@ -291,12 +291,24 @@ void test_tile_get_tile_file_path(){
     free(s);
 }
 
+void test_tile_pawn_matches_node(){
+    printf("test_tile_pawn_matches_node results: ");
+    int i=0,j=0, nb_matches=0;
+    for(i=0;i<=CBCT_FIELD;i++){
+        for(j=0;j<=PAWN_PIG;j++){
+            nb_matches += CBT_node_type_matches_pawn_type(i,j);
+        }
+    }
+    printf("All tests successful: %d\n",nb_matches==16);
+}
+
 void test_tile_add_pawn(){
     printf("test_tile_add_pawn results: ");
     char* tile_start_str=CT_get_tile_file_path("tile1.txt");
     Carc_Tile *tile_empty=CBT_new_empty_tile(),
               *tile_start=CBT_new_tile_from_file(tile_start_str);
-    Carc_Pawn* pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
+    Carc_Pawn *pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
+              *architect=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_2,CPC_BLUE),PAWN_ARCHITECT);
 
     //Tile init without pawn tested in tile init tests
     //Test cannot add pawn on NULL tile
@@ -317,11 +329,18 @@ void test_tile_add_pawn(){
     printf("%d",CBT_add_pawn(pawn,tile_start,CTL_SOUTH)==-1
                 && CBT_get_node_from_loc(tile_start,CTL_SOUTH)->pawn==NULL);
 
+    //Test add pawn on a node not supporting this kind of pawn
+    printf("%d",CBT_add_pawn(architect,tile_start,CTL_SOUTH)==-1
+                && CBT_get_node_from_loc(tile_start,CTL_SOUTH)->pawn==NULL
+                && architect->owner->nb_pawns[PAWN_ARCHITECT]==NB_ARCHITECT_PAWNS_PER_PLAYER);
+
     free(tile_start_str);
     CBT_free_tile(tile_empty);
     CBT_free_tile(tile_start);
     CPPlayer_free_player(pawn->owner);
     CPPawn_free_pawn(pawn);
+    CPPlayer_free_player(architect->owner);
+    CPPawn_free_pawn(architect);
 }
 
 void test_tile_rm_pawn(){
@@ -389,6 +408,8 @@ void test_tile_run_all(){
     test_tiles_connect_in();
     printf("\n");
     test_tile_get_tile_file_path();
+    printf("\n");
+    test_tile_pawn_matches_node();
     printf("\n");
     test_tile_add_pawn();
     printf("\n");

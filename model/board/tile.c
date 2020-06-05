@@ -545,13 +545,45 @@ void CBT_display_tile(Carc_Tile tile){
     printf("\n");
 }
 
+int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn_Type pawn_type){
+    ///Function to tell if a pawn type can be played on a construction type.
+    ///Other considerations/rules such as checking if a player can legally play the architect are considered
+    ///at game level, as they imply to consider the construction as a whole (all the tiles building a same city
+    ///for instance) and not only a location on a tile.
+    int result=0;
+    switch(pawn_type){
+        case PAWN_NORMAL:
+            if(const_type!=CBCT_PATH_END)
+                result = 1;
+            //NB: the garden case is special as normal pawn can be played in the field only. This is handled in the structure Carc_Garden
+            break;
+        case PAWN_DOUBLE:
+            if(const_type!=CBCT_PATH_END)
+                result = 1;
+            break;
+        case PAWN_ARCHITECT:
+            if(const_type==CBCT_CITY || const_type==CBCT_PATH || const_type==CBCT_PATH_END)
+                result = 1;
+            break;
+        case PAWN_BISHOP:
+            if(const_type==CBCT_CLOISTER || const_type==CBCT_GARDEN)
+                result = 1;
+            break;
+        case PAWN_PIG:
+            if(const_type==CBCT_FIELD)
+                result = 1;
+            break;
+    }
+    return result;
+}
+
 int CBT_add_pawn(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
-    int res=0;
+    int res=-1;
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
     if(node==NULL){
         fprintf(stderr, "ERROR: cannot add pawn to NULL tile node\n");
-        res = -1;
-    } else{
+    } else if(CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1
+              && CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1){
         res = CPPawn_play(pawn);
         if(res==0){
             node->pawn = pawn;
