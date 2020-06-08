@@ -608,3 +608,113 @@ int CBT_rm_pawn(Carc_Tile* tile, Carc_Tile_Location loc){
     return res;
 }
 
+Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node** pointer_to_node){
+    if(pointer_to_node==NULL || *pointer_to_node==NULL){
+        fprintf(stderr,"ERROR: cannot init node list from NULL\n");
+        return NULL;
+    }
+    Carc_Tile_Node_List* res = malloc(sizeof(*res));
+    res->node = *pointer_to_node;
+    res->next = NULL;
+    return res;
+}
+
+void CBTList_free(Carc_Tile_Node_List* l){
+    //Free the allocated memory for a list.
+    //NB: freeing the tile nodes themselves is to be done when freeing the playboard
+    Carc_Tile_Node_List* next=NULL;
+    while(l!=NULL){
+        next = l->next;
+        free(l);
+        l = next;
+    }
+}
+
+int CBTList_append(Carc_Tile_Node_List* l, Carc_Tile_Node** n){
+    int fail=-1, already_in=-2;
+    Carc_Tile_Node_List* current=l, *previous=NULL;
+    Carc_Tile_Node_List* append=NULL;
+    if(l==NULL){
+        fprintf(stderr,"ERROR: Cannot add node to NULL (CTList_add_node)\n");
+        return fail;
+    }
+    if(n==NULL || *n==NULL){
+        fprintf(stderr,"ERROR: Cannot add NULL to a node list (CTList_add_node)\n");
+        return fail;
+    }
+    while(current!=NULL){
+        if(current->node==*n){
+            return already_in;
+        } else{
+            previous = current;
+            current = current->next;
+        }
+    }
+    append = CBTList_new(n);
+    if(append==NULL){
+        fprintf(stderr,"ERROR: cannot allocate memory (CTList_add_node)\n");
+        return fail;
+    }
+    previous->next = append;
+    return 0;
+}
+
+Carc_Macro_Construct* CBTMacro_Construct_new(Carc_Tile_Node** n){
+    if(n==NULL || *n==NULL || (*n)->construction==NULL){
+        fprintf(stderr,"ERROR: cannot initiate macro construct from NULL or from node with null construction (CTMacroConstruct_new)\n");
+        return NULL;
+    }
+    Carc_Macro_Construct* construct=malloc(sizeof(*construct));
+    if(construct==NULL){
+        fprintf(stderr,"ERROR: couldn't allocate memory (CTMacroConstruct_new)\n");
+        return NULL;
+    }
+    Carc_Tile_Node* node=*n;
+    construct->type = node->node_type;
+    construct->construct = *(node->construction);
+    construct->pawns = NULL;
+    construct->nb_pawns = 0;
+    construct->rim = CBTList_new(n);
+
+    return construct;
+}
+
+void CBTMacro_Construct_free(Carc_Macro_Construct* mc){
+    int i=0;
+    if(mc!=NULL){
+        for(i=0;i<mc->nb_pawns;i++){
+            //Pawns should be freed when sent back to players. When pawns are sent back, the construct should be
+            //updated accordingly. Thus this loop is in theorie useless but here for safety.
+            CPPawn_free_pawn(mc->pawns[i]);
+        }
+        free(mc->pawns);
+        CBTList_free(mc->rim);
+    }
+    free(mc);
+}
+
+Carc_Macro_Construct_List* CBTMacro_Construct_List_new(Carc_Macro_Construct** mc){
+    if(mc==NULL || *mc==NULL){
+        fprintf(stderr,"ERROR: cannot initiate list of macro constructs from NULL (CTMacro_Construct_new_list)\n");
+        return NULL;
+    }
+    Carc_Macro_Construct_List* constructs=malloc(sizeof(*constructs));
+    if(constructs==NULL){
+        fprintf(stderr,"ERROR: couldn't allocate memory (CTMacro_Construct_new_list)\n");
+        return NULL;
+    }
+    constructs->construct = *mc;
+    constructs->next = NULL;
+
+    return constructs;
+}
+
+void CBTMacro_Construct_List_free(Carc_Macro_Construct_List* l){
+    Carc_Macro_Construct_List* cur=l;
+    while(cur!=NULL){
+        CBTMacro_Construct_free(cur->construct);
+        l = cur->next;
+        free(cur);
+        cur = l;
+    }
+}

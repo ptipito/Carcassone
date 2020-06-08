@@ -34,6 +34,28 @@ typedef struct {
     Carc_Pawn* pawn;
 } Carc_Tile_Node;
 
+typedef struct Carc_Tile_Node_List Carc_Tile_Node_List;
+struct Carc_Tile_Node_List {
+    Carc_Tile_Node* node;
+    Carc_Tile_Node_List* next;
+};
+
+//A structure to consider constructions from at tile level and not at tile node level.
+//It is if two nodes of the same construction type are neighbors, gather them as one construction.
+//This avoids walking the same graph again and again and recompute all information of a construction at macro level.
+typedef struct {
+    Carc_Construction_Type type;
+    Carc_Construction construct;
+    Carc_Pawn** pawns;
+    int nb_pawns;
+    Carc_Tile_Node_List* rim;
+} Carc_Macro_Construct;
+
+typedef struct Carc_Macro_Construct_List Carc_Macro_Construct_List;
+struct Carc_Macro_Construct_List{
+    Carc_Macro_Construct* construct;
+    Carc_Macro_Construct_List* next;
+};
 
 typedef struct Carc_Tile {
     Carc_Tile_Location border_connexions[TILE_NR_BORDER_LOCATIONS][TILE_NR_BORDER_LOCATIONS];
@@ -64,5 +86,14 @@ int CBT_node_type_matches_pawn_type(Carc_Construction_Type, Carc_Pawn_Type);
 int CBT_add_pawn(Carc_Pawn*, Carc_Tile*, Carc_Tile_Location);
 int CBT_rm_pawn(Carc_Tile*, Carc_Tile_Location);
 int CBT_is_valid_loc(Carc_Tile_Location);
+
+Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node**);
+void CBTList_free(Carc_Tile_Node_List*);
+int CBTList_append(Carc_Tile_Node_List*, Carc_Tile_Node**);
+
+Carc_Macro_Construct* CBTMacro_Construct_new(Carc_Tile_Node**);
+void CBTMacro_Construct_free(Carc_Macro_Construct*);
+Carc_Macro_Construct_List* CBTMacro_Construct_List_new(Carc_Macro_Construct**);
+void CBTMacro_Construct_List_free(Carc_Macro_Construct_List*);
 
 #endif // DEF_CARC_TILE

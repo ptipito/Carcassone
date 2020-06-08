@@ -382,6 +382,76 @@ void test_tile_rm_pawn(){
     CBT_free_tile(tile_start);
 }
 
+void test_tile_list_new(){
+    printf("test_tile_list_new results: ");
+    Carc_Tile_Node node,
+                  *pointer_to_node=&node,
+                  *null_node=NULL;
+    Carc_Tile_Node_List* l=CBTList_new(&pointer_to_node);
+
+    printf("%d",CBTList_new(NULL)==NULL);
+    printf("%d",CBTList_new(&null_node)==NULL);
+    printf("%d",l!=NULL && l->node==pointer_to_node && l->next==NULL);
+
+    CBTList_free(l);
+}
+
+void test_tile_list_append(){
+    printf("test_tile_list_append results: ");
+    Carc_Tile_Node node,
+                   node2,
+                  *pointer_to_node=&node,
+                  *pointer_to_node2=&node2,
+                  *null_node=NULL;
+    Carc_Tile_Node_List* l=CBTList_new(&pointer_to_node);
+
+    printf("%d",CBTList_append(NULL,NULL)==-1);
+    printf("%d",CBTList_append(l,NULL)==-1);
+    printf("%d",CBTList_append(l,&null_node)==-1);
+    printf("%d",CBTList_append(l,&pointer_to_node)==-2);
+    printf("%d",CBTList_append(l,&pointer_to_node2)==0);
+    printf("%d",l!=NULL && l->next->node==pointer_to_node2 && l->next->next==NULL);
+
+    CBTList_free(l);
+}
+
+void test_tile_macro_construct_new(){
+    printf("test_tile_macro_construct_new results: ");
+    Carc_Tile_Node *node=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
+                   *node2=CBT_new_node(CBCT_CITY,NULL),
+                   *null_node=NULL;
+    Carc_Macro_Construct* mc=CBTMacro_Construct_new(&node);
+    printf("%d",CBTMacro_Construct_new(NULL)==NULL);
+    printf("%d",CBTMacro_Construct_new(&null_node)==NULL);
+    printf("%d",CBTMacro_Construct_new(&node2)==NULL);
+    printf("%d",mc!=NULL
+                && mc->type==node->node_type
+                && CBC_construction_cmp(&(mc->construct),mc->type,node->construction,node->node_type)==0
+                && mc->nb_pawns==0 && mc->pawns==NULL
+                && mc->rim!=NULL && mc->rim->node==node
+           );
+
+    CBTMacro_Construct_free(mc);
+    CBT_free_node(node);
+    CBT_free_node(node2);
+}
+
+void test_tile_macro_construct_list_new(){
+    printf("test_tile_macro_construct_list_new results: ");
+    Carc_Tile_Node* n=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE));
+    Carc_Macro_Construct* construct=CBTMacro_Construct_new(&n),
+                  *null_construct=NULL;
+    Carc_Macro_Construct_List* l=CBTMacro_Construct_List_new(&construct);
+
+    printf("%d",CBTMacro_Construct_List_new(NULL)==NULL);
+    printf("%d",CBTMacro_Construct_List_new(&null_construct)==NULL);
+    printf("%d",l!=NULL && l->construct==construct && l->next==NULL);
+
+    CBTMacro_Construct_List_free(l);
+    CBT_free_node(n);
+}
+
+
 void test_tile_run_all(){
     test_tile_parse_tile_file();
     printf("\n");
@@ -414,5 +484,13 @@ void test_tile_run_all(){
     test_tile_add_pawn();
     printf("\n");
     test_tile_rm_pawn();
+    printf("\n");
+    test_tile_list_new();
+    printf("\n");
+    test_tile_list_append();
+    printf("\n");
+    test_tile_macro_construct_new();
+    printf("\n");
+    test_tile_macro_construct_list_new();
     printf("\n");
 }

@@ -26,6 +26,18 @@ struct Carc_Playboard_Node {
 typedef struct Carc_Playboard_Origin{
     Carc_Playboard_Node* node;
 } Carc_Playboard_Origin;
+/*
+//A structure to consider constructions from at playboard level and not at tile or tile node level.
+//It is, it gather in a same construct the nodes of a same construct at macro level, i.e. over several tiles. E.g. a
+//same city over three different tiles.
+//This avoids walking the same graph again and again and recompute all information of a construction at macro level.
+typedef struct {
+    Carc_Construction_Type type;
+    Carc_Construction construct;
+    Carc_Pawn** pawns;
+    Carc_Tile_Node_List* rim;
+} Carc_Playboard_Construct;
+*/
 
 
 Carc_Playboard_Node* CBP_new_playboard_node(Carc_Tile*, Carc_Playboard_Location);
