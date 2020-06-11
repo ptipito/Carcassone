@@ -14,9 +14,14 @@ char* CT_get_tile_file_path(char* tile_name){
 
 void CBT_free_node(Carc_Tile_Node* node){
     if(node!=NULL){
-        free(node->construction);
+        if(node->node_type==CBCT_CITY){
+            CBC_free_city(node->construction);
+        } else{
+            free(node->construction);
+        }
         CPPawn_free_pawn(node->pawn);
     }
+    free(node);
 }
 
 Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile* tile, Carc_Tile_Location loc){
@@ -182,12 +187,14 @@ Carc_Tile* CBT_new_empty_tile(){
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
         tile->center_connexions[i]=0;
         tile->border[i].construction = NULL;
+        tile->border[i].node_type = -1;
         tile->border[i].pawn = NULL;
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
             tile->border_connexions[i][j]=0;
         }
     }
     tile->center.construction = NULL;
+    tile->center.node_type = -1;
     tile->center.pawn = NULL;
     return tile;
 }
@@ -267,7 +274,7 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
                                 //separate 2 options. Do nothing
                                 break;
                             case 'f':
-                                cur_const->city.has_flag = 1;
+                                cur_const->city.nb_flags = 1;
                                 break;
                             case 'c':
                                 cur_const->city.is_cathedral = 1;
@@ -277,7 +284,15 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
                                 cur_char = fgetc(tile_file);
                                 if(isalpha(cur_char)){
                                     //cur_char is supposed to be a letter representing the merchandise. Loop for parsing security
-                                    cur_const->city.merchandise = CBT_parse_merchandise(cur_char);
+                                    cur_const->city.merchandises = malloc(sizeof(Carc_City_Merchandise));
+                                    if(cur_const->city.merchandises!=NULL)
+                                        cur_const->city.merchandises[0] = CBT_parse_merchandise(cur_char);
+                                    else{
+                                        fprintf(stderr,"ERROR: couldn't allocate memory for merch (CBT_new_tile_from_file)\n");
+                                        free(cur_const);
+                                        CBT_free_tile(tile);
+                                        cur_char = EOF;
+                                    }
                                 }
                             default:
                                 break;
@@ -386,10 +401,7 @@ int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile
 
     if(node_t1==NULL || node_t2==NULL)
         return 1;
-    if(node_t1->node_type == node_t2->node_type)
-        return 1;
-    if((node_t1->node_type == CBCT_GARDEN && node_t2->node_type == CBCT_FIELD)
-       || (node_t1->node_type == CBCT_FIELD && node_t2->node_type == CBCT_GARDEN))
+    if(CBC_types_connect(node_t1->node_type,node_t2->node_type)==1)
         return 1;
 
     return 0;
@@ -660,8 +672,8 @@ int CBTList_append(Carc_Tile_Node_List* l, Carc_Tile_Node** n){
 }
 
 Carc_Macro_Construct* CBTMacro_Construct_new(Carc_Tile_Node** n){
-    if(n==NULL || *n==NULL || (*n)->construction==NULL){
-        fprintf(stderr,"ERROR: cannot initiate macro construct from NULL or from node with null construction (CTMacroConstruct_new)\n");
+    if(n==NULL || *n==NULL){
+        fprintf(stderr,"ERROR: cannot initiate macro construct from NULL node (CTMacroConstruct_new)\n");
         return NULL;
     }
     Carc_Macro_Construct* construct=malloc(sizeof(*construct));
@@ -670,11 +682,23 @@ Carc_Macro_Construct* CBTMacro_Construct_new(Carc_Tile_Node** n){
         return NULL;
     }
     Carc_Tile_Node* node=*n;
-    construct->type = node->node_type;
-    construct->construct = *(node->construction);
+    Carc_Construction_Type type=node->node_type;
+    if(type==CBCT_GARDEN){
+        //Gardens do not need to be considered as such in constructions but as fields.
+        //Gardens shall be handled separately
+        type = CBCT_FIELD;
+    }
+    construct->type = type;
+    construct->construct = (node->construction==NULL ? NULL : node->construction);
     construct->pawns = NULL;
     construct->nb_pawns = 0;
-    construct->rim = CBTList_new(n);
+    if(type==CBCT_PATH_END){
+        //Path ends represent the end of a path. As such they are not part of the path rim
+        construct->rim = NULL;
+    }else{
+        construct->rim = CBTList_new(n);
+    }
+
 
     return construct;
 }
@@ -718,3 +742,186 @@ void CBTMacro_Construct_List_free(Carc_Macro_Construct_List* l){
         cur = l;
     }
 }
+
+int CBTMacro_add_pawn(Carc_Macro_Construct* c, Carc_Pawn** pawn){
+    ///Add a pawn to the pawns attribute of the construct, if it is not already in.
+    int i, pawn_not_in=1, null_input=-2, fail=-1, success=0, pawn_already_in=-3;
+    if(c==NULL || pawn==NULL){
+        fprintf(stderr,"WARNING: cannot have NULL input for CBTMacro_add_pawn\n");
+        return null_input;
+    }
+    if(*pawn==NULL){
+        return success;//No pawn to add
+    }
+    Carc_Pawn** for_realloc=NULL;
+    //Check if the pawn is already in the construct
+    for(i=0;i<c->nb_pawns;i++){
+        if(c->pawns[i]==*pawn){
+            pawn_not_in = 0;
+            i = c->nb_pawns;
+        }
+    }
+    if(pawn_not_in){
+        for_realloc = realloc(c->pawns, (c->nb_pawns + 1)*sizeof(*(c->pawns)));
+        if(for_realloc==NULL){
+            fprintf(stderr,"ERROR; couldn't allocate space for adding new pawn (CBTMacro_add_pawn)\n");
+            return fail;
+        }
+        c->pawns = for_realloc;
+        c->pawns[c->nb_pawns] = *pawn;
+        c->nb_pawns++;
+        return success;
+    } else{
+        return pawn_already_in;
+    }
+}
+
+int CBTMacro_Construct_add_node(Carc_Macro_Construct* c, Carc_Tile_Node** n){
+    ///Add a node to the rim attribute of a construct if not already in.
+    if(c==NULL || n==NULL || *n==NULL){
+        fprintf(stderr,"ERROR: cannot have null input in CBTMacro_Construct_add_node\n");
+        return -1;
+    }
+    if(CBC_types_connect((*n)->node_type,c->type)==0){
+        fprintf(stderr,"ERROR: cannot add node to construct if their types doesn't connect CBTMacro_Construct_add_node\n");
+        return -1;
+    }
+    int res=CBTList_append(c->rim,n);
+    if(res==0){
+        //Consider adding info of the construction itself such has lakes, flags, etc...
+        if(c->type==CBCT_CITY)
+            CBCCity_enrich_with(&(c->construct->city),
+                                (*n)->construction->city);
+        if(c->type==CBCT_PATH || c->type==CBCT_PATH_END)
+            CBCPath_enrich_with(&(c->construct->path),(*n)->construction->path);
+        //Add pawns should be done outside this function has this function shall be executed
+        //before the player is allowed to play a pawn. It is however done here to, to secure
+        //unexpected inputs
+        CBTMacro_add_pawn(c,&((*n)->pawn));
+    }
+    return res;
+}
+
+int CBTMacro_node_in(Carc_Macro_Construct* construct, Carc_Tile_Node** n){
+    if(construct==NULL || n==NULL)
+        return 0;
+    Carc_Tile_Node_List *current=construct->rim;
+    int found=0;
+    while(current!=NULL){
+        if(current->node==*n){
+            found = 1;
+            current = NULL;
+        } else{
+            current = current->next;
+        }
+    }
+    return found;
+}
+
+Carc_Macro_Construct* CBTMacro_get_node_construct(Carc_Macro_Construct_List* l, Carc_Tile_Node** n){
+    if(n==NULL)
+        return NULL;
+    Carc_Macro_Construct_List *current=l;
+    Carc_Macro_Construct* res=NULL;
+    while(current!=NULL){
+        if(CBTMacro_node_in(current->construct,n)){
+            res = current->construct;
+            current = NULL;
+        } else{
+            current = current->next;
+        }
+    }
+    return res;
+}
+
+Carc_Macro_Construct_List* CBTMacro_add_to_list(Carc_Macro_Construct_List* l, Carc_Macro_Construct** c){
+    //Create new elt to duplicate and replace current head
+    if(c==NULL || *c==NULL){
+        fprintf(stderr,"ERROR: adding NULL construct to a list is forbidden (CBTMacro_add_to_list)\n");
+        return NULL;
+    }
+    if(l==NULL){
+        l = malloc(sizeof(*l));
+        l->construct = *c;
+        l->next = NULL;
+        return l;
+    }
+    Carc_Macro_Construct_List* new_elt = CBTMacro_Construct_List_new(&(l->construct));
+    if(new_elt==NULL){
+        fprintf(stderr,"ERROR: Couldn't allocate memory (CBTMacro_add_to_list)\n");
+        return NULL;
+    }
+    new_elt->next = l->next;
+    //update head elt and insert the duplicate as second elt
+    l->construct = *c;
+    l->next = new_elt;
+    return l;
+}
+
+Carc_Macro_Construct_List* CBTMacro_get_tile_macro_constructions(Carc_Tile* tile){
+    ///TODO: handle gardens: 2 constructions needed: garden and field
+    Carc_Macro_Construct_List* constructs=NULL;
+    Carc_Tile_Node *cur_node, *j_node,
+                   *center=CBT_get_node_from_loc(tile,CTL_CENTER);
+    Carc_Tile_Node** pcur_node=&cur_node;
+    Carc_Macro_Construct *j_construct=NULL,
+                         *new_const=NULL;
+    int i=0, j=0, added_to_const=0, center_added_to_const=0, nb_constructs=0;
+    if(tile!=NULL){
+        //Init lists
+        cur_node = CBT_get_node_from_loc(tile,0);
+        new_const = CBTMacro_Construct_new(pcur_node);
+        nb_constructs++;
+        constructs=CBTMacro_Construct_List_new(&new_const);
+
+        //Walk all locations on the tile and add the nodes to the construct they belong to.
+        //Create a new construct if the node doesn't belong to an existing one
+        for(i=1;i<TILE_NR_BORDER_LOCATIONS;i++){
+            cur_node = CBT_get_node_from_loc(tile,i);
+            //Check if the node belongs to an an existing construct. Loop stops at i as we walk the locations in increasing order.
+            //Hence no construct for nodes after i, since not considered.
+            added_to_const = 0;
+            j = 0;
+            while(j<i && !added_to_const){
+                if(tile->border_connexions[i][j]==1){
+                    j_node = CBT_get_node_from_loc(tile, j);
+                    j_construct = CBTMacro_get_node_construct(constructs,&j_node);
+                    if(j_node->node_type==cur_node->node_type){
+                        CBTMacro_Construct_add_node(j_construct,&cur_node);
+                    }
+                    added_to_const = 1;
+                }
+                j++;
+            }
+            //Create new construct if necessary
+            if(!added_to_const){
+                //Check if can be added to an existing construction through the center
+                //E.g. a path from east to west is connected through center but has no direct connection east-west
+                if(tile->center_connexions[i]==1 && center_added_to_const){
+                    j_construct = CBTMacro_get_node_construct(constructs,&center);
+                    CBTMacro_Construct_add_node(j_construct,&cur_node);
+                } else{//A new construction is needed
+                    new_const = CBTMacro_Construct_new(&cur_node);
+                    nb_constructs++;
+                    CBTMacro_add_to_list(constructs,&new_const);
+                }
+            }
+            //Add center to i's constructions if linked and center is not already in a construction
+            if(!center_added_to_const
+               && tile->center_connexions[i]==1
+               && CBC_types_connect(center->node_type,cur_node->node_type)==1){
+                CBTMacro_Construct_add_node(CBTMacro_get_node_construct(constructs,pcur_node)
+                                       ,&center);
+                center_added_to_const = 1;
+            }
+        }
+        //Consider stand alone center (e.g. cloister)
+        if(!center_added_to_const){
+            new_const = CBTMacro_Construct_new(&center);
+            nb_constructs++;
+            CBTMacro_add_to_list(constructs,&new_const);
+        }
+    }
+    return constructs;
+}
+

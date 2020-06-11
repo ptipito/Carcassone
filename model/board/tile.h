@@ -45,10 +45,10 @@ struct Carc_Tile_Node_List {
 //This avoids walking the same graph again and again and recompute all information of a construction at macro level.
 typedef struct {
     Carc_Construction_Type type;
-    Carc_Construction construct;
+    Carc_Construction* construct;
     Carc_Pawn** pawns;
     int nb_pawns;
-    Carc_Tile_Node_List* rim;
+    Carc_Tile_Node_List* rim;//The current edge of a construction. I.e. all nodes offering a possible connection to extend this construction.
 } Carc_Macro_Construct;
 
 typedef struct Carc_Macro_Construct_List Carc_Macro_Construct_List;
@@ -95,5 +95,11 @@ Carc_Macro_Construct* CBTMacro_Construct_new(Carc_Tile_Node**);
 void CBTMacro_Construct_free(Carc_Macro_Construct*);
 Carc_Macro_Construct_List* CBTMacro_Construct_List_new(Carc_Macro_Construct**);
 void CBTMacro_Construct_List_free(Carc_Macro_Construct_List*);
+int CBTMacro_add_pawn(Carc_Macro_Construct*, Carc_Pawn**);
+int CBTMacro_Construct_add_node(Carc_Macro_Construct*, Carc_Tile_Node**);
+int CBTMacro_node_in(Carc_Macro_Construct*, Carc_Tile_Node**);
+Carc_Macro_Construct* CBTMacro_get_node_construct(Carc_Macro_Construct_List*, Carc_Tile_Node**);
+Carc_Macro_Construct_List* CBTMacro_add_to_list(Carc_Macro_Construct_List*, Carc_Macro_Construct**);
+Carc_Macro_Construct_List* CBTMacro_get_tile_macro_constructions(Carc_Tile*);
 
 #endif // DEF_CARC_TILE
