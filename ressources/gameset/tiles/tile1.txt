@@ -18,7 +18,7 @@ E
 	neighbors:C
 ES
 	node:field
-	neighbors:SE
+	neighbors:SE WS
 SE
 	node:field
 	neighbors:ES S
@@ -30,7 +30,7 @@ SW
 	neighbors:S WS
 WS
 	node:field
-	neighbors:SW
+	neighbors:SW ES
 W
 	node:path
 	neighbors:C

@@ -3,16 +3,16 @@ C
 	neighbors:S
 NW
 	node:field
-	neighbors:N WN
+	neighbors:N WN SW
 N
 	node:field
 	neighbors:NW NE
 NE
 	node:field
-	neighbors:N EN
+	neighbors:N EN SE
 EN
 	node:field
-	neighbors:EN E
+	neighbors:EN E WN
 E
 	node:field
 	neighbors:EN ES
@@ -21,13 +21,13 @@ ES
 	neighbors:E SE
 SE
 	node:field
-	neighbors:ES
+	neighbors:ES NE
 S
 	node:path
 	neighbors:C
 SW
 	node:field
-	neighbors:WS
+	neighbors:WS NW
 WS
 	node:field
 	neighbors:SW W
@@ -36,4 +36,4 @@ W
 	neighbors:WS WN
 WN
 	node:field
-	neigbors:W NW
+	neigbors:W NW EN
