@@ -33,6 +33,14 @@ void test_game_initiate(){
     }
     printf("%d",boolean);
 
+    //Test constructs init properly
+    Carc_Macro_Construct_List* game_const = game->constructs;
+    printf("%d",game_const!=NULL && game_const->construct->type==CBCT_FIELD
+           && game_const->next!=NULL && game_const->next->construct->type==CBCT_PATH
+           && game_const->next->next!=NULL && game_const->next->next->construct->type==CBCT_FIELD
+           && game_const->next->next->next!=NULL && game_const->next->next->next->construct->type==CBCT_CITY
+           && game_const->next->next->next->next==NULL);
+
     //Test creating with invalid number of players
     printf("\n");
     printf("%d\n",CGG_initiate_game(start_tile_str,1)==NULL);

@@ -14,6 +14,7 @@
 typedef struct Carc_Game{
     Carc_Playboard_Origin* playboard;
     Carc_Rim* playable;
+    Carc_Macro_Construct_List* constructs;
     Carc_Player* players[NB_MAX_PLAYERS+1];//index 0 should remain NULL. Other indices are aligned with player id (starting from 1).
 } Carc_Game;
 

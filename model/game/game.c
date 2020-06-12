@@ -1,7 +1,7 @@
 #include "model/game/game.h"
 
 Carc_Game* CGG_initiate_game(char* filename, int nb_players){
-    Carc_Game *game = malloc(sizeof(Carc_Game));
+    Carc_Game* game=malloc(sizeof(Carc_Game));
     if(game==NULL){
         fprintf(stderr,"ERROR: couldn't allocate memory for new game object\n");
         carcassone_error_quit(ERR_MEM_ALLOC,NULL);
@@ -11,9 +11,9 @@ Carc_Game* CGG_initiate_game(char* filename, int nb_players){
                       ,nb_players, NB_MAX_PLAYERS);
         return NULL;
     }
-    Carc_Tile *start_tile = CBT_new_tile_from_file(filename);
-    Carc_Playboard_Origin *playboard_origin = CBP_init_playboard(start_tile);
-    Carc_Playboard_Node** pointer_on_origin_node = &(playboard_origin->node);
+    Carc_Tile* start_tile=CBT_new_tile_from_file(filename);
+    Carc_Playboard_Origin* playboard_origin=CBP_init_playboard(start_tile);
+    Carc_Playboard_Node** pointer_on_origin_node=&(playboard_origin->node);
     int i=0;
 
     game->playboard = playboard_origin;
@@ -27,12 +27,15 @@ Carc_Game* CGG_initiate_game(char* filename, int nb_players){
     for(i=nb_players+1;i<=NB_MAX_PLAYERS;i++){
         game->players[i] = NULL;
     }
+    //Set initial constructs
+    game->constructs = CBTMacroC_get_tile_macro_constructions(start_tile);
 
     return game;
 }
 
 void CGG_free_game(Carc_Game* game){
     if(game!=NULL){
+        CBTMacroCList_free(game->constructs);
         CBP_free_playboard(game->playboard);
         CBRim_free(game->playable);
         int i;
@@ -155,6 +158,7 @@ Carc_Playboard_Node* CGG_play_tile_in(Carc_Game* game, Carc_Playboard_Location l
             CBP_free_playboard_node(playboard_node);
             return NULL;
         }
+        ///TODO update game->constructs
     }
     //else loc is not playable (by definition of the game rim)
     return NULL;
@@ -172,6 +176,7 @@ Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_
             pawn = NULL;
         }
     }
+    ///TODO update game->constructs
     return pawn;
 }
 
