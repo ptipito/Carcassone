@@ -11,8 +11,8 @@ void test_rim_new_empty(){
 void test_rim_insert_node(){
     printf("test_rim_insert_node results: ");
     Carc_Rim *rim = CB_Rim_new_empty();
-    char *tile1_path = CT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path = CT_get_tile_file_path("cloister_path.txt");
+    char *tile1_path = CBT_get_tile_file_path("tile1.txt"),
+         *cloister_tile_path = CBT_get_tile_file_path("cloister_path.txt");
     Carc_Tile *start_tile = CBT_new_tile_from_file(tile1_path),
               *cloister_tile = CBT_new_tile_from_file(cloister_tile_path);
     Carc_Playboard_Node *node1 = CBP_new_empty_playboard_node(CBP_Location_new(0,1)),
@@ -54,7 +54,7 @@ void test_rim_insert_node(){
 
 void test_rim_remove_first(){
     printf("test_rim_remove_first results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Tile *start_tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Node *playboard_first_node = CBP_init_playboard(start_tile)->node;
     Carc_Rim *rim = CBRim_initiate(&playboard_first_node);
@@ -83,7 +83,7 @@ void test_rim_remove_first(){
 
 void test_rim_remove_by_node_coordinates(){
     printf("test_rim_remove_by_node_coordinates results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node *node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,1)),
                         *node2 = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(1,0)),
                         *node3 = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,-1)),
@@ -109,7 +109,7 @@ void test_rim_remove_by_node_coordinates(){
 
 void test_rim_find_by_location(){
     printf("CB_Rim_find_by_location results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Tile *start_tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Origin *playboard_origin = CBP_init_playboard(start_tile);
     Carc_Playboard_Node *playboard_first_node = playboard_origin->node;
@@ -137,7 +137,7 @@ void test_rim_find_by_location(){
 
 void test_rim_initiate(){
     printf("test_rim_initiate results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node *node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0)),
                         *null_node = NULL;
     Carc_Rim *rim = CBRim_initiate(&node),

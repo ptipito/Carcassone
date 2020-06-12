@@ -81,7 +81,7 @@ Carc_City_Merchandise CBT_parse_merchandise(char);
 int CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location);
 void CBT_set_node_const(Carc_Tile*, Carc_Tile_Location, Carc_Construction*);
 void CBT_set_node_type(Carc_Tile*,Carc_Tile_Location, Carc_Construction_Type);
-char* CT_get_tile_file_path(char*);
+char* CBT_get_tile_file_path(char*);
 int CBT_node_type_matches_pawn_type(Carc_Construction_Type, Carc_Pawn_Type);
 int CBT_add_pawn(Carc_Pawn*, Carc_Tile*, Carc_Tile_Location);
 int CBT_rm_pawn(Carc_Tile*, Carc_Tile_Location);
@@ -91,15 +91,15 @@ Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node**);
 void CBTList_free(Carc_Tile_Node_List*);
 int CBTList_append(Carc_Tile_Node_List*, Carc_Tile_Node**);
 
-Carc_Macro_Construct* CBTMacro_Construct_new(Carc_Tile_Node**);
-void CBTMacro_Construct_free(Carc_Macro_Construct*);
-Carc_Macro_Construct_List* CBTMacro_Construct_List_new(Carc_Macro_Construct**);
-void CBTMacro_Construct_List_free(Carc_Macro_Construct_List*);
-int CBTMacro_add_pawn(Carc_Macro_Construct*, Carc_Pawn**);
-int CBTMacro_Construct_add_node(Carc_Macro_Construct*, Carc_Tile_Node**);
-int CBTMacro_node_in(Carc_Macro_Construct*, Carc_Tile_Node**);
-Carc_Macro_Construct* CBTMacro_get_node_construct(Carc_Macro_Construct_List*, Carc_Tile_Node**);
-Carc_Macro_Construct_List* CBTMacro_add_to_list(Carc_Macro_Construct_List*, Carc_Macro_Construct**);
-Carc_Macro_Construct_List* CBTMacro_get_tile_macro_constructions(Carc_Tile*);
+Carc_Macro_Construct* CBTMacroC_new(Carc_Tile_Node**);
+void CBTMacroC_free(Carc_Macro_Construct*);
+Carc_Macro_Construct_List* CBTMacroCList_new(Carc_Macro_Construct**);
+void CBTMacroCList_free(Carc_Macro_Construct_List*);
+int CBTMacroC_add_pawn(Carc_Macro_Construct*, Carc_Pawn**);
+int CBTMacroC_add_node(Carc_Macro_Construct*, Carc_Tile_Node**);
+int CBTMacroC_node_in(Carc_Macro_Construct*, Carc_Tile_Node**);
+Carc_Macro_Construct* CBTMacroC_get_node_construct(Carc_Macro_Construct_List*, Carc_Tile_Node**);
+Carc_Macro_Construct_List* CBTMacroCList_append(Carc_Macro_Construct_List*, Carc_Macro_Construct**);
+Carc_Macro_Construct_List* CBTMacroC_get_tile_macro_constructions(Carc_Tile*);
 
 #endif // DEF_CARC_TILE

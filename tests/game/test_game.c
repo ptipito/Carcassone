@@ -2,7 +2,7 @@
 
 void test_game_initiate(){
     printf("test_game_initiate results: ");
-    char* start_tile_str = CT_get_tile_file_path("tile1.txt");
+    char* start_tile_str = CBT_get_tile_file_path("tile1.txt");
     int i, boolean=1;
 
     //Test playboard and rim init properly
@@ -46,8 +46,8 @@ void test_game_initiate(){
 void test_game_rim_to_playboard_update_one_side(){
     printf("test_game_rim_to_playboard_update_one_side results: ");
     int update_result=0;
-    char *tile1_path = CT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path = CT_get_tile_file_path("cloister_path.txt");
+    char *tile1_path = CBT_get_tile_file_path("tile1.txt"),
+         *cloister_tile_path = CBT_get_tile_file_path("cloister_path.txt");
     Carc_Game* game = CGG_initiate_game(tile1_path,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),
@@ -93,7 +93,7 @@ void test_game_rim_to_playboard_update_one_side(){
 void test_game_node_transfer_rim_to_playboard(){
     printf("test_game_node_transfer_rim_to_playboard results:\n");
     int update_result=0;
-    char* tile1_path = CT_get_tile_file_path("tile1.txt");
+    char* tile1_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Game* game = CGG_initiate_game(tile1_path,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt"),
@@ -133,8 +133,8 @@ void test_game_node_transfer_rim_to_playboard(){
 
 void test_game_play_tile_in(){
     printf("test_game_play_tile_in results: ");
-    char *start_tile_str = CT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_str = CT_get_tile_file_path("cloister_path.txt");
+    char *start_tile_str = CBT_get_tile_file_path("tile1.txt"),
+         *cloister_tile_str = CBT_get_tile_file_path("cloister_path.txt");
     Carc_Game* game = CGG_initiate_game(start_tile_str,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Tile* cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
@@ -203,7 +203,7 @@ void test_game_play_tile_in(){
 
 void test_game_play_pawn_in(){
     printf("test_game_play_pawn_in results: \n");
-    char *start_tile_str=CT_get_tile_file_path("tile1.txt");
+    char *start_tile_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Tile* start_tile=CBT_new_tile_from_file(start_tile_str);
     Carc_Player* player=CPPlayer_init_player(PLAYER_1,CPC_BLACK);
     Carc_Pawn* pawn=NULL;
