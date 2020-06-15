@@ -128,6 +128,7 @@ int CBCCity_enrich_with(Carc_City* src, const Carc_City new_info){
     src->is_cathedral += new_info.is_cathedral;
     src->nb_flags += new_info.nb_flags;
     for(i=0;i<new_info.nb_merchandises;i++){
+        ///TODO: Inattention here. Move the max_try mechanics into the add_merchandise func
         cur_try = 0;
         if(CBCCity_add_merchandise(src,new_info.merchandises[i])!=0){
             if(cur_try > max_try){

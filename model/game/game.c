@@ -28,14 +28,14 @@ Carc_Game* CGG_initiate_game(char* filename, int nb_players){
         game->players[i] = NULL;
     }
     //Set initial constructs
-    game->constructs = CBTMacroC_get_tile_macro_constructions(start_tile);
+    game->constructs = CBMC_get_tile_macro_constructions(start_tile);
 
     return game;
 }
 
 void CGG_free_game(Carc_Game* game){
     if(game!=NULL){
-        CBTMacroCList_free(game->constructs);
+        CBMCList_free(game->constructs);
         CBP_free_playboard(game->playboard);
         CBRim_free(game->playable);
         int i;
@@ -198,5 +198,58 @@ int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location lo
         allowed_to_play = 1;
     }
     return allowed_to_play;
+}
+
+/*int CGG_merge_with_neighbor(Carc_Game* game, Carc_Playboard_Node* node, Carc_Playboard_Connect_Side neigh_side){
+    ///TO_TEST
+
+}*/
+
+int CBMC_merge_const(Carc_Macro_Construct* into, Carc_Macro_Construct** from,
+                         Carc_Tile_Node_List* into_connect_nodes, Carc_Tile_Node_List* from_connect_nodes){
+    ///TO_TEST + TO_MIGRATE
+
+    ///Take information from the construct \from and enrich the construct \into with
+    ///this information. Once all the \from info has been imported into \into, \from is
+    ///freed (as it is now a part of \into).
+    ///The nodes list are used to update the rim of into. The connecting nodes should be in the same order
+    ///in both list (into_connect_nodes[0] corresponds to from_connect_nodes[0], etc...)
+    int fail=-1, success=0, res=success, i=0;
+    Carc_Macro_Construct* from_construct=NULL;
+    if(pointer_is_null(into,1)){
+        fprintf(stderr,"ERROR: first input cannot be NULL (CGG_merge_constructs)\n");
+        return fail;
+    }
+    if(pointer_has_null_value((void**)from,0)){ //Nothing to be done
+        return success;
+    }
+    from_construct = *from;
+    if(into==from_construct){ //Nothing to be done
+        return success;
+    }
+    if(!CBC_types_connect(into->type,from_construct->type)){
+        fprintf(stderr,"ERROR: Construct have none matching types (CGG_merge_constructs)\n");
+        return fail;
+    } else{
+        //Update construct info
+        CBMC_enrich_with(into,from_construct);
+        if(res==success){
+            //Update pawns
+            for(i=0;i<from_construct->nb_pawns;i++){
+                if(CBMC_add_pawn(into,&(from_construct->pawns[i]))==0){
+                    into->nb_pawns++;
+                } else{
+                    res = fail;
+                }
+            }
+            //Update rim
+            res = (CBMC_rm_list_from_rim(into,into_connect_nodes)==FUNC_SUCCESS
+                  && CBMC_rm_list_from_rim(from_construct,from_connect_nodes)==FUNC_SUCCESS
+                  && CBMC_transfer_rim(into,from_construct)==FUNC_SUCCESS);
+            //Free the now irrelevant construction
+            CBMC_free(from_construct);
+        }
+    }
+    return res;
 }
 

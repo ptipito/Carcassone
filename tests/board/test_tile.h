@@ -28,7 +28,5 @@ void test_tile_run_all();
 void test_tile_list_new();
 void test_tile_list_append();
 
-void test_tile_macro_construct_new();
-void test_tile_macro_construct_list_new();
 
 #endif // DEF_TEST_TILE

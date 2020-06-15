@@ -20,6 +20,8 @@ typedef struct {
     int has_lake;
 } Carc_Path;
 
+
+///TODO: Delete Garden struct and replace with a Field struct with attribute "has_garden"?. This might simplify garden considerations in the game.
 typedef struct {
     int field_occupied;
     int garden_occupied;

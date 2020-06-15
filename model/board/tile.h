@@ -90,16 +90,9 @@ int CBT_is_valid_loc(Carc_Tile_Location);
 Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node**);
 void CBTList_free(Carc_Tile_Node_List*);
 int CBTList_append(Carc_Tile_Node_List*, Carc_Tile_Node**);
+int CBTList_append_list(Carc_Tile_Node_List*, Carc_Tile_Node_List*);
+int CBTList_rm(Carc_Tile_Node_List*, Carc_Tile_Node**);
+int CBTList_rm_nodes(Carc_Tile_Node_List*, Carc_Tile_Node_List*);
 
-Carc_Macro_Construct* CBTMacroC_new(Carc_Tile_Node**);
-void CBTMacroC_free(Carc_Macro_Construct*);
-Carc_Macro_Construct_List* CBTMacroCList_new(Carc_Macro_Construct**);
-void CBTMacroCList_free(Carc_Macro_Construct_List*);
-int CBTMacroC_add_pawn(Carc_Macro_Construct*, Carc_Pawn**);
-int CBTMacroC_add_node(Carc_Macro_Construct*, Carc_Tile_Node**);
-int CBTMacroC_node_in(Carc_Macro_Construct*, Carc_Tile_Node**);
-Carc_Macro_Construct* CBTMacroC_get_node_construct(Carc_Macro_Construct_List*, Carc_Tile_Node**);
-Carc_Macro_Construct_List* CBTMacroCList_append(Carc_Macro_Construct_List*, Carc_Macro_Construct**);
-Carc_Macro_Construct_List* CBTMacroC_get_tile_macro_constructions(Carc_Tile*);
 
 #endif // DEF_CARC_TILE

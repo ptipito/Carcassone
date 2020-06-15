@@ -5,6 +5,7 @@
 #include "model/carcassone_errors.h"
 #include "model/board/carcassone_playboard.h"
 #include "model/board/rim.h"
+#include "model/board/macro_constructions.h"
 #include "model/player/player.h"
 
 /*Contains the game representation
