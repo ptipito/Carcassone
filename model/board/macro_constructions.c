@@ -115,7 +115,12 @@ int CBMC_add_node(Carc_Macro_Construct* c, Carc_Tile_Node** n){
         fprintf(stderr,"ERROR: cannot add node to construct if their types doesn't connect CBMC_add_node\n");
         return -1;
     }
-    int res=CBTList_append(c->rim,n);
+    int res=0;
+    if((*n)->node_type!=CBCT_PATH_END){
+        //If a node is a path end, it neither link the current node to another node of the same construct
+        //nor represents a rim info -->Do not append to rim, but consider potential other info (e.g. lake)
+        res = CBTList_append(c->rim,n);
+    }
     if(res==0){
         //Consider adding info of the construction itself such has lakes, flags, etc...
         if(c->type==CBCT_CITY)
@@ -164,7 +169,6 @@ Carc_Macro_Construct* CBMC_get_node_construct(Carc_Macro_Construct_List* l, Carc
 }
 
 Carc_Macro_Construct_List* CBMCList_append(Carc_Macro_Construct_List* l, Carc_Macro_Construct** c){
-    //Create new elt to duplicate and replace current head
     if(c==NULL || *c==NULL){
         fprintf(stderr,"ERROR: adding NULL construct to a list is forbidden (CBMCList_append)\n");
         return NULL;
@@ -175,6 +179,7 @@ Carc_Macro_Construct_List* CBMCList_append(Carc_Macro_Construct_List* l, Carc_Ma
         l->next = NULL;
         return l;
     }
+    //Create new elt to duplicate and replace current head
     Carc_Macro_Construct_List* new_elt = CBMCList_new(&(l->construct));
     if(new_elt==NULL){
         fprintf(stderr,"ERROR: Couldn't allocate memory (CBMCList_append)\n");
@@ -241,7 +246,9 @@ Carc_Macro_Construct_List* CBMC_get_tile_macro_constructions(Carc_Tile* tile){
                && CBC_types_connect(center->node_type,cur_node->node_type)==1){
                 CBMC_add_node(CBMC_get_node_construct(constructs,pcur_node)
                                        ,&center);
-                center_added_to_const = 1;
+                //In case of a path end for a path cross, the path end info has to be considered for each path
+                if(center->node_type!=CBCT_PATH_END)
+                    center_added_to_const = 1;
             }
         }
         //Consider stand alone center (e.g. cloister)
@@ -249,35 +256,58 @@ Carc_Macro_Construct_List* CBMC_get_tile_macro_constructions(Carc_Tile* tile){
             new_const = CBMC_new(&center);
             nb_constructs++;
             CBMCList_append(constructs,&new_const);
+        } else {
+            //Rm center from rim. Why is explained below
+            //Center was added to a rim but to build the rim of a construct that goes through the center
+            //but center can never be part of the rim, as the rim element of a construct represents the
+            //nodes on the edge of the construct that can lead to a construct extension (i.e. that are on the
+            //of a tile). Center can never lead to such an extension, except during the initial build of the
+            //tile constructs OR for cloisters/garden who are composed of one node only (their completion is not
+            //handled through the rim.
+            CBMC_rm_from_rim(CBMC_get_node_construct(constructs,&center),&center);
         }
     }
     return constructs;
 }
 
 int CBMC_rm_from_rim(Carc_Macro_Construct* c, Carc_Tile_Node** n){
-    ///TO_TEST + TO_MIGRATE
     if(pointer_is_not_null(c,1)){
-        return CBTList_rm(c->rim,n);
+        return CBTList_rm(&(c->rim),n);
     }
     return FUNC_FAIL;
 }
 
 int CBMC_rm_list_from_rim(Carc_Macro_Construct* c, Carc_Tile_Node_List* rm){
-    ///TO_TEST + TO_MIGRATE
     if(pointer_is_not_null(c,1)){
-        CBTList_rm_nodes(c->rim,rm);
-        return FUNC_SUCCESS;
+        return CBTList_rm_nodes(&(c->rim),rm);
     }
     return FUNC_FAIL;
 }
 
 int CBMC_transfer_rim(Carc_Macro_Construct* into, Carc_Macro_Construct* from){
-    ///TO_TEST + TO_MIGRATE
+    if(pointer_is_null(into,0)){
+        fprintf(stderr,"ERROR: cannot transfer rim in NULL consturct\n");
+        return FUNC_FAIL;
+    }
+    if(pointer_is_null(from,0)){
+        return FUNC_SUCCESS;//No change to be performed
+    }
     return CBTList_append_list(into->rim,from->rim);
 }
 
 int CBMC_enrich_with(Carc_Macro_Construct* to_enrich, Carc_Macro_Construct* new_info){
-    ///TO_TEST + TO_MIGRATE
+    ///Function to merge the info two constructs of a Macro Construct. Only the construct info
+    ///is considered. Merging other informations (rims and pawns e.g.) is done in another function
+    ///as it requires additional info.
+    if(pointer_is_null(to_enrich,1)){
+        return FUNC_FAIL;
+    }
+    if(pointer_is_null(new_info,0)){
+        return FUNC_SUCCESS;//Nothing to be done
+    }
+    if(!CBC_types_connect(to_enrich->type,new_info->type)){
+        return FUNC_FAIL;
+    }
     int res=FUNC_SUCCESS;
     switch(to_enrich->type){
         case CBCT_CITY:
@@ -295,6 +325,53 @@ int CBMC_enrich_with(Carc_Macro_Construct* to_enrich, Carc_Macro_Construct* new_
             fprintf(stderr,"ERROR: Try to merge non mergeable constructs of type %d (CGG_merge_constructs)\n",to_enrich->type);
             res = FUNC_FAIL;
             break;
+    }
+    return res;
+}
+
+int CBMC_merge_const(Carc_Macro_Construct* into, Carc_Macro_Construct** from,
+                         Carc_Tile_Node_List* into_connect_nodes, Carc_Tile_Node_List* from_connect_nodes){
+    ///Take information from the construct \from and enrich the construct \into with
+    ///this information. Once all the \from info has been imported into \into, \from is
+    ///freed (as it is now a part of \into).
+    ///The nodes list are used to update the rim of into. The connecting nodes should be in the same order
+    ///in both list (into_connect_nodes[0] corresponds to from_connect_nodes[0], etc...)
+    int fail=FUNC_FAIL, success=FUNC_SUCCESS, res=success, i=0;
+    Carc_Macro_Construct* from_construct=NULL;
+    if(pointer_is_null(into,1)){
+        fprintf(stderr,"ERROR: first input cannot be NULL (CGG_merge_constructs)\n");
+        return fail;
+    }
+    if(pointer_has_null_value((void**)from,0)){ //Nothing to be done
+        return success;
+    }
+    from_construct = *from;
+    if(into==from_construct){ //Cannot merge a construct into itself
+        return success;
+    }
+    if(!CBC_types_connect(into->type,from_construct->type)){
+        fprintf(stderr,"ERROR: Construct have none matching types (CGG_merge_constructs)\n");
+        return fail;
+    } else{
+        //Update construct info
+        res = CBMC_enrich_with(into,from_construct);
+        if(res==success){
+            //Update pawns
+            for(i=0;i<from_construct->nb_pawns;i++){
+                if(CBMC_add_pawn(into,&(from_construct->pawns[i]))!=0){
+                    res = fail;
+                }
+            }
+            //Update rim
+            if(!(CBMC_rm_list_from_rim(into,into_connect_nodes)==FUNC_SUCCESS
+                  && CBMC_rm_list_from_rim(from_construct,from_connect_nodes)==FUNC_SUCCESS
+                  && CBMC_transfer_rim(into,from_construct)==FUNC_SUCCESS)
+               ){
+               res = FUNC_FAIL;
+            }
+            //Free the now irrelevant construction
+            CBMC_free(from_construct);
+        }
     }
     return res;
 }

@@ -132,7 +132,6 @@ int CBP_connect_is_possible(Carc_Playboard_Node* src, Carc_Playboard_Connect_Sid
     }
 
     switch(connect_side){
-        //TODO: ADAPT the below computation with TILE_NR_LOCATIONS_ON_ONE_EDGE
         case CPCS_UP:
             src_locations[0] = CTL_NORTH_WEST;
             neigh_locations[0] = CTL_SOUTH_WEST;
@@ -273,7 +272,9 @@ int CBP_rm_pawn_in(Carc_Playboard_Node* node, Carc_Tile_Location loc_in_tile){
 }
 
 Carc_Tile_Node_List* CBP_get_edge_nodes(Carc_Playboard_Node* node, Carc_Playboard_Connect_Side edge){
-    ///TO_TEST
+    if(pointer_is_null(node,0) || pointer_is_null(node->node,0)){
+        return NULL;
+    }
     Carc_Tile_Node* cur_tile_node=NULL;
     Carc_Tile_Node_List* node_list=NULL;
     //Get node of merging side
@@ -287,11 +288,11 @@ Carc_Tile_Node_List* CBP_get_edge_nodes(Carc_Playboard_Node* node, Carc_Playboar
             CBTList_append(node_list,&cur_tile_node);
             break;
         case CPCS_RIGHT:
-            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST_NORTH);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST_NORTH);
             node_list = CBTList_new(&cur_tile_node);
-            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST);
             CBTList_append(node_list,&cur_tile_node);
-            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST_SOUTH);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST_SOUTH);
             CBTList_append(node_list,&cur_tile_node);
             break;
         case CPCS_DOWN:
@@ -303,11 +304,11 @@ Carc_Tile_Node_List* CBP_get_edge_nodes(Carc_Playboard_Node* node, Carc_Playboar
             CBTList_append(node_list,&cur_tile_node);
             break;
         case CPCS_LEFT:
-            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST_NORTH);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST_NORTH);
             node_list = CBTList_new(&cur_tile_node);
-            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST);
             CBTList_append(node_list,&cur_tile_node);
-            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST_SOUTH);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST_SOUTH);
             CBTList_append(node_list,&cur_tile_node);
             break;
         default:

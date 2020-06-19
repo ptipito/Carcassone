@@ -20,6 +20,7 @@ int CBMC_rm_from_rim(Carc_Macro_Construct*, Carc_Tile_Node**);
 int CBMC_rm_list_from_rim(Carc_Macro_Construct*, Carc_Tile_Node_List*);
 int CBMC_transfer_rim(Carc_Macro_Construct*, Carc_Macro_Construct*);
 int CBMC_enrich_with(Carc_Macro_Construct*, Carc_Macro_Construct*);
+int CBMC_merge_const(Carc_Macro_Construct*, Carc_Macro_Construct**, Carc_Tile_Node_List*, Carc_Tile_Node_List*);
 
 
 #endif // DEF_CARC_MACRO_CONST

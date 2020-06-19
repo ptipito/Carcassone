@@ -414,6 +414,159 @@ void test_tile_list_append(){
 
     CBTList_free(l);
 }
+
+void test_tile_list_append_list(){
+    printf("test_tile_list_append_list results: ");
+    Carc_Tile_Node node,
+                   node2,
+                   node3,
+                   node4,
+                   node5,
+                  *pointer_to_node=&node,
+                  *pointer_to_node2=&node2,
+                  *pointer_to_node3=&node3,
+                  *pointer_to_node4=&node4,
+                  *pointer_to_node5=&node5;
+    Carc_Tile_Node_List *l=CBTList_new(&pointer_to_node),
+                        *append_single=CBTList_new(&pointer_to_node2),
+                        *append_several=CBTList_new(&pointer_to_node3);
+    append_several->next=CBTList_new(&pointer_to_node4);
+
+    printf("%d",CBTList_append_list(NULL,NULL)==FUNC_FAIL);
+    printf("%d",CBTList_append_list(NULL,append_single)==FUNC_FAIL);
+    printf("%d",CBTList_append_list(l,NULL)==FUNC_SUCCESS && l->node==pointer_to_node && l->next==NULL);
+    printf("%d",CBTList_append_list(l,l)==FUNC_FAIL);// && l->node==pointer_to_node && l->next==NULL);
+    printf("%d",CBTList_append_list(l,append_single)==FUNC_SUCCESS && l->node==pointer_to_node
+                && l->next->node==pointer_to_node2 && l->next->next==NULL);
+    printf("%d",CBTList_append_list(l,append_several)==FUNC_SUCCESS && l->node==pointer_to_node
+                && l->next->node==pointer_to_node2 && l->next->next->node==pointer_to_node3
+                && l->next->next->next->node==pointer_to_node4
+                && l->next->next->next->next==NULL);
+    append_several->next=CBTList_new(&pointer_to_node5);
+    printf("%d",CBTList_append_list(l,append_several)==FUNC_FAIL&& l->node==pointer_to_node
+                && l->next->node==pointer_to_node2 && l->next->next->node==pointer_to_node3
+                && l->next->next->next->node==pointer_to_node4
+                && l->next->next->next->next->node==pointer_to_node5
+                && l->next->next->next->next->next==NULL);
+    printf("%d",CBTList_append_list(l,l)==FUNC_FAIL&& l->node==pointer_to_node
+                && l->next->node==pointer_to_node2 && l->next->next->node==pointer_to_node3
+                && l->next->next->next->node==pointer_to_node4
+                && l->next->next->next->next->node==pointer_to_node5
+                && l->next->next->next->next->next==NULL);
+
+    CBTList_free(l);
+    CBTList_free(append_several);
+    CBTList_free(append_single);
+}
+
+void test_tile_list_rm(){
+    printf("test_tile_list_rm results: ");
+    Carc_Tile_Node node,
+                   node2,
+                   node3,
+                   node4,
+                   node5,
+                  *pointer_to_node=&node,
+                  *pointer_to_node2=&node2,
+                  *pointer_to_node3=&node3,
+                  *pointer_to_node4=&node4,
+                  *pointer_to_node5=&node5,
+                  *null_node=NULL;
+    Carc_Tile_Node_List *l=CBTList_new(&pointer_to_node);
+
+    printf("%d",CBTList_rm(NULL,&pointer_to_node)==FUNC_SUCCESS);
+    //Test rm node not in list
+    printf("%d",CBTList_rm(&l,&pointer_to_node2)==FUNC_SUCCESS && l->node==pointer_to_node && l->next==NULL);
+    //Test rm head
+    printf("%d\n",CBTList_rm(&l,&pointer_to_node)==FUNC_SUCCESS && l==NULL);
+    //Tests if list more than just head
+    l = CBTList_new(&pointer_to_node2);//No memory leak, as the previous l was freed in the remove function
+    CBTList_append(l,&pointer_to_node3);
+    CBTList_append(l,&pointer_to_node4);
+    CBTList_append(l,&pointer_to_node5);
+    //if node is NULL
+    printf("%d",CBTList_rm(&l,NULL)==FUNC_FAIL
+           && l->node==pointer_to_node2 && l->next!=NULL
+           && l->next->node==pointer_to_node3 && l->next->next!=NULL
+           && l->next->next->node==pointer_to_node4 && l->next->next->next!=NULL
+           && l->next->next->next->node==pointer_to_node5 && l->next->next->next->next==NULL
+           );
+    printf("%d",CBTList_rm(&l,&null_node)==FUNC_FAIL
+           && l->node==pointer_to_node2 && l->next!=NULL
+           && l->next->node==pointer_to_node3 && l->next->next!=NULL
+           && l->next->next->node==pointer_to_node4 && l->next->next->next!=NULL
+           && l->next->next->next->node==pointer_to_node5 && l->next->next->next->next==NULL
+           );
+    //If not not in
+    printf("%d",CBTList_rm(&l,&pointer_to_node)==FUNC_SUCCESS
+           && l->node==pointer_to_node2 && l->next!=NULL
+           && l->next->node==pointer_to_node3 && l->next->next!=NULL
+           && l->next->next->node==pointer_to_node4 && l->next->next->next!=NULL
+           && l->next->next->next->node==pointer_to_node5 && l->next->next->next->next==NULL
+           );
+    //if node is head
+    printf("%d",CBTList_rm(&l,&pointer_to_node2)==FUNC_SUCCESS
+           && l->node==pointer_to_node3 && l->next!=NULL
+           && l->next->node==pointer_to_node4 && l->next->next!=NULL
+           && l->next->next->node==pointer_to_node5 && l->next->next->next==NULL
+           );
+    //if node is in tail
+    printf("%d",CBTList_rm(&l,&pointer_to_node4)==FUNC_SUCCESS
+           && l->node==pointer_to_node3 && l->next!=NULL
+           && l->next->node==pointer_to_node5 && l->next->next==NULL
+           );
+    //if node is last
+    printf("%d",CBTList_rm(&l,&pointer_to_node5)==FUNC_SUCCESS
+           && l->node==pointer_to_node3 && l->next==NULL
+           );
+
+    CBTList_free(l);
+}
+
+void test_tile_list_rm_list(){
+    printf("test_tile_list_rm results: ");
+    Carc_Tile_Node node,
+                   node2,
+                   node3,
+                   node4,
+                   node5,
+                  *pointer_to_node=&node,
+                  *pointer_to_node2=&node2,
+                  *pointer_to_node3=&node3,
+                  *pointer_to_node4=&node4,
+                  *pointer_to_node5=&node5;
+    Carc_Tile_Node_List *l=CBTList_new(&pointer_to_node),
+                        *rm_list=CBTList_new(&pointer_to_node),
+                        *null_list=NULL;
+
+    CBTList_append(l,&pointer_to_node2);
+    CBTList_append(l,&pointer_to_node3);
+    CBTList_append(l,&pointer_to_node4);
+
+    CBTList_append(rm_list,&pointer_to_node3);
+    CBTList_append(rm_list,&pointer_to_node4);
+    CBTList_append(rm_list,&pointer_to_node5);
+
+    printf("%d",CBTList_rm_nodes(NULL,rm_list)==FUNC_SUCCESS);
+    printf("%d",CBTList_rm_nodes(&null_list,rm_list)==FUNC_SUCCESS);
+    //Test no node to remove
+    printf("%d",CBTList_rm_nodes(&l,NULL)==FUNC_SUCCESS &&
+            l->node==pointer_to_node
+            && l->next->node==pointer_to_node2
+            && l->next->next->node==pointer_to_node3
+            && l->next->next->next->node==pointer_to_node4
+            && l->next->next->next->next==NULL
+            );
+
+    printf("%d",CBTList_rm_nodes(&l,rm_list)==FUNC_SUCCESS &&
+            l->node==pointer_to_node2
+            && l->next==NULL
+            );
+
+    CBTList_free(l);
+    CBTList_free(rm_list);
+}
+
 void test_tile_run_all(){
     test_tile_parse_tile_file();
     printf("\n************************************\n");
@@ -451,4 +604,9 @@ void test_tile_run_all(){
     printf("\n************************************\n");
     test_tile_list_append();
     printf("\n************************************\n");
+    test_tile_list_append_list();
+    printf("\n************************************\n");
+    test_tile_list_rm();
+    printf("\n************************************\n");
+    test_tile_list_rm_list();
 }

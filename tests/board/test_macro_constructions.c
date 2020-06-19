@@ -1,30 +1,30 @@
 #include "tests/board/test_macro_constructions.h"
 
 
-void test_tile_macro_construct_new(){
-    printf("test_tile_macro_construct_new results: ");
+void test_macro_const_construct_new(){
+    printf("test_macro_const_construct_new results: ");
     Carc_Tile_Node *node=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
                    *node2=CBT_new_node(CBCT_CITY,NULL),
                    *null_node=NULL;
     Carc_Macro_Construct* mc=CBMC_new(&node);
+    Carc_Macro_Construct* mc2=CBMC_new(&node2);
     printf("%d",CBMC_new(NULL)==NULL);
     printf("%d",CBMC_new(&null_node)==NULL);
-    printf("here: %p\n",node2);
-    printf("%d",CBMC_new(&node2)==NULL);
     printf("%d",mc!=NULL
                 && mc->type==node->node_type
                 && CBC_construction_cmp(mc->construct,mc->type,node->construction,node->node_type)==0
                 && mc->nb_pawns==0 && mc->pawns==NULL
                 && mc->rim!=NULL && mc->rim->node==node
            );
+    printf("%d",mc2!=NULL && mc2->construct==NULL);
 
     CBMC_free(mc);
     CBT_free_node(node);
     CBT_free_node(node2);
 }
 
-void test_tile_macro_construct_list_new(){
-    printf("test_tile_macro_construct_list_new results: ");
+void test_macro_const_construct_list_new(){
+    printf("test_macro_const_construct_list_new results: ");
     Carc_Tile_Node* n=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE));
     Carc_Macro_Construct* construct=CBMC_new(&n),
                   *null_construct=NULL;
@@ -38,8 +38,8 @@ void test_tile_macro_construct_list_new(){
     CBT_free_node(n);
 }
 
-void test_tile_macro_construct_add_pawn(){
-    printf("test_tile_macro_construct_add_pawn results: ");
+void test_macro_const_construct_add_pawn(){
+    printf("test_macro_const_construct_add_pawn results: ");
     Carc_Player *play1=CPPlayer_init_player(PLAYER_1,CPC_BLACK),
                 *play2=CPPlayer_init_player(PLAYER_2,CPC_BLUE);
     Carc_Pawn *pawn1=CPPawn_new_pawn(play1,PAWN_NORMAL),
@@ -74,8 +74,8 @@ void test_tile_macro_construct_add_pawn(){
     CPPawn_free_pawn(pawn2);
 }
 
-void test_tile_macro_construct_add_node(){
-    printf("test_tile_macro_construct_add_node results: ");
+void test_macro_const_construct_add_node(){
+    printf("test_macro_const_construct_add_node results: ");
     Carc_Player *play1=CPPlayer_init_player(PLAYER_1,CPC_BLACK),
                 *play2=CPPlayer_init_player(PLAYER_2,CPC_BLUE);
     Carc_Pawn *pawn1=CPPawn_new_pawn(play1,PAWN_NORMAL),
@@ -148,8 +148,8 @@ void test_tile_macro_construct_add_node(){
     CPPawn_free_pawn(pawn2);
 }
 
-void test_tile_macro_node_in(){
-    printf("test_tile_macro_node_in results: ");
+void test_macro_const_node_in(){
+    printf("test_macro_const_node_in results: ");
     Carc_Tile_Node *n=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
                     *n2=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
                     *null_node=NULL;
@@ -167,8 +167,8 @@ void test_tile_macro_node_in(){
     CBT_free_node(n);
 }
 
-void test_tile_macro_get_node_construct(){
-    printf("test_tile_macro_get_node_construct results: ");
+void test_macro_const_get_node_construct(){
+    printf("test_macro_const_get_node_construct results: ");
     Carc_Tile_Node *n=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
                     *n2=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
                     *n3=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
@@ -193,8 +193,8 @@ void test_tile_macro_get_node_construct(){
     CBT_free_node(n3);
 }
 
-void test_tile_macro_add_to_list(){
-    printf("test_tile_macro_add_to_list results: ");
+void test_macro_const_add_to_list(){
+    printf("test_macro_const_add_to_list results: ");
     Carc_Tile_Node *n=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE)),
                     *n2=CBT_new_node(CBCT_CITY,CBC_new_city(0,0,CCM_NONE));
     Carc_Macro_Construct *c1=CBMC_new(&n),
@@ -203,32 +203,33 @@ void test_tile_macro_add_to_list(){
     Carc_Macro_Construct_List *l=CBMCList_new(&c1),
                               *test_res=NULL;
 
+
     printf("%d\n",CBMCList_append(NULL,NULL)==NULL);
     printf("%d\n",CBMCList_append(NULL,&null_construct)==NULL);
     test_res = CBMCList_append(NULL,&c1);
-    CBMCList_free(test_res);
     printf("%d",test_res!=NULL && test_res->construct==c1 && test_res->next==NULL);
-    test_res = CBMCList_append(l,&c1);
-    printf("%d", test_res!=NULL && test_res->construct==c1 && test_res->next->construct==c1
-           && test_res->next->next==NULL);
+    CBMCList_free(test_res);
+    c1=CBMC_new(&n);
     test_res = CBMCList_append(l,&c2);
-    printf("%d", test_res!=NULL && test_res->construct==c2 && test_res->next->construct==c1
-           && test_res->next->next->construct==c1 && test_res->next->next->next==NULL);
-
+    printf("%d", test_res!=NULL
+           && test_res->construct==c2
+           && test_res->next->construct==c1
+           && test_res->next->next==NULL);
 
     CBMCList_free(l);
     CBT_free_node(n);
     CBT_free_node(n2);
 }
 
-void test_tile_macro_get_tile_constructions(){
+void test_macro_const_get_tile_constructions(){
     ///TODO: add tests with Garden and Path ends when resources available
-    printf("test_tile_macro_get_tile_constructions results: ");
+    printf("test_macro_const_get_tile_constructions results: ");
     char *start_tile_str=CBT_get_tile_file_path("tile1.txt"),
          *cloister_tile_str=CBT_get_tile_file_path("cloister_path.txt");
     Carc_Tile *start_tile=CBT_new_tile_from_file(start_tile_str),
               *cloister_tile=CBT_new_tile_from_file(cloister_tile_str);
     Carc_Macro_Construct_List* test_res=NULL;
+    Carc_Tile_Node *center=CBT_get_node_from_loc(start_tile,CTL_CENTER);
 
     printf("%d",CBMC_get_tile_macro_constructions(NULL)==NULL);
     test_res = CBMC_get_tile_macro_constructions(start_tile);
@@ -236,14 +237,19 @@ void test_tile_macro_get_tile_constructions(){
            && test_res->next!=NULL && test_res->next->construct->type==CBCT_PATH
            && test_res->next->next!=NULL && test_res->next->next->construct->type==CBCT_FIELD
            && test_res->next->next->next!=NULL && test_res->next->next->next->construct->type==CBCT_CITY
-           && test_res->next->next->next->next==NULL);
+           && test_res->next->next->next->next==NULL
+           && CBMC_get_node_construct(test_res,&center)==NULL
+           );
     CBMCList_free(test_res);
 
     test_res = CBMC_get_tile_macro_constructions(cloister_tile);
+    center = CBT_get_node_from_loc(cloister_tile,CTL_CENTER);
     printf("%d",test_res!=NULL && test_res->construct->type==CBCT_CLOISTER
            && test_res->next!=NULL && test_res->next->construct->type==CBCT_PATH
            && test_res->next->next!=NULL && test_res->next->next->construct->type==CBCT_FIELD
-           && test_res->next->next->next==NULL);
+           && test_res->next->next->next==NULL
+           && CBMC_get_node_construct(test_res,&center)!=NULL
+           );
 
     free(start_tile_str);
     free(cloister_tile_str);
@@ -252,21 +258,299 @@ void test_tile_macro_get_tile_constructions(){
     CBMCList_free(test_res);
 }
 
+void test_macro_const_rm_from_rim(){
+    printf("test_macro_const_rm_from_rim results: ");
+    Carc_Macro_Construct c_val, *c=&c_val;
+    Carc_Tile_Node_List rim_val;
+    Carc_Tile_Node n1_val, n2_val, n3_val, n4_val,
+                *n1=&n1_val, *n2=&n2_val, *n3=&n3_val, *n4=&n4_val,
+                *null_node=NULL;
+    Carc_Tile_Node_List q1_val, q2_val, *q1=&q1_val, *q2=&q2_val;
+    c->rim = &rim_val;
+    c->rim->node = n1;
+    c->rim->next = q1;
+    q1->node = n2;
+    q1->next = q2;
+    q2->node = n3;
+    q2->next = NULL;
+
+    printf("%d",CBMC_rm_from_rim(NULL,NULL)==FUNC_FAIL);
+    printf("%d",CBMC_rm_from_rim(NULL,&null_node)==FUNC_FAIL);
+    printf("%d",CBMC_rm_from_rim(c,NULL)==FUNC_FAIL);
+    printf("%d",CBMC_rm_from_rim(c,&null_node)==FUNC_FAIL);
+    printf("%d",CBMC_rm_from_rim(c,&n4)==FUNC_SUCCESS
+                && c->rim->node==n1
+                && c->rim->next->node==n2
+                && c->rim->next->next->node==n3
+                && c->rim->next->next->next==NULL
+    );
+    printf("%d",CBMC_rm_from_rim(c,&n3)==FUNC_SUCCESS
+                && c->rim->node==n1
+                && c->rim->next->node==n2
+                && c->rim->next->next==NULL
+    );
+    printf("%d",CBMC_rm_from_rim(c,&n1)==FUNC_SUCCESS
+                && c->rim->node==n2
+                && c->rim->next==NULL
+    );
+}
+
+void test_macro_const_rm_list_from_rim(){
+    printf("test_macro_const_rm_list_from_rim results: ");
+    Carc_Macro_Construct c_val, *c=&c_val;
+    Carc_Tile_Node_List rim_val, rm_val, *rm=&rm_val;
+    Carc_Tile_Node n1_val, n2_val, n3_val, n4_val,
+                *n1=&n1_val, *n2=&n2_val, *n3=&n3_val, *n4=&n4_val;
+    Carc_Tile_Node_List q1_val, q2_val, *q1=&q1_val, *q2=&q2_val;
+    Carc_Tile_Node_List rm_q1_val, rm_q2_val, *rm_q1=&rm_q1_val, *rm_q2=&rm_q2_val;
+    c->rim = &rim_val;
+    c->rim->node = n1;
+    c->rim->next = q1;
+    q1->node = n2;
+    q1->next = q2;
+    q2->node = n3;
+    q2->next = NULL;
+    rm->node = n2;
+    rm->next = rm_q1;
+    rm_q1->node = n4;
+    rm_q1->next = rm_q2;
+    rm_q2->node = n3;
+    rm_q2->next = NULL;
+
+    printf("%d",CBMC_rm_list_from_rim(NULL,NULL)==FUNC_FAIL);
+    printf("%d",CBMC_rm_list_from_rim(c,NULL)==FUNC_SUCCESS);
+    //Test when a noded to remove is not in the construct's rim
+    printf("%d",CBMC_rm_list_from_rim(c,rm)==FUNC_SUCCESS
+                && c->rim->node==n1
+                && c->rim->next==NULL
+    );
+    //Test if all nodes ar in the rim
+    c->rim = &rim_val;
+    c->rim->node = n1;
+    c->rim->next = q1;
+    q1->node = n2;
+    q1->next = q2;
+    q2->node = n3;
+    q2->next = NULL;
+    rm->node = n2;
+    rm->next = rm_q2;
+    rm_q2->node = n3;
+    rm_q2->next = NULL;
+    printf("%d",CBMC_rm_list_from_rim(c,rm)==FUNC_SUCCESS
+                && c->rim->node==n1
+                && c->rim->next==NULL
+    );
+}
+
+void test_macro_const_transfer_rim(){
+    printf("test_macro_const_transfer_rim results: ");
+    Carc_Macro_Construct from_val, into_val, *from=&from_val, *into=&into_val;
+    Carc_Tile_Node_List rim_from_val, rim_into_val;
+    Carc_Tile_Node n1_val, n2_val, n3_val, n4_val,
+                *n1=&n1_val, *n2=&n2_val, *n3=&n3_val, *n4=&n4_val;
+    Carc_Tile_Node_List q1_val, q2_val, q3_val, *q1=&q1_val, *q2=&q2_val, *q3=&q3_val;
+    //init rims
+    into->rim = &rim_into_val;
+    into->rim->node = n1;
+    into->rim->next = q1;
+    q1->node = n2;
+    q1->next = NULL;
+    from->rim = &rim_from_val;
+    from->rim->node = n3;
+    from->rim->next = q2;
+    q2->node = n4;
+    q2->next = q3;
+    //q3 is used to try to transfer a node in a rim that already has this node
+    q3->node = n1;
+    q3->next = NULL;
+
+    //Test with null inputs
+    printf("%d",CBMC_transfer_rim(NULL,NULL)==FUNC_FAIL);
+    printf("%d",CBMC_transfer_rim(NULL,from)==FUNC_FAIL);
+    printf("%d",CBMC_transfer_rim(into,NULL)==FUNC_SUCCESS
+                && into->rim->node==n1
+                && into->rim->next->node==n2
+                && into->rim->next->next==NULL
+           );
+
+    //Test if no null input but one node is in both rim
+    printf("%d",CBMC_transfer_rim(into,from)==FUNC_FAIL
+                && into->rim->node==n1
+                && into->rim->next->node==n2
+                && into->rim->next->next->node==n3
+                && into->rim->next->next->next->node==n4
+                && into->rim->next->next->next->next==NULL
+           );
+
+    //Test when the whole rim can be successfully imported
+    into->rim = &rim_into_val;
+    into->rim->node = n1;
+    into->rim->next = q1;
+    q1->node = n2;
+    q1->next = NULL;
+    from->rim = &rim_from_val;
+    from->rim->node = n3;
+    from->rim->next = q2;
+    q2->node = n4;
+    q2->next = NULL;
+    printf("%d",CBMC_transfer_rim(into,from)==FUNC_SUCCESS
+                && into->rim->node==n1
+                && into->rim->next->node==n2
+                && into->rim->next->next->node==n3
+                && into->rim->next->next->next->node==n4
+                && into->rim->next->next->next->next==NULL
+           );
+}
+
+void test_macro_const_enrich_with(){
+    printf("test_macro_const_enrich_with results: ");
+    Carc_Macro_Construct enrich_val, from_val, *enrich=&enrich_val, *from=&from_val;
+
+    //Test that not connecting types do not enrich each other
+    enrich->type = CBCT_CITY;
+    from->type = CBCT_PATH;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_FAIL);
+    from->type = CBCT_FIELD;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_FAIL);
+    from->type = CBCT_CLOISTER;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_FAIL);
+    enrich->type = CBCT_PATH;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_FAIL);
+    from->type = CBCT_FIELD;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_FAIL);
+    enrich->type = CBCT_FIELD;
+    from->type = CBCT_CLOISTER;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_FAIL);
+
+    enrich->type = CBCT_CITY;
+    from->type = CBCT_CITY;
+    //Test null inputs
+    printf("%d",CBMC_enrich_with(NULL,NULL)==FUNC_FAIL);
+    printf("%d",CBMC_enrich_with(enrich,NULL)==FUNC_SUCCESS);
+
+    //Test enrich when fine
+    enrich->construct = CBC_new_city(0,1,CCM_NONE);
+    from->construct = CBC_new_city(1,0,CCM_CORN);
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_SUCCESS
+           && enrich->construct->city.is_cathedral==1
+           && enrich->construct->city.merchandises[0]==CCM_CORN
+           && enrich->construct->city.nb_merchandises==1
+           && enrich->construct->city.nb_flags==1
+           );
+    CBC_free_city(enrich->construct);
+    CBC_free_city(from->construct);
+    enrich->type = CBCT_PATH;
+    from->type = CBCT_PATH;
+    enrich->construct = CBC_new_path(0);
+    from->construct = CBC_new_path(0);
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_SUCCESS
+           && enrich->construct->path.has_lake==0
+           );
+    free(from->construct);
+    from->construct = CBC_new_path(1);
+    from->type = CBCT_PATH_END;
+    printf("%d",CBMC_enrich_with(enrich,from)==FUNC_SUCCESS
+           && enrich->construct->path.has_lake==1
+           );
+
+    free(enrich->construct);
+}
+
+void test_macro_const_merge(){
+    printf("test_macro_const_merge results: ");
+    char *start_tile_path=CBT_get_tile_file_path("tile1.txt"),
+         *cloister_tile_path=CBT_get_tile_file_path("cloister_path.txt");
+    Carc_Playboard_Node *start_node=CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_path),CBP_Location_new(0,0)),
+                        *cloister_node=CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),CBP_Location_new(0,0));
+    CBT_turn(cloister_node->node,CCT_RIGHT);
+    Carc_Tile_Node *start_path_connect = CBT_get_node_from_loc(start_node->node,CTL_EAST),
+                    *cloister_path_connect = CBT_get_node_from_loc(cloister_node->node,CTL_WEST);
+    //Add info on cloister_path to check all operations of the merge
+    cloister_path_connect->construction->path.has_lake = 3;
+
+    Carc_Macro_Construct_List *start_constructs=CBMC_get_tile_macro_constructions(start_node->node),
+                              *cloister_constructs=CBMC_get_tile_macro_constructions(cloister_node->node);
+    Carc_Macro_Construct *start_path=start_constructs->next->construct,
+                         *cloister_path=cloister_constructs->next->construct,
+                         *null_construct=NULL;
+
+    printf("%d",CBMC_merge_const(NULL,NULL,NULL,NULL)==FUNC_FAIL);
+    printf("%d",CBMC_merge_const(start_path,NULL,NULL,NULL)==FUNC_SUCCESS);
+    printf("%d",CBMC_merge_const(start_path,&null_construct,NULL,NULL)==FUNC_SUCCESS);
+    printf("%d\n",CBMC_merge_const(start_path,&null_construct,NULL,NULL)==FUNC_SUCCESS);
+    Carc_Tile_Node_List *into_connect=CBTList_new(&start_path_connect),
+                        *from_connect=CBTList_new(&cloister_path_connect);
+    Carc_Pawn *pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
+    CBMC_add_pawn(cloister_path,&pawn);
+    printf("%d",CBMC_merge_const(start_path,&cloister_path,into_connect,from_connect)==FUNC_SUCCESS
+                && start_path->construct->path.has_lake==3
+                && start_path->nb_pawns==1
+                && start_path->pawns[0]==pawn
+                && start_path->rim->node==CBT_get_node_from_loc(start_node->node,CTL_WEST)
+                && start_path->rim->next==NULL
+                );
+
+
+    //Test merging fields by adding cloister tile under start_tile to test if rim extension is working properly
+    Carc_Tile_Node *south=CBT_get_node_from_loc(start_node->node,CTL_SOUTH),
+                    *north=CBT_get_node_from_loc(cloister_node->node,CTL_NORTH);
+    Carc_Macro_Construct *start_field=CBMC_get_node_construct(start_constructs,&south),
+                         *cloister_field=CBMC_get_node_construct(cloister_constructs,&north);
+    Carc_Tile_Node_List *start_connect=CBP_get_edge_nodes(start_node,CPCS_DOWN),
+                        *cloister_connect=CBP_get_edge_nodes(cloister_node,CPCS_UP);
+    int test_res=CBMC_merge_const(start_field,&cloister_field,start_connect,cloister_connect);
+    printf("%d",test_res==FUNC_SUCCESS && start_field->construct==NULL
+                && start_field->nb_pawns==0
+                && start_field->rim->node==CBT_get_node_from_loc(start_node->node,CTL_EAST_SOUTH)
+                && start_field->rim->next->node==CBT_get_node_from_loc(start_node->node,CTL_WEST_SOUTH)
+                && start_field->rim->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_EAST_NORTH)
+                && start_field->rim->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_EAST)
+                && start_field->rim->next->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_EAST_SOUTH)
+                && start_field->rim->next->next->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_SOUTH_EAST)
+                && start_field->rim->next->next->next->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_SOUTH)
+                && start_field->rim->next->next->next->next->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_SOUTH_WEST)
+                && start_field->rim->next->next->next->next->next->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_WEST_SOUTH)
+                && start_field->rim->next->next->next->next->next->next->next->next->next->node==CBT_get_node_from_loc(cloister_node->node,CTL_WEST_NORTH)
+                && start_field->rim->next->next->next->next->next->next->next->next->next->next==NULL
+                );
+
+    CBTList_free(into_connect);
+    CBTList_free(from_connect);
+    CBP_free_playboard_node(start_node);
+    CPPlayer_free_player(pawn->owner);
+    CPPawn_free_pawn(pawn);
+    CBP_free_playboard_node(cloister_node);
+    free(start_tile_path);
+    free(cloister_tile_path);
+    CBMCList_free(start_constructs);
+    CBMCList_free(cloister_constructs);
+}
+
 void test_macro_construct_run_all(){
-    test_tile_macro_construct_new();
+    test_macro_const_construct_new();
     printf("\n************************************\n");
-    test_tile_macro_construct_list_new();
+    test_macro_const_construct_list_new();
     printf("\n************************************\n");
-    test_tile_macro_construct_add_pawn();
+    test_macro_const_construct_add_pawn();
     printf("\n************************************\n");
-    test_tile_macro_construct_add_node();
+    test_macro_const_construct_add_node();
     printf("\n************************************\n");
-    test_tile_macro_node_in();
+    test_macro_const_node_in();
     printf("\n************************************\n");
-    test_tile_macro_get_node_construct();
+    test_macro_const_get_node_construct();
     printf("\n************************************\n");
-    test_tile_macro_add_to_list();
+    test_macro_const_add_to_list();
     printf("\n************************************\n");
-    test_tile_macro_get_tile_constructions();
+    test_macro_const_get_tile_constructions();
+    printf("\n************************************\n");
+    test_macro_const_rm_from_rim();
+    printf("\n************************************\n");
+    test_macro_const_rm_list_from_rim();
+    printf("\n************************************\n");
+    test_macro_const_transfer_rim();
+    printf("\n************************************\n");
+    test_macro_const_enrich_with();
+    printf("\n************************************\n");
+    test_macro_const_merge();
     printf("\n************************************\n");
 }

@@ -662,6 +662,7 @@ int CBTList_append(Carc_Tile_Node_List* l, Carc_Tile_Node** n){
             current = current->next;
         }
     }
+    //If the node is not already in the list, append it at the end
     append = CBTList_new(n);
     if(append==NULL){
         fprintf(stderr,"ERROR: cannot allocate memory (CTList_add_node)\n");
@@ -672,36 +673,43 @@ int CBTList_append(Carc_Tile_Node_List* l, Carc_Tile_Node** n){
 }
 
 int CBTList_append_list(Carc_Tile_Node_List* into, Carc_Tile_Node_List* from){
-    ///TO_TEST
     Carc_Tile_Node_List* current=from;
-    int append_success=1, count=1;
+    int append_success=1, count=1, result=FUNC_SUCCESS;
+    if(into==from){
+        fprintf(stderr,"Error: cannot append a list to itself"); //Or an infinite loop is created
+        result = FUNC_FAIL;
+        current = NULL;
+    }
     while(current!=NULL){
         append_success = CBTList_append(into,&(current->node));
-        if(append_success==FUNC_SUCCESS){
-            current = current->next;
-        } else {
-            fprintf(stderr,"ERROR: CBTList_append_list(%p,%p) failed on %d-th node (%p)\n",into,from,count,current->node);
-            return FUNC_FAIL;
+        if(append_success!=FUNC_SUCCESS){
+            if(result!=FUNC_FAIL)
+                fprintf(stderr,"ERROR: CBTList_append_list(%p,%p) failed on: %d-th node (%p)",into,from,count,current->node);
+            else
+                fprintf(stderr," && %d-th node (%p)",count,current->node);
+            result = FUNC_FAIL;
         }
+        current = current->next;
         count++;
     }
-    return FUNC_SUCCESS;
+    if(result==FUNC_FAIL)//In case of errors a newline must be inserted in the error output file
+        fprintf(stderr,"\n");
+    return result;
 }
 
-int CBTList_rm(Carc_Tile_Node_List* l, Carc_Tile_Node** rm){
-    ///TO_TEST
-    Carc_Tile_Node_List *current=l,
-                        *previous=NULL;
-    int removed=0;
-    if(pointer_is_null(l,0)){
+int CBTList_rm(Carc_Tile_Node_List** l, Carc_Tile_Node** rm){
+    if(pointer_has_null_value((void**)l,0)){
         return FUNC_SUCCESS;
     } else if(pointer_has_not_null_value((void**)rm,1)){
+        Carc_Tile_Node_List *current=*l,
+                            *previous=NULL;
+        int removed=0;
         while(current!=NULL){
             if(current->node==*rm){
                 if(previous==NULL){//The node is at the head of the list
                     //Change head
-                    previous = l ;
-                    l = l->next;
+                    previous = *l;
+                    *l = (*l)->next;
                     //Free head
                     previous->next=NULL;
                     CBTList_free(previous);
@@ -721,23 +729,29 @@ int CBTList_rm(Carc_Tile_Node_List* l, Carc_Tile_Node** rm){
             }
         }
         if(!removed)
-            fprintf(stderr,"WARNING: node %p was not found in list %p\n",*rm,l);
+            fprintf(stderr,"WARNING: node %p was not found in list %p\n",*rm,*l);
         return FUNC_SUCCESS;
     }
     //If NULL input
     return FUNC_FAIL;
 }
 
-int CBTList_rm_nodes(Carc_Tile_Node_List* src, Carc_Tile_Node_List* rm){
-    ///TO_TEST
+int CBTList_rm_nodes(Carc_Tile_Node_List** src, Carc_Tile_Node_List* rm){
     ///Remove the nodes of list \rm from \src, if they are in \src
     Carc_Tile_Node_List* current=rm;
-    int res=FUNC_SUCCESS;
-    while(current!=NULL && src!=NULL){
-        if(CBTList_rm(src,&(rm->node))!=FUNC_SUCCESS){
+    int res=FUNC_SUCCESS, node_count=1;
+    if(pointer_has_null_value((void**)src,0)){
+        return FUNC_SUCCESS;
+    }
+    while(current!=NULL && *src!=NULL){
+        if(CBTList_rm(src,&(current->node))==FUNC_FAIL){
+            if(res!=FUNC_FAIL)
+                fprintf(stderr,"CBTList_rm_nodes fails to remove following nodes from list %p:\n",*src);
+            fprintf(stderr,"\t%d-th node (%p) couldn't be removed\n",node_count,rm->node);
             res = FUNC_FAIL;
         }
-        current = rm->next;
+        current = current->next;
+        node_count++;
     }
     return res;
 }

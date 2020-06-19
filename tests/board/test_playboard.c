@@ -321,6 +321,56 @@ void test_playboard_rm_pawn_in(){
     CPPawn_free_pawn(pawn2);
 }
 
+void test_playboard_get_edge_nodes(){
+    printf("test_playboard_get_edge_nodes results: ");
+    Carc_Playboard_Node node_val, *node=&node_val,
+                        node_null_tile_val, *node_null_tile=&node_null_tile_val;
+    Carc_Tile_Node_List *l=NULL;
+    //Test null input
+    printf("%d",CBP_get_edge_nodes(NULL,CPCS_UP)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_RIGHT)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_DOWN)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_LEFT)==NULL
+           );
+    node_null_tile->node = NULL;
+    printf("%d",CBP_get_edge_nodes(node_null_tile,CPCS_UP)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_RIGHT)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_DOWN)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_LEFT)==NULL
+           );
+    //Test all sides
+    l = CBP_get_edge_nodes(node,CPCS_UP);
+    printf("%d",l->node==&(node->node->border[CTL_NORTH_WEST])
+                && l->next->node==&(node->node->border[CTL_NORTH])
+                && l->next->next->node==&(node->node->border[CTL_NORTH_EAST])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+    l = CBP_get_edge_nodes(node,CPCS_RIGHT);
+    printf("%d",l->node==&(node->node->border[CTL_EAST_NORTH])
+                && l->next->node==&(node->node->border[CTL_EAST])
+                && l->next->next->node==&(node->node->border[CTL_EAST_SOUTH])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+    l = CBP_get_edge_nodes(node,CPCS_DOWN);
+    printf("%d",l->node==&(node->node->border[CTL_SOUTH_WEST])
+                && l->next->node==&(node->node->border[CTL_SOUTH])
+                && l->next->next->node==&(node->node->border[CTL_SOUTH_EAST])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+    l = CBP_get_edge_nodes(node,CPCS_LEFT);
+    printf("%d",l->node==&(node->node->border[CTL_WEST_NORTH])
+                && l->next->node==&(node->node->border[CTL_WEST])
+                && l->next->next->node==&(node->node->border[CTL_WEST_SOUTH])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+
+
+}
+
 void test_playboard_run_all(){
     test_new_location();
     printf("\n***********************************************\n");
@@ -349,6 +399,8 @@ void test_playboard_run_all(){
     test_playboard_set_neighbor();
     printf("\n***********************************************\n");
     test_playboard_is_neigh_null();
+    printf("\n***********************************************\n");
+    test_playboard_get_edge_nodes();
     printf("\n***********************************************\n");
 
 }

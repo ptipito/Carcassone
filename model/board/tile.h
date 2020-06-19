@@ -91,8 +91,8 @@ Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node**);
 void CBTList_free(Carc_Tile_Node_List*);
 int CBTList_append(Carc_Tile_Node_List*, Carc_Tile_Node**);
 int CBTList_append_list(Carc_Tile_Node_List*, Carc_Tile_Node_List*);
-int CBTList_rm(Carc_Tile_Node_List*, Carc_Tile_Node**);
-int CBTList_rm_nodes(Carc_Tile_Node_List*, Carc_Tile_Node_List*);
+int CBTList_rm(Carc_Tile_Node_List**, Carc_Tile_Node**);
+int CBTList_rm_nodes(Carc_Tile_Node_List**, Carc_Tile_Node_List*);
 
 
 #endif // DEF_CARC_TILE
