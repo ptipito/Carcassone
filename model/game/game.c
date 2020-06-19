@@ -168,7 +168,7 @@ Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_
     Carc_Pawn* pawn=NULL;
     if(tile==NULL){
         fprintf(stderr,"ERROR: cannot have null tile input in CGG_play_pawn_in\n");
-    } else if(CPPlayer_can_play_pawn(player,pawn_type)==1){
+    } else if(CPPlayer_can_play_pawn(player,pawn_type)==1){//TODO CHange with CGG_can_play_pawn_in
         pawn = CPPawn_new_pawn(player,pawn_type);
         if(CBT_add_pawn(pawn, tile, loc_on_tile)!=0){
             //The pawn can't be played

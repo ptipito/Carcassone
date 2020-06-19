@@ -367,8 +367,6 @@ void test_playboard_get_edge_nodes(){
                 && l->next->next->next==NULL
            );
     CBTList_free(l);
-
-
 }
 
 void test_playboard_run_all(){
