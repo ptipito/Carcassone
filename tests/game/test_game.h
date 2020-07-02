@@ -10,5 +10,7 @@ void test_game_node_transfer_rim_to_playboard();
 void test_game_play_tile_in();
 void test_game_play_pawn_in();
 void test_game_run_all();
+void test_game_merge_constructs_with_neighbor();
+void test_game_update_constructs();
 
 #endif // DEF_TEST_GAME

@@ -8,18 +8,14 @@ void CBP_free_playboard_node(Carc_Playboard_Node* node){
 }
 
 Carc_Playboard_Node* CBP_get_neighbor(Carc_Playboard_Node* node, Carc_Playboard_Connect_Side side){
-    //printf("in cbp_get_neigh %p %d\n",node,side);
     if(node==NULL){
         fprintf(stderr,"WARNING: tried to access neighbor of NULL node (CBP_get_neighbor)\n");
         return NULL;
     }
-    //printf("\tget neigh\n");
     Carc_Playboard_Node** neighbor_pointer = node->neighbors[side];
-    //printf("\tcheck if null\n");
     if(neighbor_pointer==NULL){
         return NULL;
     }
-    //printf("\tderef\n");
     return (*neighbor_pointer);
 }
 
@@ -76,7 +72,6 @@ int CBP_Location_cmp(Carc_Playboard_Location l1,Carc_Playboard_Location l2){
 
 int CBP_node_cmp(Carc_Playboard_Node* n1,Carc_Playboard_Node* n2){
     int equal=0, different=1, i=0, same_neigh=1;
-    //printf("\n in node cmp\n");
     if(n1==NULL || n2==NULL){
         if(n1==n2)
             return equal;

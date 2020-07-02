@@ -385,7 +385,6 @@ void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
         previous_location = positive_modulo(i - transposition_factor, TILE_NR_BORDER_LOCATIONS);
         (tile->border)[i] = entry_tile.border[previous_location];
-        //printf("%d is a %d (from index %d)\n",i,(tile->border)[i].node_type,previous_location);
         (tile->center_connexions)[i] = entry_tile.center_connexions[previous_location];
         //Update connexion matrix line per line
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
@@ -398,7 +397,6 @@ void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
 int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile t2, Carc_Tile_Location t2_node_loc){
     Carc_Tile_Node *node_t1 = CBT_get_node_from_loc(&t1, t1_node_loc),
                    *node_t2 = CBT_get_node_from_loc(&t2, t2_node_loc);
-
     if(node_t1==NULL || node_t2==NULL)
         return 1;
     if(CBC_types_connect(node_t1->node_type,node_t2->node_type)==1)

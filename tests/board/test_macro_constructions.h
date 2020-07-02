@@ -15,6 +15,8 @@ void test_macro_const_rm_list_from_rim();
 void test_macro_const_transfer_rim();
 void test_macro_const_enrich_with();
 void test_macro_const_merge();
+void test_macro_const_list_rm();
+void test_macro_const_list_is_in();
 
 void test_macro_construct_run_all();
 

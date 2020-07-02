@@ -107,10 +107,11 @@ void test_macro_const_construct_add_node(){
     printf("%d",CBMC_add_node(construct,&n4)==0
            && construct->nb_pawns==0
            && construct->pawns==NULL
-           && construct->construct->city.is_cathedral==1
-           && construct->construct->city.nb_flags==0
-           && construct->construct->city.nb_merchandises==1
-           && construct->construct->city.merchandises[0]==CCM_CORN);
+           //&& construct->construct->city.is_cathedral==1
+           //&& construct->construct->city.nb_flags==0
+           //&& construct->construct->city.nb_merchandises==1
+           //&& construct->construct->city.merchandises[0]==CCM_CORN
+           );
     printf("%d",CBMC_add_node(construct,&n5)==0
            && construct->nb_pawns==1
            && construct->pawns[0]==pawn1
@@ -200,21 +201,29 @@ void test_macro_const_add_to_list(){
     Carc_Macro_Construct *c1=CBMC_new(&n),
                          *c2=CBMC_new(&n2),
                          *null_construct=NULL;
-    Carc_Macro_Construct_List *l=CBMCList_new(&c1),
-                              *test_res=NULL;
-
+    Carc_Macro_Construct_List* test_res=NULL;
 
     printf("%d\n",CBMCList_append(NULL,NULL)==NULL);
     printf("%d\n",CBMCList_append(NULL,&null_construct)==NULL);
     test_res = CBMCList_append(NULL,&c1);
     printf("%d",test_res!=NULL && test_res->construct==c1 && test_res->next==NULL);
     CBMCList_free(test_res);
-    c1=CBMC_new(&n);
+
+    c1 = CBMC_new(&n);
+    Carc_Macro_Construct_List *l=CBMCList_new(&c1);
+    test_res = CBMCList_append(l,&c2);
+    printf("%d\n", test_res!=NULL
+           && test_res->construct==c2
+           && test_res->next->construct==c1
+           && test_res->next->next==NULL
+           );
+    //Test cannot add twice the same construct
     test_res = CBMCList_append(l,&c2);
     printf("%d", test_res!=NULL
            && test_res->construct==c2
            && test_res->next->construct==c1
-           && test_res->next->next==NULL);
+           && test_res->next->next==NULL
+           );
 
     CBMCList_free(l);
     CBT_free_node(n);
@@ -244,11 +253,12 @@ void test_macro_const_get_tile_constructions(){
 
     test_res = CBMC_get_tile_macro_constructions(cloister_tile);
     center = CBT_get_node_from_loc(cloister_tile,CTL_CENTER);
-    printf("%d",test_res!=NULL && test_res->construct->type==CBCT_CLOISTER
-           && test_res->next!=NULL && test_res->next->construct->type==CBCT_PATH
-           && test_res->next->next!=NULL && test_res->next->next->construct->type==CBCT_FIELD
+    printf("%d",test_res!=NULL
+           && test_res->construct->type==CBCT_CLOISTER && test_res->construct->construct==NULL && test_res->construct->rim==NULL
+           && test_res->next!=NULL && test_res->next->construct->type==CBCT_PATH && test_res->next->construct->rim!=NULL
+           && test_res->next->next!=NULL && test_res->next->next->construct->type==CBCT_FIELD && test_res->next->next->construct->rim!=NULL
            && test_res->next->next->next==NULL
-           && CBMC_get_node_construct(test_res,&center)!=NULL
+           && CBMC_get_node_construct(test_res,&center)==NULL
            );
 
     free(start_tile_str);
@@ -473,11 +483,14 @@ void test_macro_const_merge(){
     Carc_Macro_Construct *start_path=start_constructs->next->construct,
                          *cloister_path=cloister_constructs->next->construct,
                          *null_construct=NULL;
-
+    //Tests null inputs
     printf("%d",CBMC_merge_const(NULL,NULL,NULL,NULL)==FUNC_FAIL);
     printf("%d",CBMC_merge_const(start_path,NULL,NULL,NULL)==FUNC_SUCCESS);
     printf("%d",CBMC_merge_const(start_path,&null_construct,NULL,NULL)==FUNC_SUCCESS);
     printf("%d\n",CBMC_merge_const(start_path,&null_construct,NULL,NULL)==FUNC_SUCCESS);
+
+
+
     Carc_Tile_Node_List *into_connect=CBTList_new(&start_path_connect),
                         *from_connect=CBTList_new(&cloister_path_connect);
     Carc_Pawn *pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
@@ -514,16 +527,96 @@ void test_macro_const_merge(){
                 && start_field->rim->next->next->next->next->next->next->next->next->next->next==NULL
                 );
 
+    //Tests merging a construct with itself
+    Carc_Tile_Node *west_node=CBT_get_node_from_loc(start_node->node,CTL_WEST);
+    Carc_Tile_Node_List *into_same_connect=into_connect,
+                        *from_same_connect=CBTList_new(&west_node);
+    Carc_Macro_Construct start_path2=*start_path,
+                         *p_start_path_2=&start_path2,
+                         *city=start_constructs->next->next->next->construct;
+
+    printf("%d",CBMC_merge_const(p_start_path_2,&p_start_path_2,into_same_connect,from_same_connect)==FUNC_SUCCESS
+                  && p_start_path_2->rim==NULL
+           );
+    into_same_connect=CBTList_new(&(city->rim->node));
+    printf("%d\n",CBMC_merge_const(city,&city,into_same_connect,from_connect)==FUNC_SUCCESS
+                  && city->rim->node==CBT_get_node_from_loc(start_node->node,CTL_NORTH)
+                  && city->rim->next->node==CBT_get_node_from_loc(start_node->node,CTL_NORTH_EAST)
+                  && city->rim->next->next==NULL
+           );
+
     CBTList_free(into_connect);
     CBTList_free(from_connect);
+    CBTList_free(into_same_connect);
+    CBTList_free(from_same_connect);
     CBP_free_playboard_node(start_node);
     CPPlayer_free_player(pawn->owner);
     CPPawn_free_pawn(pawn);
     CBP_free_playboard_node(cloister_node);
     free(start_tile_path);
     free(cloister_tile_path);
-    CBMCList_free(start_constructs);
     CBMCList_free(cloister_constructs);
+    start_path->rim = NULL;//Avoid issue on freeing because rim already freed on the test with start_path2
+    CBMCList_free(start_constructs);
+}
+
+void test_macro_const_list_rm(){
+    printf("test_macro_const_list_rm results: ");
+    Carc_Macro_Construct c1, c2, c3, *pc1=&c1, *pc2=&c2, *pc3=&c3, *null_const=NULL;
+    Carc_Macro_Construct_List *test_list=CBMCList_new(&pc1), *test_result=NULL, *null_list=NULL;
+    CBMCList_append(test_list,&pc2);
+    CBMCList_append(test_list,&pc3);
+
+    printf("%d",CBMCList_rm(NULL,&pc1)==NULL);
+    printf("%d",CBMCList_rm(&null_list,&pc1)==NULL);
+    printf("%d",CBMCList_rm(&test_list,NULL)==NULL);
+    printf("%d",CBMCList_rm(&test_list,&null_const)==NULL);
+
+    test_result = CBMCList_rm(&test_list,&pc2);
+    printf("%d",test_result!=NULL
+           && test_result->construct==pc2
+           && test_result->next==NULL
+           && test_list->construct==pc3
+           && test_list->next->construct==pc1
+           && test_list->next->next==NULL
+           );
+    test_result = NULL;
+    CBMCList_free(test_result);
+
+    test_result = CBMCList_rm(&test_list,&pc1);
+    printf("%d",test_result!=NULL
+           && test_result->construct==pc1
+           && test_result->next==NULL
+           && test_list->construct==pc3
+           && test_list->next==NULL
+           );
+    test_result = NULL;
+    CBMCList_free(test_result);
+
+    test_result = CBMCList_rm(&test_list,&pc3);
+    printf("%d",test_result!=NULL
+           && test_result->construct==pc3
+           && test_result->next==NULL
+           && test_list==NULL
+           );
+    test_result = NULL;
+    CBMCList_free(test_result);
+
+    CBMCList_free(test_list);
+}
+
+void test_macro_const_list_is_in(){
+    printf("test_macro_const_list_is_in results: ");
+    Carc_Macro_Construct c1, c2, c3, *pc1=&c1, *pc2=&c2, *pc3=&c3, *null_const=NULL;
+    Carc_Macro_Construct_List *test_list=CBMCList_new(&pc1);
+    CBMCList_append(test_list,&pc3);
+
+    printf("%d",CBMCList_in(NULL,NULL)==0);
+    printf("%d",CBMCList_in(test_list,NULL)==0);
+    printf("%d",CBMCList_in(test_list,&null_const)==0);
+    printf("%d",CBMCList_in(test_list,&pc2)==0);
+    printf("%d",CBMCList_in(test_list,&pc1)==1);
+    printf("%d",CBMCList_in(test_list,&pc3)==1);
 }
 
 void test_macro_construct_run_all(){
@@ -551,6 +644,10 @@ void test_macro_construct_run_all(){
     printf("\n************************************\n");
     test_macro_const_enrich_with();
     printf("\n************************************\n");
+    test_macro_const_list_rm();
+    printf("\n************************************\n");
     test_macro_const_merge();
+    printf("\n************************************\n");
+    test_macro_const_list_is_in();
     printf("\n************************************\n");
 }

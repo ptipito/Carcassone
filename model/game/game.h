@@ -26,5 +26,7 @@ int CGG_node_transfer_rim_to_playboard(Carc_Game*,Carc_Playboard_Location, Carc_
 Carc_Playboard_Node* CGG_play_tile_in(Carc_Game*, Carc_Playboard_Location, Carc_Tile*);
 Carc_Pawn* CGG_play_pawn_in(Carc_Player*, Carc_Pawn_Type, Carc_Tile*, Carc_Tile_Location);
 int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Tile*, Carc_Tile_Location);
+int CGG_merge_constructs_with_neighbor(Carc_Game*, Carc_Playboard_Node*, Carc_Playboard_Connect_Side, Carc_Macro_Construct_List*);
+int CGG_update_game_constructs(Carc_Game*, Carc_Playboard_Node*);
 
 #endif // DEF_CARC_GAME

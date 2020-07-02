@@ -21,7 +21,7 @@ Carc_Macro_Construct* CBMC_new(Carc_Tile_Node** n){
     construct->construct = (node->construction==NULL ? NULL : node->construction);
     construct->pawns = NULL;
     construct->nb_pawns = 0;
-    if(type==CBCT_PATH_END){
+    if(type==CBCT_PATH_END || type==CBCT_CLOISTER){
         //Path ends represent the end of a path. As such they are not part of the path rim
         construct->rim = NULL;
     }else{
@@ -169,6 +169,7 @@ Carc_Macro_Construct* CBMC_get_node_construct(Carc_Macro_Construct_List* l, Carc
 }
 
 Carc_Macro_Construct_List* CBMCList_append(Carc_Macro_Construct_List* l, Carc_Macro_Construct** c){
+    ///Append a construct to a list, if it is not already in the list.
     if(c==NULL || *c==NULL){
         fprintf(stderr,"ERROR: adding NULL construct to a list is forbidden (CBMCList_append)\n");
         return NULL;
@@ -180,7 +181,16 @@ Carc_Macro_Construct_List* CBMCList_append(Carc_Macro_Construct_List* l, Carc_Ma
         return l;
     }
     //Create new elt to duplicate and replace current head
-    Carc_Macro_Construct_List* new_elt = CBMCList_new(&(l->construct));
+    Carc_Macro_Construct_List *cur=l,
+                              *new_elt = NULL;
+    while(cur!=NULL){
+        if(cur->construct==*c){
+            return l;//Terminate function without appending
+        }
+        cur = cur->next;
+    }
+    //End of list reached without encountering c ==> append c (at the beginning of the list)
+    new_elt = CBMCList_new(&(l->construct));
     if(new_elt==NULL){
         fprintf(stderr,"ERROR: Couldn't allocate memory (CBMCList_append)\n");
         return NULL;
@@ -191,6 +201,49 @@ Carc_Macro_Construct_List* CBMCList_append(Carc_Macro_Construct_List* l, Carc_Ma
     l->next = new_elt;
     return l;
 }
+
+int CBMCList_in(Carc_Macro_Construct_List* l, Carc_Macro_Construct** construct){
+    if(pointer_is_null(l,0)
+       || pointer_has_null_value((void**)construct,0))
+        return 0;
+
+    Carc_Macro_Construct_List* cur=l;
+    int is_in=0;
+    while(cur!=NULL){
+        if(cur->construct==*construct){
+            is_in = 1;
+            cur = NULL;
+        } else{
+            cur = cur->next;
+        }
+    }
+    return is_in;
+}
+
+
+Carc_Macro_Construct_List* CBMCList_rm(Carc_Macro_Construct_List** l, Carc_Macro_Construct** construct){
+    ///Remove the element containing the construct and returns the removed element. DO NOT free the
+    ///list element (nor the construct) has the construct is needed for the return value.
+    if(pointer_is_null(construct,0) || pointer_is_null(l,0))
+        return NULL;
+    Carc_Macro_Construct_List *cur=*l, *prev=NULL;
+    while(cur!=NULL){
+        if(cur->construct==*construct){
+            if(cur==*l){//Edge case of the head
+                *l = (*l)->next;
+                cur->next = NULL;//Return the construct as stand alone
+            } else{
+                prev->next = cur->next;
+                cur->next = NULL;
+            }
+            return cur;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+    return NULL;
+}
+
 
 Carc_Macro_Construct_List* CBMC_get_tile_macro_constructions(Carc_Tile* tile){
     ///TODO: handle gardens
@@ -292,7 +345,14 @@ int CBMC_transfer_rim(Carc_Macro_Construct* into, Carc_Macro_Construct* from){
     if(pointer_is_null(from,0)){
         return FUNC_SUCCESS;//No change to be performed
     }
-    return CBTList_append_list(into->rim,from->rim);
+    Carc_Tile_Node_List* to_append=from->rim;
+    if(into->rim==NULL){
+        if(from->rim!=NULL){
+            into->rim = CBTList_new(&(from->rim->node));
+            to_append = to_append->next;
+        }
+    }
+    return CBTList_append_list(into->rim,to_append);
 }
 
 int CBMC_enrich_with(Carc_Macro_Construct* to_enrich, Carc_Macro_Construct* new_info){
@@ -346,8 +406,15 @@ int CBMC_merge_const(Carc_Macro_Construct* into, Carc_Macro_Construct** from,
         return success;
     }
     from_construct = *from;
-    if(into==from_construct){ //Cannot merge a construct into itself
-        return success;
+    if(into==from_construct){
+        //This case is used when a new tile links two tiles which have a already common construction.
+        //Remove both connect lists from the rim
+        success = (CBMC_rm_list_from_rim(into,into_connect_nodes)==FUNC_SUCCESS);
+        success = (CBMC_rm_list_from_rim(into,from_connect_nodes)==FUNC_SUCCESS);
+        if(success)
+            return FUNC_SUCCESS;
+        else
+            return FUNC_FAIL;
     }
     if(!CBC_types_connect(into->type,from_construct->type)){
         fprintf(stderr,"ERROR: Construct have none matching types (CGG_merge_constructs)\n");
