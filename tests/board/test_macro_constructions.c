@@ -617,7 +617,48 @@ void test_macro_const_list_is_in(){
     printf("%d",CBMCList_in(test_list,&pc2)==0);
     printf("%d",CBMCList_in(test_list,&pc1)==1);
     printf("%d",CBMCList_in(test_list,&pc3)==1);
+
+    //Free memory
+    Carc_Macro_Construct_List *cur=test_list, *prev=NULL;;
+    while(cur!=NULL){
+        prev = cur;
+        cur = cur->next;
+        free(prev);
+    }
 }
+
+void test_macro_get_tile_constructs_per_node(){
+    printf("CBMC_get_tile_constructs_per_node results: ");
+    char* str_start_tile=CBT_get_tile_file_path("tile1.txt");
+    Carc_Tile* tile=CBT_new_tile_from_file(str_start_tile);
+    Carc_Macro_Construct_List *test_list=CBMC_get_tile_macro_constructions(tile);
+    //Test null inputs
+    printf("%d\n",CBMC_get_tile_constructs_per_node(NULL,NULL)==NULL);
+    printf("%d\n",CBMC_get_tile_constructs_per_node(NULL,tile)==NULL);
+    printf("%d\n",CBMC_get_tile_constructs_per_node(test_list,NULL)==NULL);
+
+    //Test output veracity
+    Carc_Macro_Construct** test_res=CBMC_get_tile_constructs_per_node(test_list,tile);
+    printf("%d",test_res[CTL_NORTH_WEST]==test_list->next->next->next->construct);
+    printf("%d",test_res[CTL_NORTH]==test_list->next->next->next->construct);
+    printf("%d",test_res[CTL_NORTH_EAST]==test_list->next->next->next->construct);
+    printf("%d",test_res[CTL_WEST_NORTH]==test_list->next->next->construct);
+    printf("%d",test_res[CTL_EAST_NORTH]==test_list->next->next->construct);
+    printf("%d",test_res[CTL_WEST]==test_list->next->construct);
+    printf("%d",test_res[CTL_CENTER]==test_list->next->construct);
+    printf("%d",test_res[CTL_EAST]==test_list->next->construct);
+    printf("%d",test_res[CTL_WEST_SOUTH]==test_list->construct);
+    printf("%d",test_res[CTL_EAST_SOUTH]==test_list->construct);
+    printf("%d",test_res[CTL_SOUTH_EAST]==test_list->construct);
+    printf("%d",test_res[CTL_SOUTH]==test_list->construct);
+    printf("%d",test_res[CTL_SOUTH_WEST]==test_list->construct);
+
+    free(test_res);
+    CBT_free_tile(tile);
+    CBMCList_free(test_list);
+    free(str_start_tile);
+}
+
 
 void test_macro_construct_run_all(){
     test_macro_const_construct_new();

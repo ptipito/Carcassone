@@ -17,6 +17,7 @@ void test_macro_const_enrich_with();
 void test_macro_const_merge();
 void test_macro_const_list_rm();
 void test_macro_const_list_is_in();
+void test_macro_get_tile_constructs_per_node();
 
 void test_macro_construct_run_all();
 

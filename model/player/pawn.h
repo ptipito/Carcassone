@@ -1,6 +1,7 @@
 #ifndef DEF_CARC_PAWN
 #define DEF_CARC_PAWN
 #include "model/player/player.h"
+#include "utils.h"
 
 
 typedef struct {

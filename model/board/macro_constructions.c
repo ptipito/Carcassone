@@ -443,3 +443,40 @@ int CBMC_merge_const(Carc_Macro_Construct* into, Carc_Macro_Construct** from,
     return res;
 }
 
+Carc_Macro_Construct** CBMC_get_tile_constructs_per_node(Carc_Macro_Construct_List* tile_constructs, Carc_Tile* tile){
+    ///Returns an array of length TILE_NR_LOCATIONS in which indices are the construct pointers of the tile construct
+    ///of the locations corresponding to the index. eg result[CTL_NORTH] is the construct for the node in CTL_NORTH.
+    ///\tile_constructs is the list of constructs of \tile. It was built outside the function to ensure uniqueness of the pointer reference
+    if(pointer_is_null(tile_constructs,0) || pointer_is_null(tile,0)){
+        if((void*)tile_constructs!=(void*)tile){//i.e not both inputs are null
+            fprintf(stderr,"ERROR: Null inputs allowed only if both inputs are null (CBMC_get_tile_constructs_per_node)\n");
+        }
+        return NULL;
+    }
+    Carc_Macro_Construct** result=malloc(TILE_NR_LOCATIONS*sizeof(*result));
+    if(result==NULL){
+        fprintf(stderr,"ERROR: couldn't allocate memory\n");
+        return NULL;
+    }
+    Carc_Tile_Node* cur_node=NULL;
+    int i=0;
+    for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
+        cur_node = CBT_get_node_from_loc(tile,i);
+        result[i] = CBMC_get_node_construct(tile_constructs,&cur_node);
+    }
+    cur_node = CBT_get_node_from_loc(tile,CTL_CENTER);
+    result[CTL_CENTER] = CBMC_get_node_construct(tile_constructs,&cur_node);
+    if(result[CTL_CENTER]==NULL){
+        //CTL_CENTER is not in the rim of a construct of the tile
+        //i.e. it is not a stand alone struct (e.g. a cloister) => find to which construct it belongs
+        i = 0;
+        while(i<TILE_NR_BORDER_LOCATIONS){
+            if(tile->center_connexions[i]==1){
+                result[CTL_CENTER] = result[i];
+                i = TILE_NR_BORDER_LOCATIONS;//stop the loop
+            }
+            i++;
+        }
+    }
+    return result;
+}

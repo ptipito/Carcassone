@@ -588,14 +588,14 @@ int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn
 }
 
 int CBT_add_pawn(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
-    int res=-1;
+    int res=FUNC_FAIL;
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
     if(node==NULL){
         fprintf(stderr, "ERROR: cannot add pawn to NULL tile node\n");
     } else if(CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1
               && CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1){
         res = CPPawn_play(pawn);
-        if(res==0){
+        if(res==FUNC_SUCCESS){
             node->pawn = pawn;
         }
     }

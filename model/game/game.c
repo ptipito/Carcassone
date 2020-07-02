@@ -144,6 +144,7 @@ Carc_Playboard_Node* CGG_play_tile_in(Carc_Game* game, Carc_Playboard_Location l
     //TODO combine both if in a function
     if(rim_node!=NULL){//A tile can be played in loc
         playboard_node = CBP_new_playboard_node(tile,loc);
+        //encapsulate the if conditions in a func "can_insert_tile_in"
         if(CBP_connect_is_possible(playboard_node,CPCS_UP,CBP_get_neighbor(rim_node,CPCS_UP))==0
            || CBP_connect_is_possible(playboard_node,CPCS_DOWN,CBP_get_neighbor(rim_node,CPCS_DOWN))==0
            || CBP_connect_is_possible(playboard_node,CPCS_LEFT,CBP_get_neighbor(rim_node,CPCS_LEFT))==0
@@ -152,11 +153,12 @@ Carc_Playboard_Node* CGG_play_tile_in(Carc_Game* game, Carc_Playboard_Location l
             CBP_free_playboard_node(playboard_node);
             return NULL;
         }
+        //Encapsulate if/else a Function "insert_tile"
         pointer_on_playboard_node = malloc(sizeof(*pointer_on_playboard_node));//necessary because playboard_node is a local variable. Thus do not use & to get the pointer's address
         if(pointer_on_playboard_node!=NULL){
             *pointer_on_playboard_node = playboard_node;
             CGG_node_transfer_rim_to_playboard(game,loc,pointer_on_playboard_node);
-            CGG_update_game_constructs(game,playboard_node);///TO_TEST
+            CGG_update_game_constructs(game,playboard_node);
             free(pointer_on_playboard_node);
             return playboard_node;
         } else{
@@ -169,20 +171,30 @@ Carc_Playboard_Node* CGG_play_tile_in(Carc_Game* game, Carc_Playboard_Location l
     return NULL;
 }
 
-Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_Tile* tile, Carc_Tile_Location loc_on_tile){
-    Carc_Pawn* pawn=NULL;
-    if(tile==NULL){
-        fprintf(stderr,"ERROR: cannot have null tile input in CGG_play_pawn_in\n");
-    } else if(CPPlayer_can_play_pawn(player,pawn_type)==1){//TODO CHange with CGG_can_play_pawn_in
-        pawn = CPPawn_new_pawn(player,pawn_type);
-        if(CBT_add_pawn(pawn, tile, loc_on_tile)!=0){
+Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_Tile* tile, Carc_Tile_Location loc_on_tile,
+                            Carc_Macro_Construct* tile_constructs[TILE_NR_LOCATIONS], Carc_Game* game){
+    Carc_Pawn* pawn=CPPawn_new_pawn(player,pawn_type);
+    Carc_Macro_Construct* construct_in_loc=NULL;
+    if(pointer_is_not_null(tile,1) && pointer_is_not_null(pawn,0)
+       && pointer_is_not_null(tile_constructs,1) && pointer_is_not_null(game,1)){
+        if(CGG_can_play_pawn_in(pawn,tile,loc_on_tile)){
+            if(CBT_add_pawn(pawn, tile, loc_on_tile)==FUNC_SUCCESS){
+                //Using CBMC_get_node_construct could fail since the rim is already altered (so possibly not on the current tile anymore) when a pawn is played
+                construct_in_loc = tile_constructs[loc_on_tile];
+                CBMC_add_pawn(construct_in_loc,&pawn);
+            } else{
+                //The pawn can't be played
+                CPPawn_free_pawn(pawn);
+                pawn = NULL;
+            }
+        } else{
             //The pawn can't be played
             CPPawn_free_pawn(pawn);
             pawn = NULL;
         }
+        return pawn;
     }
-    ///TODO update game->constructs
-    return pawn;
+    return NULL;
 }
 
 int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
@@ -195,7 +207,8 @@ int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location lo
         return allowed_to_play;
     }
     Carc_Tile_Node* node=CBT_get_node_from_loc(tile,loc);
-    if(CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1
+    if(node!=NULL
+       && CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1
        && CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1){
         ///TODO: complete once the construction at global level are implemented
         ///Add check if construction occupied

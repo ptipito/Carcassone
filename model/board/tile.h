@@ -13,7 +13,7 @@
 #define TILE_NR_BORDER_LOCATIONS 12
 #define TILE_NR_EDGES 4
 #define TILE_NR_LOCATIONS_ON_ONE_EDGE 3
-#define TILE_NR_LOCATIONS 3
+#define TILE_NR_LOCATIONS 13
 #define TILE_FOLDER "ressources/gameset/tiles/"
 #define TILE_FULL_PATH_MAX_LEN 50
 
