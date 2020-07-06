@@ -293,13 +293,16 @@ void test_tile_get_tile_file_path(){
 
 void test_tile_pawn_matches_node(){
     printf("test_tile_pawn_matches_node results: ");
-    int i=0,j=0, nb_matches=0;
+    int i=0,j=0, k=0, nb_matches=0;
     for(i=0;i<=CBCT_FIELD;i++){
         for(j=0;j<=PAWN_PIG;j++){
-            nb_matches += CBT_node_type_matches_pawn_type(i,j);
+            for(k=0;k<TILE_NR_BORDER_LOCATIONS;k++){
+                nb_matches += CBT_node_type_matches_pawn_type(i,j,k);
+            }
+            nb_matches += CBT_node_type_matches_pawn_type(i,j,CTL_CENTER);
         }
     }
-    printf("All tests successful: %d\n",nb_matches==16);
+    printf("All tests successful: %d\n",nb_matches==231);
 }
 
 void test_tile_add_pawn(){
@@ -567,6 +570,15 @@ void test_tile_list_rm_list(){
     CBTList_free(rm_list);
 }
 
+void test_tile_path_end_is_playable(){
+    printf("test_tile_path_end_is_playable results: ");
+    int i;
+    for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
+        printf("%d",CBT_path_end_is_playable(i)==1);
+    }
+    printf("%d\n",CBT_path_end_is_playable(CTL_CENTER)==0);
+}
+
 void test_tile_run_all(){
     test_tile_parse_tile_file();
     printf("\n************************************\n");
@@ -608,5 +620,6 @@ void test_tile_run_all(){
     printf("\n************************************\n");
     test_tile_list_rm();
     printf("\n************************************\n");
-    test_tile_list_rm_list();
+    test_tile_path_end_is_playable();
+    printf("\n************************************\n");
 }

@@ -171,16 +171,17 @@ Carc_Playboard_Node* CGG_play_tile_in(Carc_Game* game, Carc_Playboard_Location l
     return NULL;
 }
 
-Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_Tile* tile, Carc_Tile_Location loc_on_tile,
+Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_Playboard_Node* node, Carc_Tile_Location loc_on_tile,
                             Carc_Macro_Construct* tile_constructs[TILE_NR_LOCATIONS], Carc_Game* game){
-    Carc_Pawn* pawn=CPPawn_new_pawn(player,pawn_type);
-    Carc_Macro_Construct* construct_in_loc=NULL;
-    if(pointer_is_not_null(tile,1) && pointer_is_not_null(pawn,0)
-       && pointer_is_not_null(tile_constructs,1) && pointer_is_not_null(game,1)){
-        if(CGG_can_play_pawn_in(pawn,tile,loc_on_tile)){
+    if(pointer_is_not_null(node,1) && pointer_is_not_null(tile_constructs,1)
+       && pointer_is_not_null(game,1)
+       ){
+        Carc_Tile* tile=node->node;
+        Carc_Pawn* pawn=CPPawn_new_pawn(player,pawn_type);
+        Carc_Macro_Construct* construct_in_loc=tile_constructs[loc_on_tile];
+        if(CGG_can_play_pawn_in(pawn,node,construct_in_loc,loc_on_tile)){
             if(CBT_add_pawn(pawn, tile, loc_on_tile)==FUNC_SUCCESS){
                 //Using CBMC_get_node_construct could fail since the rim is already altered (so possibly not on the current tile anymore) when a pawn is played
-                construct_in_loc = tile_constructs[loc_on_tile];
                 CBMC_add_pawn(construct_in_loc,&pawn);
             } else{
                 //The pawn can't be played
@@ -197,23 +198,42 @@ Carc_Pawn* CGG_play_pawn_in(Carc_Player* player, Carc_Pawn_Type pawn_type, Carc_
     return NULL;
 }
 
-int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
-    ///Function to consider if a pawn can be played in a given location. It is based on
+int CGG_can_play_pawn_in(Carc_Pawn* pawn, Carc_Playboard_Node* node, Carc_Macro_Construct* c, Carc_Tile_Location loc){
+    ///Function to consider if a pawn can be played in a given tile location. It is based on
     ///CBT_node_type_matches_pawn_type and add special rules, such as is the global
     ///construction already occupied or when to play the architect
     int allowed_to_play=0;
-    if(tile==NULL){
-        fprintf(stderr,"ERROR: cannot play pawn on null tile (CGG_can_play_pawn_in)\n");
-        return allowed_to_play;
+    if(pointer_is_null(node,1) || pointer_is_null(c,1) || pointer_is_null(pawn,0)){
+        return 0;
     }
-    Carc_Tile_Node* node=CBT_get_node_from_loc(tile,loc);
-    if(node!=NULL
-       && CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1
-       && CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1){
-        ///TODO: complete once the construction at global level are implemented
-        ///Add check if construction occupied
-        ///TODO Add architect rule
+    Carc_Tile_Node* tile_node=CBT_get_node_from_loc(node->node,loc);
+    if(tile_node!=NULL
+       && CBT_node_type_matches_pawn_type(tile_node->node_type,pawn->type,loc)
+       && CPPlayer_can_play_pawn(pawn->owner,pawn->type)
+       ){
         allowed_to_play = 1;
+        switch(pawn->type){
+            case PAWN_ARCHITECT:
+                if(!CBMC_player_has_pawns_in(c,pawn->owner,PAWN_NORMAL))
+                    allowed_to_play = 0;
+                break;
+            case PAWN_PIG:
+                if(!CBMC_player_has_pawns_in(c,pawn->owner,PAWN_NORMAL))
+                    allowed_to_play = 0;
+                break;
+            case PAWN_NORMAL:
+                if(!CBMC_has_no_pawns(*c))
+                    allowed_to_play = 0;
+                break;
+            case PAWN_DOUBLE:
+                if(!CBMC_has_no_pawns(*c))
+                    allowed_to_play = 0;
+                break;
+            case PAWN_BISHOP:
+                if(!CBMC_has_no_pawns(*c))
+                    allowed_to_play = 0;
+                break;
+        }
     }
     return allowed_to_play;
 }

@@ -23,13 +23,13 @@ void test_tile_get_tile_file_path();
 void test_tile_pawn_matches_node();
 void test_tile_add_pawn();
 void test_tile_rm_pawn();
-void test_tile_run_all();
-
+void test_tile_path_end_is_playable();
 void test_tile_list_new();
 void test_tile_list_append();
 void test_tile_list_append_list();
 void test_tile_list_rm();
 void test_tile_list_rm_list();
 
+void test_tile_run_all();
 
 #endif // DEF_TEST_TILE

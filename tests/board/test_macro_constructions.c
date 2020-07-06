@@ -660,6 +660,58 @@ void test_macro_get_tile_constructs_per_node(){
 }
 
 
+void test_macro_player_has_pawns_in(){
+    printf("test_macro_player_has_pawns_in results: ");
+    Carc_Macro_Construct c_val, *c=&c_val;
+    c->nb_pawns=0;
+    c->pawns=NULL;
+    Carc_Player *pl1=CPPlayer_init_player(PLAYER_1,CPC_BLACK),
+                *pl2=CPPlayer_init_player(PLAYER_2,CPC_BLUE);
+    Carc_Pawn *pa1=CPPawn_new_pawn(pl1,PAWN_NORMAL),
+              *pa2=CPPawn_new_pawn(pl1,PAWN_NORMAL),
+              *pa3=CPPawn_new_pawn(pl2,PAWN_NORMAL);
+    //Test null inputs
+    printf("%d",CBMC_player_has_pawns_in(NULL,pl1,PAWN_NORMAL)==0);
+    printf("%d",CBMC_player_has_pawns_in(c,NULL,PAWN_NORMAL)==0);
+
+    //Test output veracity
+    printf("%d",CBMC_player_has_pawns_in(c,pl1,PAWN_NORMAL)==0);
+    CBMC_add_pawn(c,&pa1);
+    printf("%d",CBMC_player_has_pawns_in(c,pl1,PAWN_NORMAL)==1);
+    printf("%d",CBMC_player_has_pawns_in(c,pl2,PAWN_NORMAL)==0);
+    printf("%d",CBMC_player_has_pawns_in(c,pl1,PAWN_ARCHITECT)==0);
+    CBMC_add_pawn(c,&pa2);
+    CBMC_add_pawn(c,&pa3);
+    printf("%d",CBMC_player_has_pawns_in(c,pl1,PAWN_NORMAL)==2);
+    printf("%d",CBMC_player_has_pawns_in(c,pl2,PAWN_NORMAL)==1);
+    printf("%d",CBMC_player_has_pawns_in(c,pl1,PAWN_PIG)==0);
+
+    CPPlayer_free_player(pl1);
+    CPPlayer_free_player(pl2);
+    CPPawn_free_pawn(pa1);
+    CPPawn_free_pawn(pa2);
+    CPPawn_free_pawn(pa3);
+}
+
+void test_macro_has_no_pawns(){
+    printf("test_macro_has_no_pawns results: ");
+    Carc_Macro_Construct c;
+    c.nb_pawns=0;
+    c.pawns=NULL;
+    Carc_Pawn pawn_val, *pawn=&pawn_val;
+
+    printf("%d",CBMC_has_no_pawns(c)==1);
+    c.nb_pawns=2;
+    printf("%d",CBMC_has_no_pawns(c)==1);
+    c.nb_pawns=0;//To avoid bug when adding pawn on next line
+    CBMC_add_pawn(&c,&pawn);
+    c.nb_pawns=0;
+    printf("%d",CBMC_has_no_pawns(c)==1);
+    c.nb_pawns=1;
+    printf("%d",CBMC_has_no_pawns(c)==0);
+}
+
+
 void test_macro_construct_run_all(){
     test_macro_const_construct_new();
     printf("\n************************************\n");
@@ -690,5 +742,7 @@ void test_macro_construct_run_all(){
     test_macro_const_merge();
     printf("\n************************************\n");
     test_macro_const_list_is_in();
+    printf("\n************************************\n");
+    test_macro_has_no_pawns();
     printf("\n************************************\n");
 }

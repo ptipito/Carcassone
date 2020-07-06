@@ -480,3 +480,21 @@ Carc_Macro_Construct** CBMC_get_tile_constructs_per_node(Carc_Macro_Construct_Li
     }
     return result;
 }
+
+int CBMC_player_has_pawns_in(const Carc_Macro_Construct* c, const Carc_Player* player, Carc_Pawn_Type type){
+    ///Returns the number of pawns of type \type that player \p has in \c
+    int res=0, i;
+    if(pointer_is_null(c,0) || pointer_is_null(player,0)){
+        return 0;
+    }
+    for(i=0;i<c->nb_pawns;i++){
+        if(c->pawns[i]->owner==player && c->pawns[i]->type==type){
+            res++;
+        }
+    }
+    return res;
+}
+
+int CBMC_has_no_pawns(Carc_Macro_Construct c){
+    return c.nb_pawns==0 || c.pawns==NULL;
+}

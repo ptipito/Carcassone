@@ -555,7 +555,12 @@ void CBT_display_tile(Carc_Tile tile){
     printf("\n");
 }
 
-int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn_Type pawn_type){
+int CBT_path_end_is_playable(Carc_Tile_Location loc){
+    //A CBCT_PATH_END in the center represents a path cross and is therefore not playable
+    return loc!=CTL_CENTER;
+}
+
+int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn_Type pawn_type, Carc_Tile_Location loc){
     ///Function to tell if a pawn type can be played on a construction type.
     ///Other considerations/rules such as checking if a player can legally play the architect are considered
     ///at game level, as they imply to consider the construction as a whole (all the tiles building a same city
@@ -563,16 +568,20 @@ int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn
     int result=0;
     switch(pawn_type){
         case PAWN_NORMAL:
-            if(const_type!=CBCT_PATH_END)
+            if(const_type!=CBCT_PATH_END
+               || (const_type==CBCT_PATH_END && CBT_path_end_is_playable(loc)))
+                //NB: the garden case is special as normal pawn can be played in the field only. This is handled in the structure Carc_Garden
                 result = 1;
-            //NB: the garden case is special as normal pawn can be played in the field only. This is handled in the structure Carc_Garden
             break;
         case PAWN_DOUBLE:
-            if(const_type!=CBCT_PATH_END)
+            if(const_type!=CBCT_PATH_END
+               || (const_type==CBCT_PATH_END && CBT_path_end_is_playable(loc)))
+                //NB: the garden case is special as normal pawn can be played in the field only. This is handled in the structure Carc_Garden
                 result = 1;
             break;
         case PAWN_ARCHITECT:
-            if(const_type==CBCT_CITY || const_type==CBCT_PATH || const_type==CBCT_PATH_END)
+            if(const_type==CBCT_CITY || const_type==CBCT_PATH
+               || (const_type==CBCT_PATH_END && CBT_path_end_is_playable(loc)))
                 result = 1;
             break;
         case PAWN_BISHOP:
@@ -580,7 +589,7 @@ int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn
                 result = 1;
             break;
         case PAWN_PIG:
-            if(const_type==CBCT_FIELD)
+            if(const_type==CBCT_FIELD || const_type==CBCT_GARDEN)
                 result = 1;
             break;
     }
@@ -593,7 +602,7 @@ int CBT_add_pawn(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
     if(node==NULL){
         fprintf(stderr, "ERROR: cannot add pawn to NULL tile node\n");
     } else if(CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1
-              && CBT_node_type_matches_pawn_type(node->node_type,pawn->type)==1){
+              && CBT_node_type_matches_pawn_type(node->node_type,pawn->type,loc)==1){
         res = CPPawn_play(pawn);
         if(res==FUNC_SUCCESS){
             node->pawn = pawn;

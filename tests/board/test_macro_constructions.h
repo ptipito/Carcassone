@@ -18,6 +18,8 @@ void test_macro_const_merge();
 void test_macro_const_list_rm();
 void test_macro_const_list_is_in();
 void test_macro_get_tile_constructs_per_node();
+void test_macro_player_has_pawns_in();
+void test_macro_has_no_pawns();
 
 void test_macro_construct_run_all();
 

@@ -35,11 +35,12 @@ void test_game_initiate(){
 
     //Test constructs init properly
     Carc_Macro_Construct_List* game_const = game->constructs;
-    printf("%d",game_const!=NULL && game_const->construct->type==CBCT_FIELD
-           && game_const->next!=NULL && game_const->next->construct->type==CBCT_PATH
-           && game_const->next->next!=NULL && game_const->next->next->construct->type==CBCT_FIELD
-           && game_const->next->next->next!=NULL && game_const->next->next->next->construct->type==CBCT_CITY
-           && game_const->next->next->next->next==NULL);
+    printf("%d",game_const!=NULL && game_const->construct->type==CBCT_FIELD && game_const->construct->nb_pawns==0 && game_const->construct->pawns==NULL
+           && game_const->next!=NULL && game_const->next->construct->type==CBCT_PATH && game_const->next->construct->nb_pawns==0 && game_const->next->construct->pawns==NULL
+           && game_const->next->next!=NULL && game_const->next->next->construct->type==CBCT_FIELD && game_const->next->next->construct->nb_pawns==0 && game_const->next->next->construct->pawns==NULL
+           && game_const->next->next->next!=NULL && game_const->next->next->next->construct->type==CBCT_CITY && game_const->next->next->next->construct->nb_pawns==0 && game_const->next->next->construct->pawns==NULL
+           && game_const->next->next->next->next==NULL
+        );
 
     //Test creating with invalid number of players
     printf("\n");
@@ -242,53 +243,204 @@ void test_game_play_pawn_in(){
     Carc_Pawn* pawn=NULL, *pawn2=NULL;
     Carc_Tile_Location loc=CTL_CENTER;
     Carc_Game* game=CGG_initiate_game(start_tile_str,2);
-    Carc_Tile* start_tile=game->playboard->node->node;
+    Carc_Playboard_Node* start_node=game->playboard->node;
+    Carc_Tile* start_tile=start_node->node;
     Carc_Macro_Construct** arr_start_constructs=CBMC_get_tile_constructs_per_node(game->constructs,start_tile);
 
     //Test if player or tile null
     printf("Test player is null: ");
-    pawn = CGG_play_pawn_in(NULL,PAWN_NORMAL,start_tile,loc,NULL,NULL);
+    pawn = CGG_play_pawn_in(NULL,PAWN_NORMAL,start_node,loc,NULL,NULL);
     printf("\tTest result: %d\n",pawn==NULL);
     printf("Test tile is null: ");
     pawn = CGG_play_pawn_in(player,PAWN_NORMAL,NULL,loc,NULL,NULL);
     printf("\tTest result: %d\n",pawn==NULL);
     CPPawn_free_pawn(pawn);
     printf("Test tile_constructs is null: ");
-    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_tile,loc,NULL,NULL);
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_node,loc,NULL,NULL);
     printf("\tTest result: %d\n",pawn==NULL);
     printf("Test game is null: ");
-    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_tile,loc,arr_start_constructs,NULL);
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_node,loc,arr_start_constructs,NULL);
     printf("\tTest result: %d\n",pawn==NULL);
 
     //Test player cannot play
     printf("Test cannot play this pawn type: \n");
     player->nb_pawns[PAWN_ARCHITECT] = 0;
-    pawn = CGG_play_pawn_in(player,PAWN_ARCHITECT,start_tile,loc,arr_start_constructs,game);
+    pawn = CGG_play_pawn_in(player,PAWN_ARCHITECT,start_node,loc,arr_start_constructs,game);
     printf("\tTest result: %d\n",pawn==NULL);
     CPPawn_free_pawn(pawn);
 
     //Test invalid loc input
     printf("Test invalid loc input: \n");
-    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_tile,68,arr_start_constructs,game);
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_node,68,arr_start_constructs,game);
     printf("\tTest result: %d\n",pawn==NULL);
     CPPawn_free_pawn(pawn);
 
     //Test when inputs allow to play
     printf("Test when playing is ok: ");
-    pawn = CGG_play_pawn_in(player, PAWN_NORMAL, start_tile, CTL_CENTER, arr_start_constructs, game);
+    pawn = CGG_play_pawn_in(player, PAWN_NORMAL, start_node, CTL_CENTER, arr_start_constructs, game);
     printf("%d",pawn!=NULL && player->nb_pawns[PAWN_NORMAL]==NB_NORMAL_PAWNS_PER_PLAYER-1
                 && start_tile->center.pawn == pawn
                 && game->constructs->next->construct->nb_pawns==1
                 && game->constructs->next->construct->pawns[0]==pawn
                 );
-    pawn = CGG_play_pawn_in(player, PAWN_NORMAL, start_tile, CTL_SOUTH_WEST, arr_start_constructs, game);
+    pawn2 = CGG_play_pawn_in(player, PAWN_NORMAL, start_node, CTL_SOUTH_WEST, arr_start_constructs, game);
     printf("%d",pawn!=NULL && player->nb_pawns[PAWN_NORMAL]==NB_NORMAL_PAWNS_PER_PLAYER-2
-                && start_tile->border[CTL_SOUTH_WEST].pawn == pawn
+                && start_tile->center.pawn == pawn
+                && game->constructs->next->construct->nb_pawns==1
+                && game->constructs->next->construct->pawns[0]==pawn
+                && start_tile->border[CTL_SOUTH_WEST].pawn == pawn2
                 && game->constructs->construct->nb_pawns==1
-                && game->constructs->construct->pawns[0]==pawn
+                && game->constructs->construct->pawns[0]==pawn2
                 );
 
     CPPlayer_free_player(player);
+    CGG_free_game(game);
+    free(start_tile_str);
+}
+
+void test_game_can_play_pawn_in(){
+    printf("test_game_can_play_pawn_in results: \n");
+    char *start_tile_str=CBT_get_tile_file_path("tile1.txt");
+    Carc_Player *player1=CPPlayer_init_player(PLAYER_1,CPC_BLACK),
+                *player2=CPPlayer_init_player(PLAYER_2,CPC_YELLOW);
+    Carc_Pawn *pawn=CPPawn_new_pawn(player1,PAWN_NORMAL),
+              *pawn2=CPPawn_new_pawn(player1,PAWN_NORMAL),
+              *pawn3=CPPawn_new_pawn(player1,PAWN_ARCHITECT),
+              *pawn4=CPPawn_new_pawn(player1,PAWN_PIG),
+              *pawn5=CPPawn_new_pawn(player1,PAWN_BISHOP),
+              *pawn6=CPPawn_new_pawn(player2,PAWN_DOUBLE);
+    Carc_Game* game=CGG_initiate_game(start_tile_str,2);
+    Carc_Playboard_Node* start_node=game->playboard->node;
+
+    //Test null inputs
+    printf("%d",CGG_can_play_pawn_in(NULL,NULL,NULL,CTL_CENTER)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn,NULL,NULL,CTL_CENTER)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,NULL,CTL_CENTER)==0);
+
+    Carc_Tile_Location loc=CTL_CENTER;
+    Carc_Tile_Node* n=CBT_get_node_from_loc(start_node->node,CTL_EAST);
+    Carc_Macro_Construct* c=CBMC_get_node_construct(game->constructs,&n);//Test on a Path
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    //Test adding architect
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==1);
+    //Test path ends
+    c->type = CBCT_PATH_END;
+    (&(start_node->node->center))->node_type = CBCT_PATH_END;
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,CTL_EAST)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==0);
+    c->type = CBCT_PATH;
+    (&(start_node->node->center))->node_type = CBCT_PATH;
+
+// Test on a Field
+    loc = CTL_EAST_NORTH;
+    n = CBT_get_node_from_loc(start_node->node,loc);
+    c = CBMC_get_node_construct(game->constructs,&n);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    //Test adding pig
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+// Test on a city
+    loc = CTL_NORTH;
+    n = CBT_get_node_from_loc(start_node->node,loc);
+    c = CBMC_get_node_construct(game->constructs,&n);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    //Test adding architect
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+//Test for cloisters
+    loc = CTL_CENTER;
+    n = CBT_get_node_from_loc(start_node->node,CTL_EAST);
+    c=CBMC_get_node_construct(game->constructs,&n);
+    c->type = CBCT_CLOISTER;
+    (&(start_node->node->center))->node_type = CBCT_CLOISTER;
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+//Test for gardens
+    c->type = CBCT_GARDEN;
+    (&(start_node->node->center))->node_type = CBCT_GARDEN;
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+    c->type = CBCT_PATH;
+    (&(start_node->node->center))->node_type = CBCT_PATH;
+
+    CPPlayer_free_player(player1);
+    CPPlayer_free_player(player2);
+    CPPawn_free_pawn(pawn);
+    CPPawn_free_pawn(pawn2);
+    CPPawn_free_pawn(pawn3);
+    CPPawn_free_pawn(pawn4);
+    CPPawn_free_pawn(pawn5);
+    CPPawn_free_pawn(pawn6);
     CGG_free_game(game);
     free(start_tile_str);
 }
@@ -601,5 +753,7 @@ void test_game_run_all(){
     test_game_merge_constructs_with_neighbor();
     printf("\n*******************************\n");
     test_game_update_constructs();
+    printf("\n*******************************\n");
+    test_game_can_play_pawn_in();
     printf("\n*******************************\n");
 }

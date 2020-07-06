@@ -12,5 +12,6 @@ void test_game_play_pawn_in();
 void test_game_run_all();
 void test_game_merge_constructs_with_neighbor();
 void test_game_update_constructs();
+void test_game_can_play_pawn_in();
 
 #endif // DEF_TEST_GAME

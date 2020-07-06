@@ -3,6 +3,8 @@
 #include "model/board/constructions.h"
 #include "model/board/tile.h"
 #include "model/board/carcassone_playboard.h"
+#include "model/player/player.h"
+#include "model/player/pawn.h"
 #include "utils.h"
 
 Carc_Macro_Construct* CBMC_new(Carc_Tile_Node**);
@@ -25,6 +27,8 @@ int CBMC_transfer_rim(Carc_Macro_Construct*, Carc_Macro_Construct*);
 int CBMC_enrich_with(Carc_Macro_Construct*, Carc_Macro_Construct*);
 int CBMC_merge_const(Carc_Macro_Construct*, Carc_Macro_Construct**, Carc_Tile_Node_List*, Carc_Tile_Node_List*);
 Carc_Macro_Construct** CBMC_get_tile_constructs_per_node(Carc_Macro_Construct_List*, Carc_Tile*);
+int CBMC_player_has_pawns_in(const Carc_Macro_Construct*, const Carc_Player*, Carc_Pawn_Type);
+int CBMC_has_no_pawns(Carc_Macro_Construct);
 
 
 #endif // DEF_CARC_MACRO_CONST
