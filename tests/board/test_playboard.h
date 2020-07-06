@@ -15,9 +15,13 @@ void test_init_playboard();
 void test_get_opposite_side();
 void test_get_neighbor_loc();
 void test_create_neighbor_for();
-void test_playboard_run_all();
+void test_playboard_add_pawn_in();
+void test_playboard_rm_pawn_in();
 void test_playboard_get_neighbor();
 void test_playboard_set_neighbor();
 void test_playboard_is_neigh_null();
+void test_playboard_get_edge_nodes();
+
+void test_playboard_run_all();
 
 #endif // DEF_TEST_PLAYBOARD

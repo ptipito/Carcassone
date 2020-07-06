@@ -95,7 +95,7 @@ void test_location_cmp(){
 void test_new_playboard_node(){
     printf("test_new_playboard_node results: ");
 
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Tile* test_tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Location test_loc = CBP_Location_new(0,1);
     Carc_Playboard_Node *test_node = CBP_new_playboard_node(test_tile,test_loc),
@@ -127,7 +127,7 @@ void test_new_playboard_node(){
 
 void test_node_cmp(){
     printf("test_node_equality results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Tile *tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Node *n1 = CBP_new_playboard_node(NULL,CBP_Location_new(0,0)),
                         *n2 = CBP_new_playboard_node(tile,CBP_Location_new(0,0));
@@ -162,7 +162,7 @@ void test_node_cmp(){
 
 void test_connect_is_possible(){
     printf("test CBP_connect_is_possible results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Tile *origin_tile = CBT_new_tile_from_file(tile_path),
               *tile2 = CBT_new_tile_from_file(tile_path);
 
@@ -190,7 +190,7 @@ void test_connect_is_possible(){
 
 void test_init_playboard(){
     printf("test_init_playboard results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Tile* start_tile = CBT_new_tile_from_file(tile_path);
     Carc_Playboard_Node* start_node = CBP_new_playboard_node(start_tile,CBP_Location_new(0,0));
     Carc_Playboard_Origin* playboard = CBP_init_playboard(start_tile);
@@ -236,7 +236,7 @@ void test_get_neighbor_loc(){
 
 void test_create_neighbor_for(){
     printf("test_create_neighbor_for results: ");
-    char* tile_path = CT_get_tile_file_path("tile1.txt");
+    char* tile_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node* start_node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0));
     Carc_Playboard_Node* neigh1 = CBP_create_rim_neigh_for(&start_node,CPCS_UP);
     printf("%d",neigh1!=NULL && CBP_get_neighbor(neigh1,CPCS_DOWN)==start_node);
@@ -248,7 +248,7 @@ void test_create_neighbor_for(){
 
 void test_playboard_add_pawn_in(){
     printf("test_playboard_add_pawn_in results: ");
-    char* tile_start_str=CT_get_tile_file_path("tile1.txt");
+    char* tile_start_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node *node_empty=CBP_new_empty_playboard_node(CBP_Location_new(0,2)),
               *node_start=CBP_new_playboard_node(CBT_new_tile_from_file(tile_start_str),CBP_Location_new(0,0));
     Carc_Pawn* pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
@@ -278,7 +278,7 @@ void test_playboard_add_pawn_in(){
 
 void test_playboard_rm_pawn_in(){
     printf("test_playboard_rm_pawn_in results: ");
-    char* tile_start_str=CT_get_tile_file_path("tile1.txt");
+    char* tile_start_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node *node_empty=CBP_new_empty_playboard_node(CBP_Location_new(0,2)),
               *node_start=CBP_new_playboard_node(CBT_new_tile_from_file(tile_start_str),CBP_Location_new(0,0));
     Carc_Pawn *pawn1=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
@@ -321,6 +321,54 @@ void test_playboard_rm_pawn_in(){
     CPPawn_free_pawn(pawn2);
 }
 
+void test_playboard_get_edge_nodes(){
+    printf("test_playboard_get_edge_nodes results: ");
+    Carc_Playboard_Node node_val, *node=&node_val,
+                        node_null_tile_val, *node_null_tile=&node_null_tile_val;
+    Carc_Tile_Node_List *l=NULL;
+    //Test null input
+    printf("%d",CBP_get_edge_nodes(NULL,CPCS_UP)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_RIGHT)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_DOWN)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_LEFT)==NULL
+           );
+    node_null_tile->node = NULL;
+    printf("%d",CBP_get_edge_nodes(node_null_tile,CPCS_UP)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_RIGHT)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_DOWN)==NULL
+                && CBP_get_edge_nodes(NULL,CPCS_LEFT)==NULL
+           );
+    //Test all sides
+    l = CBP_get_edge_nodes(node,CPCS_UP);
+    printf("%d",l->node==&(node->node->border[CTL_NORTH_WEST])
+                && l->next->node==&(node->node->border[CTL_NORTH])
+                && l->next->next->node==&(node->node->border[CTL_NORTH_EAST])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+    l = CBP_get_edge_nodes(node,CPCS_RIGHT);
+    printf("%d",l->node==&(node->node->border[CTL_EAST_NORTH])
+                && l->next->node==&(node->node->border[CTL_EAST])
+                && l->next->next->node==&(node->node->border[CTL_EAST_SOUTH])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+    l = CBP_get_edge_nodes(node,CPCS_DOWN);
+    printf("%d",l->node==&(node->node->border[CTL_SOUTH_WEST])
+                && l->next->node==&(node->node->border[CTL_SOUTH])
+                && l->next->next->node==&(node->node->border[CTL_SOUTH_EAST])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+    l = CBP_get_edge_nodes(node,CPCS_LEFT);
+    printf("%d",l->node==&(node->node->border[CTL_WEST_NORTH])
+                && l->next->node==&(node->node->border[CTL_WEST])
+                && l->next->next->node==&(node->node->border[CTL_WEST_SOUTH])
+                && l->next->next->next==NULL
+           );
+    CBTList_free(l);
+}
+
 void test_playboard_run_all(){
     test_new_location();
     printf("\n***********************************************\n");
@@ -349,6 +397,8 @@ void test_playboard_run_all(){
     test_playboard_set_neighbor();
     printf("\n***********************************************\n");
     test_playboard_is_neigh_null();
+    printf("\n***********************************************\n");
+    test_playboard_get_edge_nodes();
     printf("\n***********************************************\n");
 
 }

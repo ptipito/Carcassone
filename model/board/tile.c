@@ -1,8 +1,8 @@
 #include "model/board/tile.h"
 
-char* CT_get_tile_file_path(char* tile_name){
+char* CBT_get_tile_file_path(char* tile_name){
     if(strlen(TILE_FOLDER)+strlen(tile_name) > TILE_FULL_PATH_MAX_LEN){
-        fprintf(stderr,"CT_get_tile_file_path error: tile path too long for %s%s\n",TILE_FOLDER,tile_name);
+        fprintf(stderr,"CBT_get_tile_file_path error: tile path too long for %s%s\n",TILE_FOLDER,tile_name);
         exit(ERR_STR_BUFFER_LENGTH);
     }
     char* full_path = malloc((TILE_FULL_PATH_MAX_LEN+1)*sizeof(char));//Add an extra char for '\0'
@@ -14,9 +14,14 @@ char* CT_get_tile_file_path(char* tile_name){
 
 void CBT_free_node(Carc_Tile_Node* node){
     if(node!=NULL){
-        free(node->construction);
+        if(node->node_type==CBCT_CITY){
+            CBC_free_city(node->construction);
+        } else{
+            free(node->construction);
+        }
         CPPawn_free_pawn(node->pawn);
     }
+    free(node);
 }
 
 Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile* tile, Carc_Tile_Location loc){
@@ -24,9 +29,14 @@ Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile* tile, Carc_Tile_Location loc){
         fprintf(stderr, "ERROR: cannot get node for loc %d for NULL tile\n",loc);
         return NULL;
     }
-    if(loc == CTL_CENTER)
-        return &(tile->center);
-    return &(tile->border[loc]);
+    if(CBT_is_valid_loc(loc)){
+        if(loc == CTL_CENTER)
+            return &(tile->center);
+        return &(tile->border[loc]);
+    } else{
+        fprintf(stderr, "ERROR: loc %d is invalid\n",loc);
+        return NULL;
+    }
 }
 
 void CBT_free_tile(Carc_Tile* tile){
@@ -49,7 +59,7 @@ void CBT_free_tile(Carc_Tile* tile){
 }
 
 Carc_Tile_Location CBT_get_location_from_string(char* loc){
-    Carc_Tile_Location result=CTL_CENTER;
+    Carc_Tile_Location result=-1;
     if(strcmp(loc,"C")==0){
         result = CTL_CENTER;
     }
@@ -92,20 +102,24 @@ Carc_Tile_Location CBT_get_location_from_string(char* loc){
     return result;
 }
 
+int CBT_is_valid_loc(Carc_Tile_Location loc){
+    return 0<= loc && loc <= CTL_CENTER;
+}
+
 Carc_Construction_Type CBT_get_node_type_from_str(char* type){
-    Carc_Construction_Type result=CCBT_FIELD;
+    Carc_Construction_Type result=CBCT_FIELD;
     if(strcmp(type,"path")==0)
-        result = CCBT_PATH;
+        result = CBCT_PATH;
     if(strcmp(type,"path_end")==0)
-        result = CCBT_PATH_END;
+        result = CBCT_PATH_END;
     if(strcmp(type,"city")==0)
-        result = CCBT_CITY;
+        result = CBCT_CITY;
     if(strcmp(type,"cloister")==0)
-        result = CCBT_CLOISTER;
+        result = CBCT_CLOISTER;
     if(strcmp(type,"garden")==0)
-        result = CCBT_GARDEN;
+        result = CBCT_GARDEN;
     if(strcmp(type,"field")==0)
-        result = CCBT_FIELD;
+        result = CBCT_FIELD;
 
     return result;
 }
@@ -128,9 +142,13 @@ void CBT_set_node_const(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Constructi
     node->construction = construct;
 }
 
-void CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile_Location neighbor_loc){
+int  CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile_Location neighbor_loc){
+    if(CBT_is_valid_loc(loc)==0 || CBT_is_valid_loc(neighbor_loc)==0){
+        fprintf(stderr,"WARNING: single connexion not set as one of the locations is invalid\n");
+        return -1;
+    }
     if(loc == neighbor_loc){
-        return; //no connexion to self is possible
+        return -1; //no connexion to self is possible
     }
     if(loc == CTL_CENTER){
         tile->center_connexions[neighbor_loc] = 1;
@@ -140,11 +158,13 @@ void CBT_set_single_connexion(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Tile
         tile->border_connexions[loc][neighbor_loc] = 1;
         tile->border_connexions[neighbor_loc][loc] = 1;
     }
+    return 0;
 }
 
-void CBT_set_node_type(Carc_Tile* tile,Carc_Tile_Location loc, Carc_Construction_Type type){
+void CBT_set_node_type(Carc_Tile* tile, Carc_Tile_Location loc, Carc_Construction_Type type){
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile, loc);
-    node->node_type=type;
+    if(node!=NULL)
+        node->node_type=type;
 }
 
 Carc_Tile_Node* CBT_new_node(Carc_Construction_Type type, Carc_Construction* cons){
@@ -167,12 +187,14 @@ Carc_Tile* CBT_new_empty_tile(){
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
         tile->center_connexions[i]=0;
         tile->border[i].construction = NULL;
+        tile->border[i].node_type = -1;
         tile->border[i].pawn = NULL;
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
             tile->border_connexions[i][j]=0;
         }
     }
     tile->center.construction = NULL;
+    tile->center.node_type = -1;
     tile->center.pawn = NULL;
     return tile;
 }
@@ -228,13 +250,13 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
             CBT_set_node_type(tile,loc,type);
             //Set node construction
             switch(type){
-                case CCBT_CITY:
+                case CBCT_CITY:
                     cur_const = CBC_new_city(0,0,CCM_NONE);
                     break;
-                case CCBT_PATH:
+                case CBCT_PATH:
                     cur_const = CBC_new_path(0);
                     break;
-                case CCBT_GARDEN:
+                case CBCT_GARDEN:
                     cur_const = CBC_new_garden();
                     break;
                 default:
@@ -246,13 +268,13 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
             while(cur_char!='\n' && cur_char != EOF){
                 cur_char = fgetc(tile_file);//on first iteration, this fast pass the first ' ' before the options list
                 switch(type){
-                    case CCBT_CITY:
+                    case CBCT_CITY:
                         switch(cur_char){
                             case ' ':
                                 //separate 2 options. Do nothing
                                 break;
                             case 'f':
-                                cur_const->city.has_flag = 1;
+                                cur_const->city.nb_flags = 1;
                                 break;
                             case 'c':
                                 cur_const->city.is_cathedral = 1;
@@ -262,13 +284,21 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
                                 cur_char = fgetc(tile_file);
                                 if(isalpha(cur_char)){
                                     //cur_char is supposed to be a letter representing the merchandise. Loop for parsing security
-                                    cur_const->city.merchandise = CBT_parse_merchandise(cur_char);
+                                    cur_const->city.merchandises = malloc(sizeof(Carc_City_Merchandise));
+                                    if(cur_const->city.merchandises!=NULL)
+                                        cur_const->city.merchandises[0] = CBT_parse_merchandise(cur_char);
+                                    else{
+                                        fprintf(stderr,"ERROR: couldn't allocate memory for merch (CBT_new_tile_from_file)\n");
+                                        free(cur_const);
+                                        CBT_free_tile(tile);
+                                        cur_char = EOF;
+                                    }
                                 }
                             default:
                                 break;
                         }
                         break;
-                    case CCBT_PATH:
+                    case CBCT_PATH:
                         switch(cur_char){
                             case 'l':
                                 cur_const->path.has_lake = 1;
@@ -355,7 +385,6 @@ void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
         previous_location = positive_modulo(i - transposition_factor, TILE_NR_BORDER_LOCATIONS);
         (tile->border)[i] = entry_tile.border[previous_location];
-        //printf("%d is a %d (from index %d)\n",i,(tile->border)[i].node_type,previous_location);
         (tile->center_connexions)[i] = entry_tile.center_connexions[previous_location];
         //Update connexion matrix line per line
         for(j=0;j<TILE_NR_BORDER_LOCATIONS;j++){
@@ -368,11 +397,9 @@ void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
 int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile t2, Carc_Tile_Location t2_node_loc){
     Carc_Tile_Node *node_t1 = CBT_get_node_from_loc(&t1, t1_node_loc),
                    *node_t2 = CBT_get_node_from_loc(&t2, t2_node_loc);
-
-    if(node_t1->node_type == node_t2->node_type)
+    if(node_t1==NULL || node_t2==NULL)
         return 1;
-    if((node_t1->node_type == CCBT_GARDEN && node_t2->node_type == CCBT_FIELD)
-       || (node_t1->node_type == CCBT_FIELD && node_t2->node_type == CCBT_GARDEN))
+    if(CBC_types_connect(node_t1->node_type,node_t2->node_type)==1)
         return 1;
 
     return 0;
@@ -528,15 +555,56 @@ void CBT_display_tile(Carc_Tile tile){
     printf("\n");
 }
 
+int CBT_path_end_is_playable(Carc_Tile_Location loc){
+    //A CBCT_PATH_END in the center represents a path cross and is therefore not playable
+    return loc!=CTL_CENTER;
+}
+
+int CBT_node_type_matches_pawn_type(Carc_Construction_Type const_type, Carc_Pawn_Type pawn_type, Carc_Tile_Location loc){
+    ///Function to tell if a pawn type can be played on a construction type.
+    ///Other considerations/rules such as checking if a player can legally play the architect are considered
+    ///at game level, as they imply to consider the construction as a whole (all the tiles building a same city
+    ///for instance) and not only a location on a tile.
+    int result=0;
+    switch(pawn_type){
+        case PAWN_NORMAL:
+            if(const_type!=CBCT_PATH_END
+               || (const_type==CBCT_PATH_END && CBT_path_end_is_playable(loc)))
+                //NB: the garden case is special as normal pawn can be played in the field only. This is handled in the structure Carc_Garden
+                result = 1;
+            break;
+        case PAWN_DOUBLE:
+            if(const_type!=CBCT_PATH_END
+               || (const_type==CBCT_PATH_END && CBT_path_end_is_playable(loc)))
+                //NB: the garden case is special as normal pawn can be played in the field only. This is handled in the structure Carc_Garden
+                result = 1;
+            break;
+        case PAWN_ARCHITECT:
+            if(const_type==CBCT_CITY || const_type==CBCT_PATH
+               || (const_type==CBCT_PATH_END && CBT_path_end_is_playable(loc)))
+                result = 1;
+            break;
+        case PAWN_BISHOP:
+            if(const_type==CBCT_CLOISTER || const_type==CBCT_GARDEN)
+                result = 1;
+            break;
+        case PAWN_PIG:
+            if(const_type==CBCT_FIELD || const_type==CBCT_GARDEN)
+                result = 1;
+            break;
+    }
+    return result;
+}
+
 int CBT_add_pawn(Carc_Pawn* pawn, Carc_Tile* tile, Carc_Tile_Location loc){
-    int res=0;
+    int res=FUNC_FAIL;
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
     if(node==NULL){
         fprintf(stderr, "ERROR: cannot add pawn to NULL tile node\n");
-        res = -1;
-    } else{
+    } else if(CPPlayer_can_play_pawn(pawn->owner,pawn->type)==1
+              && CBT_node_type_matches_pawn_type(node->node_type,pawn->type,loc)==1){
         res = CPPawn_play(pawn);
-        if(res==0){
+        if(res==FUNC_SUCCESS){
             node->pawn = pawn;
         }
     }
@@ -559,3 +627,138 @@ int CBT_rm_pawn(Carc_Tile* tile, Carc_Tile_Location loc){
     return res;
 }
 
+Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node** pointer_to_node){
+    if(pointer_to_node==NULL || *pointer_to_node==NULL){
+        fprintf(stderr,"ERROR: cannot init node list from NULL\n");
+        return NULL;
+    }
+    Carc_Tile_Node_List* res = malloc(sizeof(*res));
+    res->node = *pointer_to_node;
+    res->next = NULL;
+    return res;
+}
+
+void CBTList_free(Carc_Tile_Node_List* l){
+    //Free the allocated memory for a list.
+    //NB: freeing the tile nodes themselves is to be done when freeing the playboard
+    Carc_Tile_Node_List* next=NULL;
+    while(l!=NULL){
+        next = l->next;
+        free(l);
+        l = next;
+    }
+}
+
+int CBTList_append(Carc_Tile_Node_List* l, Carc_Tile_Node** n){
+    int fail=FUNC_FAIL, already_in=-2;
+    Carc_Tile_Node_List* current=l, *previous=NULL;
+    Carc_Tile_Node_List* append=NULL;
+    if(l==NULL){
+        fprintf(stderr,"ERROR: Cannot add node to NULL (CTList_add_node)\n");
+        return fail;
+    }
+    if(n==NULL || *n==NULL){
+        fprintf(stderr,"ERROR: Cannot add NULL to a node list (CTList_add_node)\n");
+        return fail;
+    }
+    while(current!=NULL){
+        if(current->node==*n){
+            return already_in;
+        } else{
+            previous = current;
+            current = current->next;
+        }
+    }
+    //If the node is not already in the list, append it at the end
+    append = CBTList_new(n);
+    if(append==NULL){
+        fprintf(stderr,"ERROR: cannot allocate memory (CTList_add_node)\n");
+        return fail;
+    }
+    previous->next = append;
+    return FUNC_SUCCESS;
+}
+
+int CBTList_append_list(Carc_Tile_Node_List* into, Carc_Tile_Node_List* from){
+    Carc_Tile_Node_List* current=from;
+    int append_success=1, count=1, result=FUNC_SUCCESS;
+    if(into==from){
+        fprintf(stderr,"Error: cannot append a list to itself"); //Or an infinite loop is created
+        result = FUNC_FAIL;
+        current = NULL;
+    }
+    while(current!=NULL){
+        append_success = CBTList_append(into,&(current->node));
+        if(append_success!=FUNC_SUCCESS){
+            if(result!=FUNC_FAIL)
+                fprintf(stderr,"ERROR: CBTList_append_list(%p,%p) failed on: %d-th node (%p)",into,from,count,current->node);
+            else
+                fprintf(stderr," && %d-th node (%p)",count,current->node);
+            result = FUNC_FAIL;
+        }
+        current = current->next;
+        count++;
+    }
+    if(result==FUNC_FAIL)//In case of errors a newline must be inserted in the error output file
+        fprintf(stderr,"\n");
+    return result;
+}
+
+int CBTList_rm(Carc_Tile_Node_List** l, Carc_Tile_Node** rm){
+    if(pointer_has_null_value((void**)l,0)){
+        return FUNC_SUCCESS;
+    } else if(pointer_has_not_null_value((void**)rm,1)){
+        Carc_Tile_Node_List *current=*l,
+                            *previous=NULL;
+        int removed=0;
+        while(current!=NULL){
+            if(current->node==*rm){
+                if(previous==NULL){//The node is at the head of the list
+                    //Change head
+                    previous = *l;
+                    *l = (*l)->next;
+                    //Free head
+                    previous->next=NULL;
+                    CBTList_free(previous);
+                } else{
+                    //Remove
+                    previous->next = current->next;
+                    //Free current
+                    current->next=NULL;
+                    CBTList_free(current);
+                }
+                removed = 1;
+                current=NULL;
+            }
+            else{
+                previous = current;
+                current = current->next;
+            }
+        }
+        if(!removed)
+            fprintf(stderr,"WARNING: node %p was not found in list %p\n",*rm,*l);
+        return FUNC_SUCCESS;
+    }
+    //If NULL input
+    return FUNC_FAIL;
+}
+
+int CBTList_rm_nodes(Carc_Tile_Node_List** src, Carc_Tile_Node_List* rm){
+    ///Remove the nodes of list \rm from \src, if they are in \src
+    Carc_Tile_Node_List* current=rm;
+    int res=FUNC_SUCCESS, node_count=1;
+    if(pointer_has_null_value((void**)src,0)){
+        return FUNC_SUCCESS;
+    }
+    while(current!=NULL && *src!=NULL){
+        if(CBTList_rm(src,&(current->node))==FUNC_FAIL){
+            if(res!=FUNC_FAIL)
+                fprintf(stderr,"CBTList_rm_nodes fails to remove following nodes from list %p:\n",*src);
+            fprintf(stderr,"\t%d-th node (%p) couldn't be removed\n",node_count,rm->node);
+            res = FUNC_FAIL;
+        }
+        current = current->next;
+        node_count++;
+    }
+    return res;
+}

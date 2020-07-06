@@ -13,7 +13,7 @@
 #define TILE_NR_BORDER_LOCATIONS 12
 #define TILE_NR_EDGES 4
 #define TILE_NR_LOCATIONS_ON_ONE_EDGE 3
-#define TILE_NR_LOCATIONS 3
+#define TILE_NR_LOCATIONS 13
 #define TILE_FOLDER "ressources/gameset/tiles/"
 #define TILE_FULL_PATH_MAX_LEN 50
 
@@ -34,6 +34,28 @@ typedef struct {
     Carc_Pawn* pawn;
 } Carc_Tile_Node;
 
+typedef struct Carc_Tile_Node_List Carc_Tile_Node_List;
+struct Carc_Tile_Node_List {
+    Carc_Tile_Node* node;
+    Carc_Tile_Node_List* next;
+};
+
+//A structure to consider constructions from at tile level and not at tile node level.
+//It is if two nodes of the same construction type are neighbors, gather them as one construction.
+//This avoids walking the same graph again and again and recompute all information of a construction at macro level.
+typedef struct {
+    Carc_Construction_Type type;
+    Carc_Construction* construct;
+    Carc_Pawn** pawns;
+    int nb_pawns;
+    Carc_Tile_Node_List* rim;//The current edge of a construction. I.e. all nodes offering a possible connection to extend this construction.
+} Carc_Macro_Construct;
+
+typedef struct Carc_Macro_Construct_List Carc_Macro_Construct_List;
+struct Carc_Macro_Construct_List{
+    Carc_Macro_Construct* construct;
+    Carc_Macro_Construct_List* next;
+};
 
 typedef struct Carc_Tile {
     Carc_Tile_Location border_connexions[TILE_NR_BORDER_LOCATIONS][TILE_NR_BORDER_LOCATIONS];
@@ -56,11 +78,22 @@ void CBT_display_tile(Carc_Tile);
 Carc_Tile_Node* CBT_new_node(Carc_Construction_Type, Carc_Construction*);
 Carc_Tile_Node* CBT_get_node_from_loc(Carc_Tile*,Carc_Tile_Location);
 Carc_City_Merchandise CBT_parse_merchandise(char);
-void CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location);
+int CBT_set_single_connexion(Carc_Tile*, Carc_Tile_Location, Carc_Tile_Location);
 void CBT_set_node_const(Carc_Tile*, Carc_Tile_Location, Carc_Construction*);
 void CBT_set_node_type(Carc_Tile*,Carc_Tile_Location, Carc_Construction_Type);
-char* CT_get_tile_file_path(char*);
+char* CBT_get_tile_file_path(char*);
+int CBT_path_end_is_playable(Carc_Tile_Location);
+int CBT_node_type_matches_pawn_type(Carc_Construction_Type, Carc_Pawn_Type, Carc_Tile_Location);
 int CBT_add_pawn(Carc_Pawn*, Carc_Tile*, Carc_Tile_Location);
 int CBT_rm_pawn(Carc_Tile*, Carc_Tile_Location);
+int CBT_is_valid_loc(Carc_Tile_Location);
+
+Carc_Tile_Node_List* CBTList_new(Carc_Tile_Node**);
+void CBTList_free(Carc_Tile_Node_List*);
+int CBTList_append(Carc_Tile_Node_List*, Carc_Tile_Node**);
+int CBTList_append_list(Carc_Tile_Node_List*, Carc_Tile_Node_List*);
+int CBTList_rm(Carc_Tile_Node_List**, Carc_Tile_Node**);
+int CBTList_rm_nodes(Carc_Tile_Node_List**, Carc_Tile_Node_List*);
+
 
 #endif // DEF_CARC_TILE

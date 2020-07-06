@@ -23,6 +23,7 @@ Carc_Rim* CBRim_initiate(Carc_Playboard_Node**);
 void CBRim_remove_first(Carc_Rim*);
 int CBRim_remove_by_node_coordinates(Carc_Rim*, Carc_Playboard_Location);
 void CBRim_free(Carc_Rim*);
+void CB_Rim_free_rim_elt(Carc_Rim_Element*);
 void CBRim_display(Carc_Rim*);
 Carc_Playboard_Node* CB_Rim_find_by_location(Carc_Rim*, Carc_Playboard_Location);
 

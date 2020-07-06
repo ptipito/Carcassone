@@ -2,7 +2,7 @@
 
 void test_game_initiate(){
     printf("test_game_initiate results: ");
-    char* start_tile_str = CT_get_tile_file_path("tile1.txt");
+    char* start_tile_str = CBT_get_tile_file_path("tile1.txt");
     int i, boolean=1;
 
     //Test playboard and rim init properly
@@ -33,6 +33,15 @@ void test_game_initiate(){
     }
     printf("%d",boolean);
 
+    //Test constructs init properly
+    Carc_Macro_Construct_List* game_const = game->constructs;
+    printf("%d",game_const!=NULL && game_const->construct->type==CBCT_FIELD && game_const->construct->nb_pawns==0 && game_const->construct->pawns==NULL
+           && game_const->next!=NULL && game_const->next->construct->type==CBCT_PATH && game_const->next->construct->nb_pawns==0 && game_const->next->construct->pawns==NULL
+           && game_const->next->next!=NULL && game_const->next->next->construct->type==CBCT_FIELD && game_const->next->next->construct->nb_pawns==0 && game_const->next->next->construct->pawns==NULL
+           && game_const->next->next->next!=NULL && game_const->next->next->next->construct->type==CBCT_CITY && game_const->next->next->next->construct->nb_pawns==0 && game_const->next->next->construct->pawns==NULL
+           && game_const->next->next->next->next==NULL
+        );
+
     //Test creating with invalid number of players
     printf("\n");
     printf("%d\n",CGG_initiate_game(start_tile_str,1)==NULL);
@@ -46,8 +55,8 @@ void test_game_initiate(){
 void test_game_rim_to_playboard_update_one_side(){
     printf("test_game_rim_to_playboard_update_one_side results: ");
     int update_result=0;
-    char *tile1_path = CT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path = CT_get_tile_file_path("cloister_path.txt");
+    char *tile1_path = CBT_get_tile_file_path("tile1.txt"),
+         *cloister_tile_path = CBT_get_tile_file_path("cloister_path.txt");
     Carc_Game* game = CGG_initiate_game(tile1_path,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),
@@ -93,7 +102,7 @@ void test_game_rim_to_playboard_update_one_side(){
 void test_game_node_transfer_rim_to_playboard(){
     printf("test_game_node_transfer_rim_to_playboard results:\n");
     int update_result=0;
-    char* tile1_path = CT_get_tile_file_path("tile1.txt");
+    char* tile1_path = CBT_get_tile_file_path("tile1.txt");
     Carc_Game* game = CGG_initiate_game(tile1_path,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
     Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt"),
@@ -133,11 +142,11 @@ void test_game_node_transfer_rim_to_playboard(){
 
 void test_game_play_tile_in(){
     printf("test_game_play_tile_in results: ");
-    char *start_tile_str = CT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_str = CT_get_tile_file_path("cloister_path.txt");
+    char *start_tile_str = CBT_get_tile_file_path("tile1.txt"),
+         *cloister_tile_str = CBT_get_tile_file_path("cloister_path.txt");
     Carc_Game* game = CGG_initiate_game(start_tile_str,2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
-    Carc_Tile *cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
+    Carc_Tile* cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
     Carc_Playboard_Node *origin_node = CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_str),CBP_Location_new(0,0)),
                         *curr_node=NULL;
     Carc_Playboard_Node* node_played = CGG_play_tile_in(game,play_in,cloister_tile);
@@ -149,7 +158,6 @@ void test_game_play_tile_in(){
     printf("%d",CBP_get_neighbor(game->playboard->node,CPCS_RIGHT)==NULL);
     printf("%d",CBP_get_neighbor(game->playboard->node,CPCS_UP)==NULL);
     //Check the neighbor was inserted correctly
-    printf("\n");
     curr_node = CBP_get_neighbor(game->playboard->node,CPCS_DOWN);
     printf("%d",CBT_tile_cmp(curr_node->node,cloister_tile)==0);
     printf("%d",CBP_Location_cmp(curr_node->node_coordinates,play_in)==0);
@@ -166,6 +174,15 @@ void test_game_play_tile_in(){
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(1,-1))!=NULL);
     //Test node was removed from rim
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,-1))==NULL);
+    //Test game constructs updated (test only types. The deeper check is done in the test of the update_constructs function)
+    printf("%d",game->constructs->construct->type==CBCT_CLOISTER
+                && game->constructs->next->construct->type==CBCT_PATH
+                && game->constructs->next->next->construct->type==CBCT_FIELD
+                && game->constructs->next->next->next->construct->type==CBCT_PATH
+                && game->constructs->next->next->next->next->construct->type==CBCT_FIELD
+                && game->constructs->next->next->next->next->next->construct->type==CBCT_CITY
+                && game->constructs->next->next->next->next->next->next==NULL
+                );
 
     //Test play in a location where tiles do not connect
     printf("\n");
@@ -180,6 +197,15 @@ void test_game_play_tile_in(){
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,-2))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(-1,-1))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(1,-1))!=NULL);
+    //Test game constructs unchanged
+    printf("%d",game->constructs->construct->type==CBCT_CLOISTER
+                && game->constructs->next->construct->type==CBCT_PATH
+                && game->constructs->next->next->construct->type==CBCT_FIELD
+                && game->constructs->next->next->next->construct->type==CBCT_PATH
+                && game->constructs->next->next->next->next->construct->type==CBCT_FIELD
+                && game->constructs->next->next->next->next->next->construct->type==CBCT_CITY
+                && game->constructs->next->next->next->next->next->next==NULL
+                );
 
     //Test play in location not in rim
     printf("\n");
@@ -193,12 +219,524 @@ void test_game_play_tile_in(){
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,-2))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(-1,-1))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(1,-1))!=NULL);
+    //Test game constructs updated (test only types. The deeper check is done in the test of the update_constructs function)
+    printf("%d",game->constructs->construct->type==CBCT_CLOISTER
+                && game->constructs->next->construct->type==CBCT_PATH
+                && game->constructs->next->next->construct->type==CBCT_FIELD
+                && game->constructs->next->next->next->construct->type==CBCT_PATH
+                && game->constructs->next->next->next->next->construct->type==CBCT_FIELD
+                && game->constructs->next->next->next->next->next->construct->type==CBCT_CITY
+                && game->constructs->next->next->next->next->next->next==NULL
+                );
 
     CBP_free_playboard_node(CBP_get_neighbor(game->playboard->node,CPCS_DOWN));//To be removed when CBP_free_playboard is complete
     CGG_free_game(game);
     CBP_free_playboard_node(origin_node);
     free(start_tile_str);
     free(cloister_tile_str);
+}
+
+void test_game_play_pawn_in(){
+    printf("test_game_play_pawn_in results: \n");
+    char *start_tile_str=CBT_get_tile_file_path("tile1.txt");
+    Carc_Player* player=CPPlayer_init_player(PLAYER_1,CPC_BLACK);
+    Carc_Pawn* pawn=NULL, *pawn2=NULL;
+    Carc_Tile_Location loc=CTL_CENTER;
+    Carc_Game* game=CGG_initiate_game(start_tile_str,2);
+    Carc_Playboard_Node* start_node=game->playboard->node;
+    Carc_Tile* start_tile=start_node->node;
+    Carc_Macro_Construct** arr_start_constructs=CBMC_get_tile_constructs_per_node(game->constructs,start_tile);
+
+    //Test if player or tile null
+    printf("Test player is null: ");
+    pawn = CGG_play_pawn_in(NULL,PAWN_NORMAL,start_node,loc,NULL,NULL);
+    printf("\tTest result: %d\n",pawn==NULL);
+    printf("Test tile is null: ");
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,NULL,loc,NULL,NULL);
+    printf("\tTest result: %d\n",pawn==NULL);
+    CPPawn_free_pawn(pawn);
+    printf("Test tile_constructs is null: ");
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_node,loc,NULL,NULL);
+    printf("\tTest result: %d\n",pawn==NULL);
+    printf("Test game is null: ");
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_node,loc,arr_start_constructs,NULL);
+    printf("\tTest result: %d\n",pawn==NULL);
+
+    //Test player cannot play
+    printf("Test cannot play this pawn type: \n");
+    player->nb_pawns[PAWN_ARCHITECT] = 0;
+    pawn = CGG_play_pawn_in(player,PAWN_ARCHITECT,start_node,loc,arr_start_constructs,game);
+    printf("\tTest result: %d\n",pawn==NULL);
+    CPPawn_free_pawn(pawn);
+
+    //Test invalid loc input
+    printf("Test invalid loc input: \n");
+    pawn = CGG_play_pawn_in(player,PAWN_NORMAL,start_node,68,arr_start_constructs,game);
+    printf("\tTest result: %d\n",pawn==NULL);
+    CPPawn_free_pawn(pawn);
+
+    //Test when inputs allow to play
+    printf("Test when playing is ok: ");
+    pawn = CGG_play_pawn_in(player, PAWN_NORMAL, start_node, CTL_CENTER, arr_start_constructs, game);
+    printf("%d",pawn!=NULL && player->nb_pawns[PAWN_NORMAL]==NB_NORMAL_PAWNS_PER_PLAYER-1
+                && start_tile->center.pawn == pawn
+                && game->constructs->next->construct->nb_pawns==1
+                && game->constructs->next->construct->pawns[0]==pawn
+                );
+    pawn2 = CGG_play_pawn_in(player, PAWN_NORMAL, start_node, CTL_SOUTH_WEST, arr_start_constructs, game);
+    printf("%d",pawn!=NULL && player->nb_pawns[PAWN_NORMAL]==NB_NORMAL_PAWNS_PER_PLAYER-2
+                && start_tile->center.pawn == pawn
+                && game->constructs->next->construct->nb_pawns==1
+                && game->constructs->next->construct->pawns[0]==pawn
+                && start_tile->border[CTL_SOUTH_WEST].pawn == pawn2
+                && game->constructs->construct->nb_pawns==1
+                && game->constructs->construct->pawns[0]==pawn2
+                );
+
+    CPPlayer_free_player(player);
+    CGG_free_game(game);
+    free(start_tile_str);
+}
+
+void test_game_can_play_pawn_in(){
+    printf("test_game_can_play_pawn_in results: \n");
+    char *start_tile_str=CBT_get_tile_file_path("tile1.txt");
+    Carc_Player *player1=CPPlayer_init_player(PLAYER_1,CPC_BLACK),
+                *player2=CPPlayer_init_player(PLAYER_2,CPC_YELLOW);
+    Carc_Pawn *pawn=CPPawn_new_pawn(player1,PAWN_NORMAL),
+              *pawn2=CPPawn_new_pawn(player1,PAWN_NORMAL),
+              *pawn3=CPPawn_new_pawn(player1,PAWN_ARCHITECT),
+              *pawn4=CPPawn_new_pawn(player1,PAWN_PIG),
+              *pawn5=CPPawn_new_pawn(player1,PAWN_BISHOP),
+              *pawn6=CPPawn_new_pawn(player2,PAWN_DOUBLE);
+    Carc_Game* game=CGG_initiate_game(start_tile_str,2);
+    Carc_Playboard_Node* start_node=game->playboard->node;
+
+    //Test null inputs
+    printf("%d",CGG_can_play_pawn_in(NULL,NULL,NULL,CTL_CENTER)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn,NULL,NULL,CTL_CENTER)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,NULL,CTL_CENTER)==0);
+
+    Carc_Tile_Location loc=CTL_CENTER;
+    Carc_Tile_Node* n=CBT_get_node_from_loc(start_node->node,CTL_EAST);
+    Carc_Macro_Construct* c=CBMC_get_node_construct(game->constructs,&n);//Test on a Path
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    //Test adding architect
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==1);
+    //Test path ends
+    c->type = CBCT_PATH_END;
+    (&(start_node->node->center))->node_type = CBCT_PATH_END;
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,CTL_EAST)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==0);
+    c->type = CBCT_PATH;
+    (&(start_node->node->center))->node_type = CBCT_PATH;
+
+// Test on a Field
+    loc = CTL_EAST_NORTH;
+    n = CBT_get_node_from_loc(start_node->node,loc);
+    c = CBMC_get_node_construct(game->constructs,&n);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    //Test adding pig
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+// Test on a city
+    loc = CTL_NORTH;
+    n = CBT_get_node_from_loc(start_node->node,loc);
+    c = CBMC_get_node_construct(game->constructs,&n);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    //Test adding architect
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+//Test for cloisters
+    loc = CTL_CENTER;
+    n = CBT_get_node_from_loc(start_node->node,CTL_EAST);
+    c=CBMC_get_node_construct(game->constructs,&n);
+    c->type = CBCT_CLOISTER;
+    (&(start_node->node->center))->node_type = CBCT_CLOISTER;
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+//Test for gardens
+    c->type = CBCT_GARDEN;
+    (&(start_node->node->center))->node_type = CBCT_GARDEN;
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==1);
+    printf("%d",CGG_can_play_pawn_in(pawn6,start_node,c,loc)==1);
+    //Test with has pawns
+    CBMC_add_pawn(c,&pawn6);
+    printf("%d",CGG_can_play_pawn_in(pawn,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn3,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==0);
+    printf("%d",CGG_can_play_pawn_in(pawn5,start_node,c,loc)==0);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+    CBMC_add_pawn(c,&pawn);
+    printf("%d",CGG_can_play_pawn_in(pawn4,start_node,c,loc)==1);
+    c->pawns = NULL;
+    c->nb_pawns = 0;
+
+    c->type = CBCT_PATH;
+    (&(start_node->node->center))->node_type = CBCT_PATH;
+
+    CPPlayer_free_player(player1);
+    CPPlayer_free_player(player2);
+    CPPawn_free_pawn(pawn);
+    CPPawn_free_pawn(pawn2);
+    CPPawn_free_pawn(pawn3);
+    CPPawn_free_pawn(pawn4);
+    CPPawn_free_pawn(pawn5);
+    CPPawn_free_pawn(pawn6);
+    CGG_free_game(game);
+    free(start_tile_str);
+}
+
+void test_game_merge_constructs_with_neighbor(){
+    printf("test_game_merge_constructs_with_neighbor results: \n");
+    char *cloister_path=CBT_get_tile_file_path("cloister_path.txt"),
+    *start_tile_path=CBT_get_tile_file_path("tile1.txt");
+    Carc_Game* game=CGG_initiate_game(start_tile_path,3);
+    Carc_Tile* tile_cloister=CBT_new_tile_from_file(cloister_path);
+    Carc_Macro_Construct_List* cloister_constructs=CBMC_get_tile_macro_constructions(tile_cloister);
+
+    Carc_Playboard_Node* cloister=CBP_new_playboard_node(tile_cloister,CBP_Location_new(0,-1));
+    cloister->neighbors[CPCS_UP] = &(game->playboard->node);
+
+    //Test merge with null neighbor
+    int test_res=CGG_merge_constructs_with_neighbor(NULL,cloister,CPCS_UP,cloister_constructs);
+    printf("%d",test_res==FUNC_FAIL);
+    test_res=CGG_merge_constructs_with_neighbor(game,NULL,CPCS_UP,NULL);
+    printf("%d",test_res==FUNC_FAIL);
+    test_res=CGG_merge_constructs_with_neighbor(game,cloister,CPCS_UP,NULL);
+    printf("%d",test_res==FUNC_FAIL);
+    //Test merges properly with a good tile as neighbor and 1 construct on the edge
+    test_res=CGG_merge_constructs_with_neighbor(game,cloister,CPCS_UP,cloister_constructs);
+    int rim_is_right = 1;
+    Carc_Tile_Node_List* cur=game->constructs->construct->rim;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_EAST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_SOUTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_SOUTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_WEST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(game->playboard->node->node->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(game->playboard->node->node->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur==NULL);
+    printf("%d",test_res==FUNC_SUCCESS
+           && game->constructs->construct->type==CBCT_FIELD
+           && rim_is_right
+           //other constructs are untouched
+           && game->constructs->next->construct->type==CBCT_PATH
+           && game->constructs->next->next->construct->type==CBCT_FIELD
+           && game->constructs->next->next->next->construct->type==CBCT_CITY
+           && game->constructs->next->next->next->next==NULL
+           );
+
+    //Test if neighhbor is null (nothing changed)
+    test_res = CGG_merge_constructs_with_neighbor(game,cloister,CPCS_DOWN,cloister_constructs);
+    printf("%d",test_res==FUNC_SUCCESS
+           && game->constructs->construct->type==CBCT_FIELD
+           && game->constructs->next->construct->type==CBCT_PATH
+           && game->constructs->next->next->construct->type==CBCT_FIELD
+           && game->constructs->next->next->next->construct->type==CBCT_CITY
+           && game->constructs->next->next->next->next==NULL
+           );
+
+    //Test merging cloister_path with starting tile on path side. (Merge 2 fields of starting tile into one thanks to field of cloister_path)
+    Carc_Tile* tile_cloister2=CBT_new_tile_from_file(cloister_path);
+    CBT_turn(tile_cloister2,CCT_RIGHT);
+    Carc_Macro_Construct_List* cloister_constructs2=CBMC_get_tile_macro_constructions(tile_cloister2);
+    Carc_Playboard_Node* cloister2=CBP_new_playboard_node(tile_cloister2,CBP_Location_new(1,0));
+    cloister2->neighbors[CPCS_LEFT] = &(game->playboard->node);
+
+
+    test_res = CGG_merge_constructs_with_neighbor(game,cloister2,CPCS_LEFT,cloister_constructs2);
+
+
+    cur=game->constructs->next->construct->rim;//The extended field rim
+    rim_is_right = 1;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_NORTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_NORTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_EAST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_SOUTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister2->node->border[CTL_SOUTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(game->playboard->node->node->border[CTL_WEST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_EAST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_SOUTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_SOUTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(cloister->node->border[CTL_WEST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(game->playboard->node->node->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur==NULL);
+
+    cur=game->constructs->construct->rim;//The rim of the path construction
+    int path_rim_is_right=(cur->node==&(game->playboard->node->node->border[CTL_WEST]) && cur->next==NULL);
+
+    printf("%d",test_res==FUNC_SUCCESS
+           && rim_is_right
+           && path_rim_is_right
+           && game->constructs->construct->type==CBCT_PATH
+           && game->constructs->next->construct->type==CBCT_FIELD
+           && game->constructs->next->next->construct->type==CBCT_CITY
+           && game->constructs->next->next->next==NULL
+           );
+
+    //Avoid double free by removing from tile constructs the merrged constructions
+    Carc_Tile_Node* n=CBT_get_node_from_loc(tile_cloister,CTL_NORTH);
+    Carc_Macro_Construct* c=CBMC_get_node_construct(cloister_constructs,&n);
+    CBMCList_rm(&cloister_constructs,&c);
+    n=CBT_get_node_from_loc(tile_cloister2,CTL_NORTH);
+    c=CBMC_get_node_construct(cloister_constructs2,&n);
+    CBMCList_rm(&cloister_constructs2,&c);
+    n=CBT_get_node_from_loc(tile_cloister2,CTL_WEST);
+    c=CBMC_get_node_construct(cloister_constructs2,&n);
+    CBMCList_rm(&cloister_constructs2,&c);
+    //Free operations can be performed without double free
+    CGG_free_game(game);
+    CBMCList_free(cloister_constructs);
+    free(cloister_path);
+    free(start_tile_path);
+    CBP_free_playboard_node(cloister);
+    CBP_free_playboard_node(cloister2);
+}
+
+void test_game_update_constructs(){
+    printf("test_game_update_constructs results: ");
+    char *cloister_path=CBT_get_tile_file_path("cloister_path.txt"),
+         *start_tile_path=CBT_get_tile_file_path("tile1.txt");
+    Carc_Game* game=CGG_initiate_game(start_tile_path,3);
+    Carc_Tile *tile_cloister=CBT_new_tile_from_file(cloister_path),
+              *start_tile=game->playboard->node->node;
+    Carc_Playboard_Node* node_cloister=CBP_new_playboard_node(tile_cloister,CBP_Location_new(0,-1));
+    node_cloister->neighbors[CPCS_UP] = &(game->playboard->node);
+
+    //Test null inputs
+    printf("%d",CGG_update_game_constructs(NULL,node_cloister)==FUNC_FAIL);
+    printf("%d",CGG_update_game_constructs(game,NULL)==FUNC_SUCCESS);
+
+    //Test merge when played with only one neighbor
+    int test_res=CGG_update_game_constructs(game,node_cloister),
+        rim_is_right = 1;
+    Carc_Tile_Node_List* cur=game->constructs->next->next->construct->rim;//The merged field
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_EAST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_SOUTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_SOUTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(node_cloister->node->border[CTL_WEST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(start_tile->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(start_tile->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur==NULL);
+    printf("%d",test_res==FUNC_SUCCESS
+                && game->constructs->construct->type==CBCT_CLOISTER
+                && game->constructs->next->construct->type==CBCT_PATH
+                    && game->constructs->next->construct->rim->node==CBT_get_node_from_loc(tile_cloister,CTL_SOUTH)
+                    && game->constructs->next->construct->rim->next==NULL
+                && game->constructs->next->next->construct->type==CBCT_FIELD && rim_is_right
+                && game->constructs->next->next->next->construct->type==CBCT_PATH
+                    && game->constructs->next->next->next->construct->rim->node==CBT_get_node_from_loc(start_tile,CTL_EAST)
+                    && game->constructs->next->next->next->construct->rim->next->node==CBT_get_node_from_loc(start_tile,CTL_WEST)
+                    && game->constructs->next->next->next->construct->rim->next->next==NULL
+                && game->constructs->next->next->next->next->construct->type==CBCT_FIELD
+                    && game->constructs->next->next->next->next->construct->rim->node==CBT_get_node_from_loc(start_tile,CTL_EAST_NORTH)
+                    && game->constructs->next->next->next->next->construct->rim->next->node==CBT_get_node_from_loc(start_tile,CTL_WEST_NORTH)
+                    && game->constructs->next->next->next->next->construct->rim->next->next==NULL
+                && game->constructs->next->next->next->next->next->construct->type==CBCT_CITY
+                    && game->constructs->next->next->next->next->next->construct->rim->node==CBT_get_node_from_loc(start_tile,CTL_NORTH_WEST)
+                    && game->constructs->next->next->next->next->next->construct->rim->next->node==CBT_get_node_from_loc(start_tile,CTL_NORTH)
+                    && game->constructs->next->next->next->next->next->construct->rim->next->next->node==CBT_get_node_from_loc(start_tile,CTL_NORTH_EAST)
+                    && game->constructs->next->next->next->next->next->construct->rim->next->next->next==NULL
+                && game->constructs->next->next->next->next->next->next==NULL
+           );
+
+
+    //Test when several neighbors
+    Carc_Tile *tile_cloister2=CBT_new_tile_from_file(cloister_path),
+              *tile_cloister3=CBT_new_tile_from_file(cloister_path);
+    CBT_turn(tile_cloister2,CCT_RIGHT);
+    Carc_Playboard_Node *node_cloister2=CBP_new_playboard_node(tile_cloister2,CBP_Location_new(1,0)),
+                        *node_cloister3=CBP_new_playboard_node(tile_cloister3,CBP_Location_new(1,-1));
+    node_cloister2->neighbors[CPCS_LEFT] = &(game->playboard->node);
+    node_cloister3->neighbors[CPCS_LEFT] = &(node_cloister);
+    node_cloister3->neighbors[CPCS_UP] = &(node_cloister2);
+    //Prepare 2nd neighbor
+    CGG_update_game_constructs(game,node_cloister2);//Do not display test result as the case is the same as the previous one
+    //Test the merger happened properly on both side
+    test_res = CGG_update_game_constructs(game,node_cloister3);
+    //Check the field rim
+    cur = game->constructs->next->next->construct->rim;//The extended field rim
+    rim_is_right = 1;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister3->border[CTL_EAST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister3->border[CTL_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister3->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister3->border[CTL_SOUTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister3->border[CTL_SOUTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister2->border[CTL_NORTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister2->border[CTL_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister2->border[CTL_NORTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister2->border[CTL_EAST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister2->border[CTL_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister2->border[CTL_EAST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(game->playboard->node->node->border[CTL_WEST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister->border[CTL_SOUTH_EAST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister->border[CTL_SOUTH_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister->border[CTL_WEST]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(tile_cloister->border[CTL_WEST_NORTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur->node==&(game->playboard->node->node->border[CTL_WEST_SOUTH]));
+    cur = cur->next;
+    rim_is_right = (rim_is_right && cur==NULL);
+
+    printf("%d",test_res==FUNC_SUCCESS
+                && game->constructs->construct->type==CBCT_CLOISTER
+                && game->constructs->next->construct->type==CBCT_PATH
+                    && game->constructs->next->construct->rim->node==CBT_get_node_from_loc(tile_cloister3,CTL_SOUTH)
+                    && game->constructs->next->construct->rim->next==NULL
+                && game->constructs->next->next->construct->type==CBCT_FIELD && rim_is_right
+                && game->constructs->next->next->next->construct->type==CBCT_CLOISTER
+                && game->constructs->next->next->next->next->construct->type==CBCT_PATH
+                    && game->constructs->next->next->next->next->construct->rim->node==CBT_get_node_from_loc(start_tile,CTL_WEST)
+                    && game->constructs->next->next->next->next->construct->rim->next==NULL
+                && game->constructs->next->next->next->next->next->construct->type==CBCT_CLOISTER
+                && game->constructs->next->next->next->next->next->next->construct->type==CBCT_PATH
+                    && game->constructs->next->next->next->next->next->next->construct->rim->node==CBT_get_node_from_loc(tile_cloister,CTL_SOUTH)
+                    && game->constructs->next->next->next->next->next->next->construct->rim->next==NULL
+                && game->constructs->next->next->next->next->next->next->next->construct->type==CBCT_CITY
+                    && game->constructs->next->next->next->next->next->next->next->construct->rim->node==CBT_get_node_from_loc(start_tile,CTL_NORTH_WEST)
+                    && game->constructs->next->next->next->next->next->next->next->construct->rim->next->node==CBT_get_node_from_loc(start_tile,CTL_NORTH)
+                    && game->constructs->next->next->next->next->next->next->next->construct->rim->next->next->node==CBT_get_node_from_loc(start_tile,CTL_NORTH_EAST)
+                    && game->constructs->next->next->next->next->next->next->next->construct->rim->next->next->next==NULL
+                && game->constructs->next->next->next->next->next->next->next->next==NULL
+           );
+
+
+    ///TODO add a test with 2 neighbors without merging their constructions when resources are available (e.g. one has a city, the other a path)
+
+    CGG_free_game(game);
+    free(cloister_path);
+    free(start_tile_path);
+    CBP_free_playboard_node(node_cloister);
 }
 
 void test_game_run_all(){
@@ -209,5 +747,13 @@ void test_game_run_all(){
     test_game_node_transfer_rim_to_playboard();
     printf("\n*******************************\n");
     test_game_play_tile_in();
+    printf("\n*******************************\n");
+    test_game_play_pawn_in();
+    printf("\n*******************************\n");
+    test_game_merge_constructs_with_neighbor();
+    printf("\n*******************************\n");
+    test_game_update_constructs();
+    printf("\n*******************************\n");
+    test_game_can_play_pawn_in();
     printf("\n*******************************\n");
 }

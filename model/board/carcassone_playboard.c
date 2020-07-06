@@ -8,18 +8,14 @@ void CBP_free_playboard_node(Carc_Playboard_Node* node){
 }
 
 Carc_Playboard_Node* CBP_get_neighbor(Carc_Playboard_Node* node, Carc_Playboard_Connect_Side side){
-    //printf("in cbp_get_neigh %p %d\n",node,side);
     if(node==NULL){
         fprintf(stderr,"WARNING: tried to access neighbor of NULL node (CBP_get_neighbor)\n");
         return NULL;
     }
-    //printf("\tget neigh\n");
     Carc_Playboard_Node** neighbor_pointer = node->neighbors[side];
-    //printf("\tcheck if null\n");
     if(neighbor_pointer==NULL){
         return NULL;
     }
-    //printf("\tderef\n");
     return (*neighbor_pointer);
 }
 
@@ -76,7 +72,6 @@ int CBP_Location_cmp(Carc_Playboard_Location l1,Carc_Playboard_Location l2){
 
 int CBP_node_cmp(Carc_Playboard_Node* n1,Carc_Playboard_Node* n2){
     int equal=0, different=1, i=0, same_neigh=1;
-    //printf("\n in node cmp\n");
     if(n1==NULL || n2==NULL){
         if(n1==n2)
             return equal;
@@ -132,7 +127,6 @@ int CBP_connect_is_possible(Carc_Playboard_Node* src, Carc_Playboard_Connect_Sid
     }
 
     switch(connect_side){
-        //TODO: ADAPT the below computation with TILE_NR_LOCATIONS_ON_ONE_EDGE
         case CPCS_UP:
             src_locations[0] = CTL_NORTH_WEST;
             neigh_locations[0] = CTL_SOUTH_WEST;
@@ -271,3 +265,52 @@ int CBP_rm_pawn_in(Carc_Playboard_Node* node, Carc_Tile_Location loc_in_tile){
     }
     return res;
 }
+
+Carc_Tile_Node_List* CBP_get_edge_nodes(Carc_Playboard_Node* node, Carc_Playboard_Connect_Side edge){
+    if(pointer_is_null(node,0) || pointer_is_null(node->node,0)){
+        return NULL;
+    }
+    Carc_Tile_Node* cur_tile_node=NULL;
+    Carc_Tile_Node_List* node_list=NULL;
+    //Get node of merging side
+    switch(edge){
+        case CPCS_UP:
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_NORTH_WEST);
+            node_list = CBTList_new(&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_NORTH);
+            CBTList_append(node_list,&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_NORTH_EAST);
+            CBTList_append(node_list,&cur_tile_node);
+            break;
+        case CPCS_RIGHT:
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST_NORTH);
+            node_list = CBTList_new(&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST);
+            CBTList_append(node_list,&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_EAST_SOUTH);
+            CBTList_append(node_list,&cur_tile_node);
+            break;
+        case CPCS_DOWN:
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_SOUTH_WEST);
+            node_list = CBTList_new(&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_SOUTH);
+            CBTList_append(node_list,&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_SOUTH_EAST);
+            CBTList_append(node_list,&cur_tile_node);
+            break;
+        case CPCS_LEFT:
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST_NORTH);
+            node_list = CBTList_new(&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST);
+            CBTList_append(node_list,&cur_tile_node);
+            cur_tile_node = CBT_get_node_from_loc(node->node,CTL_WEST_SOUTH);
+            CBTList_append(node_list,&cur_tile_node);
+            break;
+        default:
+            fprintf(stderr,"WARNING: Invalid value for enum Carc_Playboard_Connect_Side: %d. Discraded\n",edge);
+            break;
+    }
+    return node_list;
+}
+
+

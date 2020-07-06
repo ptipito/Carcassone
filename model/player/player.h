@@ -16,7 +16,13 @@
 
 typedef enum Carc_Player_ID {PLAYER_1=1, PLAYER_2, PLAYER_3, PLAYER_4, PLAYER_5} Carc_Player_ID;
 typedef enum {CPC_BLUE, CPC_YELLOW, CPC_RED, CPC_BLACK, CPC_GREEN} Carc_Player_Color;
-typedef enum Carc_Pawn_Type {PAWN_NORMAL, PAWN_BISHOP, PAWN_ARCHITECT, PAWN_DOUBLE, PAWN_PIG} Carc_Pawn_Type;
+typedef enum Carc_Pawn_Type {
+    PAWN_NORMAL,
+    PAWN_BISHOP,
+    PAWN_ARCHITECT,
+    PAWN_DOUBLE,//A normal pawn with double weight
+    PAWN_PIG
+} Carc_Pawn_Type;
 
 typedef struct {
     Carc_Player_ID id;
