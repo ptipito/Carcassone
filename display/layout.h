@@ -5,6 +5,9 @@
 typedef enum Carc_Layout_Part {LP_MAP, LP_DETAILS} Carc_Layout_Part;
 typedef struct Carc_Layout{
     SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Texture *map_texture,
+                *details_texture;
     //The window is split into two areas: the playboard (or map) and the details area (player pawns, current tile, etc...)
     SDL_Surface *map_surface,
                 *details_surface;
