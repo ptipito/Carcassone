@@ -44,3 +44,4 @@ void CDDetails_show_tile_turn_controls(Carc_Layout* layout, SDL_Rect tile_pos){
 void CDDetails_blit_on(SDL_Surface *surface, SDL_Rect *src, SDL_Rect *dest, Carc_Layout *layout){
     CDL_blit_on(LP_DETAILS,surface,src,dest,layout);
 }
+//
