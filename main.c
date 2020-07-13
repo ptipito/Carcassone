@@ -24,15 +24,22 @@ int main(int argc, char* argv[]){
     if(cloister==NULL)
         printf("cloister not loaded\n");
     SDL_Rect cloister_pos; cloister_pos.x=CDUtils_get_tile_size_in_pixels(MEDIUM_TILE);cloister_pos.y=CDUtils_get_tile_size_in_pixels(MEDIUM_TILE);
+    SDL_Texture* cur_tile_tex=CDDetails_show_tile(window_layout,cloister);
 
-    CDMap_insert_tile(cloister,cloister_pos.x,cloister_pos.y,window_layout);
-    CDDetails_show_tile(window_layout,cloister);
-    SDL_UpdateWindowSurface(window_layout->window);
     while(!done){
         SDL_WaitEvent(&event);
         switch(event.type){
             case SDL_QUIT:
-                done=1;
+                done = 1;
+                break;
+            case SDL_KEYDOWN:
+                switch(event.key.keysym.sym){
+                    case SDLK_ESCAPE:
+                        done = 1;
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 CDMap_insert_tile(cloister,event.button.x,event.button.y,window_layout);
@@ -40,14 +47,12 @@ int main(int argc, char* argv[]){
             default:
                 break;
         }
-
-        SDL_UpdateWindowSurface(window_layout->window);
+        SDL_RenderPresent(window_layout->renderer);
     }
 
     SDL_FreeSurface(cloister);
+    SDL_DestroyTexture(cur_tile_tex);
     CDL_free_layout(window_layout);
-    CDUtils_quit_sdl(NULL);
-
     return EXIT_SUCCESS;
 }
 
