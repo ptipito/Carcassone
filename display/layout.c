@@ -27,7 +27,7 @@ Carc_Layout* CDL_initialize_game_layout(SDL_Window *window){
     int screen_w=screen->w, screen_h=screen->h;
     int details_width=4*CDUtils_get_tile_size_in_pixels(MEDIUM_TILE);
     int map_width=screen_w-details_width;
-    SDL_Rect pos, border_pos;
+    SDL_Rect border_pos;
     SDL_Surface *map_surface=NULL,
                 *details_surface=NULL;
     SDL_Texture *map_texture=NULL,

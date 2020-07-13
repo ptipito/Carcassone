@@ -16,7 +16,6 @@ void CDMap_display_grid(Carc_Layout *layout){
         cur_coord = i*tile_size;
         SDL_RenderDrawLine(layout->renderer,cur_coord,start_y,cur_coord,height);
     }
-    printf("height: %d; tile_size: %d",height,tile_size);
 
     //Create & Display horizontal lines
     cur_coord=tile_size;
@@ -30,8 +29,16 @@ void CDMap_display_grid(Carc_Layout *layout){
 
 void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout){
     SDL_Rect pos=CDUtils_get_slot_upper_left(x,y,layout->tile_size);
-    if(CDUtils_pos_in_surface(pos, *(layout->map_surface)))
-        CDMap_blit_on(surface,NULL,&pos,layout);
+    pos.w = surface->w;
+    pos.h = surface->h;
+    surface = SDL_ConvertSurfaceFormat(surface,SDL_PIXELFORMAT_RGB888,0);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(layout->renderer,surface);
+    if(CDUtils_pos_in_surface(pos, *(layout->map_surface))){///TODO? Replace surface use with checking with the map_pos width and height?
+        SDL_SetRenderTarget(layout->renderer,layout->map_texture);
+        SDL_RenderCopy(layout->renderer, texture, NULL, &pos);
+    }
+    SDL_RenderPresent(layout->renderer);
+    SDL_DestroyTexture(texture);
 }
 
 void CDMap_blit_on(SDL_Surface *surface, SDL_Rect *src, SDL_Rect *dest, Carc_Layout *layout){
