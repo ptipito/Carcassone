@@ -42,6 +42,11 @@ void test_game_initiate(){
            && game_const->next->next->next->next==NULL
         );
 
+    //Test turn init properly
+    printf("%d",game->turn.player==game->players[PLAYER_1]
+                && game->turn.tile==game->playboard->node->node
+          );
+
     //Test creating with invalid number of players
     printf("\n");
     printf("%d\n",CGG_initiate_game(start_tile_str,1)==NULL);

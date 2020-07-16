@@ -32,6 +32,9 @@ Carc_Game* CGG_initiate_game(char* filename, int nb_players){
     //Set initial constructs
     game->constructs = CBMC_get_tile_macro_constructions(start_tile);
 
+    //Init turn
+    game->turn = CGT_new(start_tile,game->players[PLAYER_1]);
+
     return game;
 }
 
