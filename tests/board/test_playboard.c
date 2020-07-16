@@ -177,7 +177,7 @@ void test_connect_is_possible(){
     printf("%d",CBP_connect_is_possible(node1,CPCS_RIGHT,origin)==1);
     printf("%d",CBP_connect_is_possible(node1,CPCS_DOWN,origin)==0);
     printf("%d",CBP_connect_is_possible(node1,CPCS_LEFT,origin)==1);
-    CBT_turn(tile2,CCT_UPDOWN);
+    CBT_turn(tile2,CTTT_UPDOWN);
     printf("%d",CBP_connect_is_possible(node1,CPCS_UP,origin)==1);
     printf("%d",CBP_connect_is_possible(node1,CPCS_RIGHT,origin)==1);
     printf("%d",CBP_connect_is_possible(node1,CPCS_DOWN,origin)==1);

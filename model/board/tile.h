@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <string.h>
 #include "model/board/constructions.h"
 #include "utils.h"
 #include "model/carcassone_errors.h"
@@ -25,7 +24,7 @@ typedef enum {CTL_NORTH_WEST, CTL_NORTH, CTL_NORTH_EAST,
                 CTL_CENTER
 } Carc_Tile_Location;
 
-typedef enum {CCT_RIGHT, CCT_LEFT, CCT_UPDOWN} CBT_Turn_Type;
+typedef enum {CTTT_NONE, CTTT_RIGHT, CTTT_UPDOWN, CTTT_LEFT} Carc_Tile_Turn_Type;
 
 //Node on a tile. Each node contains a construction and is located at a tile location
 typedef struct {
@@ -62,13 +61,14 @@ typedef struct Carc_Tile {
     Carc_Tile_Node border[TILE_NR_BORDER_LOCATIONS];
     Carc_Tile_Node center;
     Carc_Tile_Location center_connexions[TILE_NR_BORDER_LOCATIONS];
+    Carc_Tile_Turn_Type rotation;//Rotation of the tile in regards to the definition file
 } Carc_Tile;
 
 Carc_Tile* CBT_new_tile_from_file(char*);
 Carc_Tile* CBT_new_empty_tile();
 Carc_Tile_Location CBT_get_location_from_string(char*);
 Carc_Construction_Type CBT_get_node_type_from_str(char*);
-void CBT_turn(Carc_Tile*, CBT_Turn_Type);
+void CBT_turn(Carc_Tile*, Carc_Tile_Turn_Type);
 int CBT_tiles_connect_in(Carc_Tile, Carc_Tile_Location, Carc_Tile, Carc_Tile_Location);
 void CBT_free_tile(Carc_Tile*);
 void CBT_free_node(Carc_Tile_Node*);

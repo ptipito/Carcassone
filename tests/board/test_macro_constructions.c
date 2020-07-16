@@ -472,7 +472,7 @@ void test_macro_const_merge(){
          *cloister_tile_path=CBT_get_tile_file_path("cloister_path.txt");
     Carc_Playboard_Node *start_node=CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_path),CBP_Location_new(0,0)),
                         *cloister_node=CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),CBP_Location_new(0,0));
-    CBT_turn(cloister_node->node,CCT_RIGHT);
+    CBT_turn(cloister_node->node,CTTT_RIGHT);
     Carc_Tile_Node *start_path_connect = CBT_get_node_from_loc(start_node->node,CTL_EAST),
                     *cloister_path_connect = CBT_get_node_from_loc(cloister_node->node,CTL_WEST);
     //Add info on cloister_path to check all operations of the merge

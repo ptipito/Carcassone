@@ -22,7 +22,7 @@ void test_tile_new_empty_tile(){
     }
     if(tile->center.construction != NULL || tile->center.pawn != NULL)
         result = 0;
-    printf("%d",result);
+    printf("%d",result && tile->rotation==CTTT_NONE);
 }
 
 void test_tile_parse_tile_file(){
@@ -33,8 +33,10 @@ void test_tile_parse_tile_file(){
     Carc_Tile* tile2 = CBT_new_tile_from_file(cloister_tile_path);
     printf("*******display start tile*******\n");
     CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_NONE);
     printf("\n*******display cloister_path tile*******\n");
     CBT_display_tile(*tile2);
+    printf("cur rotation is ok: %d\n",tile2->rotation==CTTT_NONE);
     CBT_free_tile(tile);
     CBT_free_tile(tile2);
     free(tile1_path);
@@ -47,25 +49,35 @@ void test_tile_turn_tile(){
     Carc_Tile* tile = CBT_new_tile_from_file(tile_path);
     CBT_display_tile(*tile);
 
-    printf("\tTURN CCT_RIGHT\n");
-    CBT_turn(tile,CCT_RIGHT);
+    printf("\tTURN CTTT_RIGHT\n");
+    CBT_turn(tile,CTTT_RIGHT);
     CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_RIGHT);
 
     printf("\tTURN 180\n");
-    CBT_turn(tile,CCT_UPDOWN);
+    CBT_turn(tile,CTTT_UPDOWN);
     CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_LEFT);
 
-    printf("\tTURN CCT_LEFT\n");
-    CBT_turn(tile,CCT_LEFT);
+    printf("\tTURN CTTT_LEFT\n");
+    CBT_turn(tile,CTTT_LEFT);
     CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_UPDOWN);
 
-    printf("\tTURN CCT_LEFT\n");
-    CBT_turn(tile,CCT_LEFT);
+    printf("\tTURN CTTT_LEFT\n");
+    CBT_turn(tile,CTTT_LEFT);
     CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_RIGHT);
 
     printf("\tTURN 180\n");
-    CBT_turn(tile,CCT_UPDOWN);
+    CBT_turn(tile,CTTT_UPDOWN);
     CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_LEFT);
+
+    printf("\tTURN CTTT_NONE\n");
+    CBT_turn(tile,CTTT_NONE);
+    CBT_display_tile(*tile);
+    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_LEFT);
 
     CBT_free_tile(tile);
     free(tile_path);

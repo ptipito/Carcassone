@@ -196,6 +196,7 @@ Carc_Tile* CBT_new_empty_tile(){
     tile->center.construction = NULL;
     tile->center.node_type = -1;
     tile->center.pawn = NULL;
+    tile->rotation = CTTT_NONE;
     return tile;
 }
 
@@ -366,19 +367,23 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
     return tile;
 }
 
-void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
+void CBT_turn(Carc_Tile *tile, Carc_Tile_Turn_Type dir){
+    ///TO_TEST (tile->rotation + CTTT_NONE)
     Carc_Tile entry_tile = *tile;
     int transposition_factor=TILE_NR_LOCATIONS_ON_ONE_EDGE,
         previous_location;
     int i=0, j=0;
     switch(dir){
-        case CCT_RIGHT:
+        case CTTT_NONE:
+            transposition_factor = 0;
             break;
-        case CCT_LEFT:
-            transposition_factor = -transposition_factor;
+        case CTTT_RIGHT:
             break;
-        case CCT_UPDOWN:
+        case CTTT_UPDOWN:
             transposition_factor *= 2;
+            break;
+        case CTTT_LEFT:
+            transposition_factor = -transposition_factor;
             break;
     }
 
@@ -392,6 +397,8 @@ void CBT_turn(Carc_Tile *tile, CBT_Turn_Type dir){
             entry_tile.border_connexions[previous_location][positive_modulo(j - transposition_factor, TILE_NR_BORDER_LOCATIONS)];
         }
     }
+    tile->rotation += dir;
+    tile->rotation %= 4;
 }
 
 int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile t2, Carc_Tile_Location t2_node_loc){

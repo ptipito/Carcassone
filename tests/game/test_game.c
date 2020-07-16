@@ -510,7 +510,7 @@ void test_game_merge_constructs_with_neighbor(){
 
     //Test merging cloister_path with starting tile on path side. (Merge 2 fields of starting tile into one thanks to field of cloister_path)
     Carc_Tile* tile_cloister2=CBT_new_tile_from_file(cloister_path);
-    CBT_turn(tile_cloister2,CCT_RIGHT);
+    CBT_turn(tile_cloister2,CTTT_RIGHT);
     Carc_Macro_Construct_List* cloister_constructs2=CBMC_get_tile_macro_constructions(tile_cloister2);
     Carc_Playboard_Node* cloister2=CBP_new_playboard_node(tile_cloister2,CBP_Location_new(1,0));
     cloister2->neighbors[CPCS_LEFT] = &(game->playboard->node);
@@ -657,7 +657,7 @@ void test_game_update_constructs(){
     //Test when several neighbors
     Carc_Tile *tile_cloister2=CBT_new_tile_from_file(cloister_path),
               *tile_cloister3=CBT_new_tile_from_file(cloister_path);
-    CBT_turn(tile_cloister2,CCT_RIGHT);
+    CBT_turn(tile_cloister2,CTTT_RIGHT);
     Carc_Playboard_Node *node_cloister2=CBP_new_playboard_node(tile_cloister2,CBP_Location_new(1,0)),
                         *node_cloister3=CBP_new_playboard_node(tile_cloister3,CBP_Location_new(1,-1));
     node_cloister2->neighbors[CPCS_LEFT] = &(game->playboard->node);
