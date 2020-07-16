@@ -23,5 +23,6 @@ SDL_Rect CDUtils_get_slot_upper_left(int, int, Carc_Tile_Size);
 int CDUtils_pos_in_surface(SDL_Rect, SDL_Surface);
 SDL_Surface* CDUtils_get_view(Carc_Utils_View_Type, char*);
 void CDUtils_set_rect_coord(SDL_Rect*, int, int);
+SDL_Rect init_rect(int,int,int,int);
 
 #endif // DEF_CARC_DISP_UTILS

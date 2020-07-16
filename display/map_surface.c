@@ -27,7 +27,7 @@ void CDMap_display_grid(Carc_Layout *layout){
     SDL_RenderPresent(layout->renderer);
 }
 
-void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout){
+void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout, int rot_angle){
     SDL_Rect pos=CDUtils_get_slot_upper_left(x,y,layout->tile_size);
     pos.w = surface->w;
     pos.h = surface->h;
@@ -35,7 +35,7 @@ void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout){
     SDL_Texture* texture = SDL_CreateTextureFromSurface(layout->renderer,surface);
     if(CDUtils_pos_in_surface(pos, *(layout->map_surface))){///TODO? Replace surface use with checking with the map_pos width and height?
         SDL_SetRenderTarget(layout->renderer,layout->map_texture);
-        SDL_RenderCopy(layout->renderer, texture, NULL, &pos);
+        SDL_RenderCopyEx(layout->renderer, texture, NULL, &pos,rot_angle,NULL,SDL_FLIP_NONE);
     }
     SDL_RenderPresent(layout->renderer);
     SDL_DestroyTexture(texture);

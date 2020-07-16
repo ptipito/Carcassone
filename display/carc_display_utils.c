@@ -92,3 +92,13 @@ void CDUtils_set_rect_coord(SDL_Rect* rect, int x, int y){
     rect->x = x;
     rect->y = y;
 }
+
+SDL_Rect init_rect(int x,int y ,int w,int h){
+    ///TO_TEST
+    SDL_Rect result;
+    result.x = x;
+    result.y = y;
+    result.w = w;
+    result.h = h;
+    return result;
+}
