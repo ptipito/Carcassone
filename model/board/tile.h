@@ -68,7 +68,7 @@ Carc_Tile* CBT_new_tile_from_file(char*);
 Carc_Tile* CBT_new_empty_tile();
 Carc_Tile_Location CBT_get_location_from_string(char*);
 Carc_Construction_Type CBT_get_node_type_from_str(char*);
-void CBT_turn(Carc_Tile*, Carc_Tile_Turn_Type);
+int CBT_turn(Carc_Tile*, Carc_Tile_Turn_Type);
 int CBT_tiles_connect_in(Carc_Tile, Carc_Tile_Location, Carc_Tile, Carc_Tile_Location);
 void CBT_free_tile(Carc_Tile*);
 void CBT_free_node(Carc_Tile_Node*);

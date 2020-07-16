@@ -79,6 +79,11 @@ void test_tile_turn_tile(){
     CBT_display_tile(*tile);
     printf("cur rotation is ok: %d\n",tile->rotation==CTTT_LEFT);
 
+
+    //Test with invalid values
+    printf("Tests for invalid inputs: %d",CBT_turn(NULL,CTTT_LEFT)==FUNC_FAIL);
+    printf("%d",CBT_turn(tile,CTTT_NONE-1)==FUNC_FAIL);
+    printf("%d",CBT_turn(tile,CTTT_LEFT+1)==FUNC_FAIL);
     CBT_free_tile(tile);
     free(tile_path);
 }

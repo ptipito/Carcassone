@@ -367,7 +367,10 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
     return tile;
 }
 
-void CBT_turn(Carc_Tile *tile, Carc_Tile_Turn_Type dir){
+int CBT_turn(Carc_Tile *tile, Carc_Tile_Turn_Type dir){
+    if(pointer_is_null(tile,1)){
+        return FUNC_FAIL;
+    }
     Carc_Tile entry_tile = *tile;
     int transposition_factor=TILE_NR_LOCATIONS_ON_ONE_EDGE,
         previous_location;
@@ -384,6 +387,8 @@ void CBT_turn(Carc_Tile *tile, Carc_Tile_Turn_Type dir){
         case CTTT_LEFT:
             transposition_factor = -transposition_factor;
             break;
+        default://Value out of the enum
+            return FUNC_FAIL;
     }
 
     for(i=0;i<TILE_NR_BORDER_LOCATIONS;i++){
@@ -398,6 +403,7 @@ void CBT_turn(Carc_Tile *tile, Carc_Tile_Turn_Type dir){
     }
     tile->rotation += dir;
     tile->rotation %= 4;
+    return FUNC_SUCCESS;
 }
 
 int CBT_tiles_connect_in(Carc_Tile t1, Carc_Tile_Location t1_node_loc, Carc_Tile t2, Carc_Tile_Location t2_node_loc){
