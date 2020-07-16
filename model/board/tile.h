@@ -94,6 +94,7 @@ int CBTList_append(Carc_Tile_Node_List*, Carc_Tile_Node**);
 int CBTList_append_list(Carc_Tile_Node_List*, Carc_Tile_Node_List*);
 int CBTList_rm(Carc_Tile_Node_List**, Carc_Tile_Node**);
 int CBTList_rm_nodes(Carc_Tile_Node_List**, Carc_Tile_Node_List*);
+int CBT_turn_type_to_degrees(Carc_Tile_Turn_Type);
 
 
 #endif // DEF_CARC_TILE

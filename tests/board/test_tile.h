@@ -29,6 +29,7 @@ void test_tile_list_append();
 void test_tile_list_append_list();
 void test_tile_list_rm();
 void test_tile_list_rm_list();
+void test_tile_turn_type_to_degrees();
 
 void test_tile_run_all();
 

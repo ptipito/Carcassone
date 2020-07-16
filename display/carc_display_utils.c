@@ -93,7 +93,7 @@ void CDUtils_set_rect_coord(SDL_Rect* rect, int x, int y){
     rect->y = y;
 }
 
-SDL_Rect init_rect(int x,int y ,int w,int h){
+SDL_Rect CDUtils_init_rect(int x,int y ,int w,int h){
     ///TO_TEST
     SDL_Rect result;
     result.x = x;
@@ -102,3 +102,4 @@ SDL_Rect init_rect(int x,int y ,int w,int h){
     result.h = h;
     return result;
 }
+

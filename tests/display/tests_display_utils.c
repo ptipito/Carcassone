@@ -93,3 +93,19 @@ void test_display_utils_set_rect_pos(){
     CDUtils_set_rect_coord(&pos,-25,30);
     printf("%d",pos.x==-25 && pos.y==30);
 }
+
+void test_display_utils_init_rect(){
+    printf("test_display_utils_init_rect result: ");
+    SDL_Rect pos;
+    pos.x=0;
+    pos.y=0;
+    int x=25, y=85, w=20, h=60;
+    pos=CDUtils_init_rect(x,y,w,h);
+    printf("%d",pos.x==25 && pos.y==85 && pos.w==20 && pos.h==60);
+    x=-5; y=0; w=-20; h=-60;
+    pos=CDUtils_init_rect(x,y,w,h);
+    printf("%d",pos.x==-5 && pos.y==0 && pos.w==-20 && pos.h==-60);
+    x=0; y=-36; w=0; h=00;
+    pos=CDUtils_init_rect(x,y,w,h);
+    printf("%d",pos.x==0 && pos.y==-36 && pos.w==0 && pos.h==0);
+}

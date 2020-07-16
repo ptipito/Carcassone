@@ -10,7 +10,7 @@ Carc_App* Carc_App_init(){
     int i;
     for(i=0;i<APP_NR_CONTROLS;i++){
         Carcassone->controls[i].id = i;
-        Carcassone->controls[i].pos = init_rect(0,0,0,0);
+        Carcassone->controls[i].pos = CDUtils_init_rect(0,0,0,0);
     }
 
     //Init SDL and display
@@ -60,12 +60,13 @@ int Carc_App_run(Carc_App* app){
     free(cloister_path);
 
     SDL_Texture* cur_tile_tex=CDDetails_show_tile(display,cloister);
-    SDL_Rect cur_tile_pos = init_rect(display->map_pos.w + display->details_pos.w/2-tile_size/2,
+    SDL_Rect cur_tile_pos = CDUtils_init_rect(display->map_pos.w + display->details_pos.w/2-tile_size/2,
                                       display->details_pos.h/2-tile_size/2,
                                       tile_size,
                                       tile_size
                                       );
-    int x=0, y=0, cur_angle=0;
+    ///TODO: replace cur_angle handling with getting the information from the tile struct in app->game->turn
+    int x=0, y=0;
     while(!done){
         SDL_WaitEvent(&event);
         switch(event.type){
@@ -85,7 +86,7 @@ int Carc_App_run(Carc_App* app){
                 x = event.button.x;
                 y = event.button.y;
                 if(x < display->map_pos.w){
-                    CDMap_insert_tile(cloister,x,y,display,cur_angle);
+                    CDMap_insert_tile(cloister,x,y,display,CBT_turn_type_to_degrees(game->turn.tile->rotation));
                 } else{
                     x %= display->map_pos.w;
                     if(x >= display->details_pos.w/2-tile_size/2 - 20 - 5
@@ -93,21 +94,21 @@ int Carc_App_run(Carc_App* app){
                        && y >= display->details_pos.h/2 - tile_size/2 - 25/3
                        && y <= display->details_pos.h/2 - tile_size/2 - 25/3 +25
                        ){
-                        cur_angle += CCD_turn_left(*display,game,cur_tile_tex,&cur_tile_pos,cur_angle);
+                        CCD_turn_left(*display,game,cur_tile_tex,&cur_tile_pos);
                        }
                     if(x >= display->details_pos.w/2+tile_size/2 + 5
                        && x <= display->details_pos.w/2+tile_size/2 + 5 +20
                        && y >= display->details_pos.h/2 - tile_size/2 - 25/3
                        && y <= display->details_pos.h/2 - tile_size/2 - 25/3 +25
                        ){
-                        cur_angle += CCD_turn_right(*display,game,cur_tile_tex,&cur_tile_pos,cur_angle);
+                        CCD_turn_right(*display,game,cur_tile_tex,&cur_tile_pos);
                        }
                     if(x >= display->details_pos.w/2 - 20/2
                        && x <= display->details_pos.w/2+20/2
                        && y >= display->details_pos.h/2 + tile_size/2 + 5
                        && y <= display->details_pos.h/2 + tile_size/2 + 5 +20
                        ){
-                        cur_angle += CCD_turn_180(*display,game,cur_tile_tex,&cur_tile_pos,cur_angle);
+                        CCD_turn_180(*display,game,cur_tile_tex,&cur_tile_pos);
                        }
                 }
                 break;

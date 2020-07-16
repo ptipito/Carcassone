@@ -368,7 +368,6 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
 }
 
 void CBT_turn(Carc_Tile *tile, Carc_Tile_Turn_Type dir){
-    ///TO_TEST (tile->rotation + CTTT_NONE)
     Carc_Tile entry_tile = *tile;
     int transposition_factor=TILE_NR_LOCATIONS_ON_ONE_EDGE,
         previous_location;
@@ -768,4 +767,22 @@ int CBTList_rm_nodes(Carc_Tile_Node_List** src, Carc_Tile_Node_List* rm){
         node_count++;
     }
     return res;
+}
+
+int CBT_turn_type_to_degrees(Carc_Tile_Turn_Type rot){
+    int degrees = 0;
+    switch(rot){
+        case CTTT_RIGHT:
+            degrees = 90;
+            break;
+        case CTTT_UPDOWN:
+            degrees = 180;
+            break;
+        case CTTT_LEFT:
+            degrees = 270;
+            break;
+        case CTTT_NONE:
+            break;
+    }
+    return degrees;
 }

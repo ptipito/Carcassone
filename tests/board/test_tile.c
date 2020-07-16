@@ -591,6 +591,17 @@ void test_tile_path_end_is_playable(){
     printf("%d\n",CBT_path_end_is_playable(CTL_CENTER)==0);
 }
 
+void test_tile_turn_type_to_degrees(){
+    printf("test_tile_turn_type_to_degrees results: ");
+    printf("%d",CBT_turn_type_to_degrees(CTTT_NONE)==0);
+    printf("%d",CBT_turn_type_to_degrees(CTTT_RIGHT)==90);
+    printf("%d",CBT_turn_type_to_degrees(CTTT_UPDOWN)==180);
+    printf("%d",CBT_turn_type_to_degrees(CTTT_LEFT)==270);
+    //Test value out of the enum
+    printf("%d",CBT_turn_type_to_degrees(CTTT_NONE-1)==0);
+    printf("%d",CBT_turn_type_to_degrees(CTTT_LEFT+1)==0);
+}
+
 void test_tile_run_all(){
     test_tile_parse_tile_file();
     printf("\n************************************\n");
@@ -633,5 +644,7 @@ void test_tile_run_all(){
     test_tile_list_rm();
     printf("\n************************************\n");
     test_tile_path_end_is_playable();
+    printf("\n************************************\n");
+    test_tile_turn_type_to_degrees();
     printf("\n************************************\n");
 }

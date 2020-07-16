@@ -8,5 +8,6 @@ void test_display_utils_get_centering_pos();
 void test_display_utils_pos_in_surface();
 void test_display_utils_get_view();
 void test_display_utils_set_rect_pos();
+void test_display_utils_init_rect();
 
 #endif //DEF_TEST_LAYOUT
