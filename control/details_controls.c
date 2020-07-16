@@ -1,9 +1,12 @@
 #include "control/details_controls.h"
 
 
-int CCD_turn_right(Carc_Layout layout, SDL_Texture* texture, SDL_Rect* pos, int cur_rot){
+int CCD_turn_right(Carc_Layout layout, Carc_Game* game, SDL_Texture* texture, SDL_Rect* pos, int cur_rot){
     int func_res=-1,
         angle = (cur_rot + 90) % 360;
+    //Query the model
+    ///TODO COMPLETE
+    //Update the view
     SDL_SetRenderTarget(layout.renderer,texture);
     func_res = SDL_RenderCopyEx(layout.renderer,texture,NULL,pos,angle,NULL,SDL_FLIP_NONE);
     SDL_SetRenderTarget(layout.renderer,NULL);
@@ -12,9 +15,13 @@ int CCD_turn_right(Carc_Layout layout, SDL_Texture* texture, SDL_Rect* pos, int 
     return 0;
 }
 
-int CCD_turn_left(Carc_Layout layout, SDL_Texture* texture, SDL_Rect* pos, int cur_rot){
+int CCD_turn_left(Carc_Layout layout, Carc_Game* game, SDL_Texture* texture, SDL_Rect* pos, int cur_rot){
+    ///TO_TEST model update
     int func_res=-1,
         angle = (cur_rot - 90) % 360;
+    //Query the model
+    ///TODO COMPLETE
+    //Update the view
     SDL_SetRenderTarget(layout.renderer,texture);
     func_res = SDL_RenderCopyEx(layout.renderer,texture,NULL,pos,angle,NULL,SDL_FLIP_NONE);
     SDL_SetRenderTarget(layout.renderer,NULL);
@@ -23,9 +30,12 @@ int CCD_turn_left(Carc_Layout layout, SDL_Texture* texture, SDL_Rect* pos, int c
     return 0;
 }
 
-int CCD_turn_180(Carc_Layout layout, SDL_Texture* texture, SDL_Rect* pos, int cur_rot){
+int CCD_turn_180(Carc_Layout layout, Carc_Game* game, SDL_Texture* texture, SDL_Rect* pos, int cur_rot){
     int func_res=-1,
         angle = (cur_rot + 180) % 360;
+    //Query the model
+    ///TODO COMPLETE
+    //Update the view
     SDL_SetRenderTarget(layout.renderer,texture);
     func_res = SDL_RenderCopyEx(layout.renderer,texture,NULL,pos,angle,NULL,SDL_FLIP_NONE);
     SDL_SetRenderTarget(layout.renderer,NULL);
