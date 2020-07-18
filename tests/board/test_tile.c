@@ -22,31 +22,26 @@ void test_tile_new_empty_tile(){
     }
     if(tile->center.construction != NULL || tile->center.pawn != NULL)
         result = 0;
-    printf("%d",result && tile->rotation==CTTT_NONE);
+    printf("%d",result && tile->rotation==CTTT_NONE && strcmp(tile->name,"")==0);
 }
 
 void test_tile_parse_tile_file(){
     printf("test_tile_parse_tile_file: \n");
-    char *tile1_path = CBT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path = CBT_get_tile_file_path("cloister_path.txt");
-    Carc_Tile* tile = CBT_new_tile_from_file(tile1_path);
-    Carc_Tile* tile2 = CBT_new_tile_from_file(cloister_tile_path);
+    Carc_Tile* tile = CBT_new_tile_from_file("tile1.txt");
+    Carc_Tile* tile2 = CBT_new_tile_from_file("cloister_path.txt");
     printf("*******display start tile*******\n");
     CBT_display_tile(*tile);
-    printf("cur rotation is ok: %d\n",tile->rotation==CTTT_NONE);
+    printf("cur rotation is ok: %d\nname is ok: %d\n",tile->rotation==CTTT_NONE, strcmp(tile->name,"tile1.txt")==0);
     printf("\n*******display cloister_path tile*******\n");
     CBT_display_tile(*tile2);
-    printf("cur rotation is ok: %d\n",tile2->rotation==CTTT_NONE);
+    printf("cur rotation is ok: %d\nname is ok: %d\n",tile2->rotation==CTTT_NONE, strcmp(tile2->name,"cloister_path.txt")==0);
     CBT_free_tile(tile);
     CBT_free_tile(tile2);
-    free(tile1_path);
-    free(cloister_tile_path);
 }
 
 void test_tile_turn_tile(){
     printf("test_tile_turn_tile:\n");
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile* tile = CBT_new_tile_from_file(tile_path);
+    Carc_Tile* tile = CBT_new_tile_from_file("tile1.txt");
     CBT_display_tile(*tile);
 
     printf("\tTURN CTTT_RIGHT\n");
@@ -85,13 +80,11 @@ void test_tile_turn_tile(){
     printf("%d",CBT_turn(tile,CTTT_NONE-1)==FUNC_FAIL);
     printf("%d",CBT_turn(tile,CTTT_LEFT+1)==FUNC_FAIL);
     CBT_free_tile(tile);
-    free(tile_path);
 }
 
 void test_tile_tile_cmp(){
     printf("test_tile_cmp resutls: ");
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile *t1 = CBT_new_tile_from_file(tile_path),
+    Carc_Tile *t1 = CBT_new_tile_from_file("tile1.txt"),
               *t2 = CBT_new_empty_tile();
     Carc_Tile t3 = *t1,
               t4 = *t1;
@@ -107,7 +100,6 @@ void test_tile_tile_cmp(){
     printf("%d%d%d%d%d%d",test1==0,test2==1,test3==1,test4==1,test5==0,test6==1);
     CBT_free_tile(t1);
     CBT_free_tile(t2);
-    free(tile_path);
 }
 
 void test_tile_CBT_new_node(){
@@ -142,8 +134,7 @@ void test_tile_is_valid_loc(){
 
 void test_tile_get_node_from_loc(){
     printf("test_get_node_from_loc results: ");
-    char *tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile *tile = CBT_new_tile_from_file(tile_path);
+    Carc_Tile *tile = CBT_new_tile_from_file("tile1.txt");
     Carc_Tile_Location loc = CTL_NORTH_WEST;
     Carc_Tile_Node* node = CBT_get_node_from_loc(tile,loc);
     Carc_Tile_Node* node2 = CBT_get_node_from_loc(tile,CTL_CENTER);
@@ -193,7 +184,6 @@ void test_tile_get_node_from_loc(){
     printf("%d",node==NULL);
 
     CBT_free_tile(tile);
-    free(tile_path);
 }
 
 void test_tile_get_loc_from_str(){
@@ -273,10 +263,8 @@ void test_tile_set_single_connexion(){
 
 void test_tiles_connect_in(){
     printf("test_tile_connect_in results: ");
-    char *tile1_path = CBT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path = CBT_get_tile_file_path("cloister_path.txt");
-    Carc_Tile *tile1 = CBT_new_tile_from_file(tile1_path),
-              *tile2 = CBT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt");
+    Carc_Tile *tile1 = CBT_new_tile_from_file("tile1.txt"),
+              *tile2 = CBT_new_tile_from_file("cloister_path.txt");
 
     printf("%d",CBT_tiles_connect_in(*tile1,CTL_WEST,*tile1,CTL_EAST)==1);
     printf("%d",CBT_tiles_connect_in(*tile1,CTL_SOUTH,*tile1,CTL_NORTH)==0);
@@ -289,8 +277,6 @@ void test_tiles_connect_in(){
 
     CBT_free_tile(tile1);
     CBT_free_tile(tile2);
-    free(tile1_path);
-    free(cloister_tile_path);
 }
 
 void test_tile_get_tile_file_path(){
@@ -319,14 +305,13 @@ void test_tile_pawn_matches_node(){
             nb_matches += CBT_node_type_matches_pawn_type(i,j,CTL_CENTER);
         }
     }
-    printf("All tests successful: %d\n",nb_matches==231);
+    printf("All tests successful: %d (%d==%d?)\n",nb_matches==244,nb_matches,244);
 }
 
 void test_tile_add_pawn(){
     printf("test_tile_add_pawn results: ");
-    char* tile_start_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Tile *tile_empty=CBT_new_empty_tile(),
-              *tile_start=CBT_new_tile_from_file(tile_start_str);
+              *tile_start=CBT_new_tile_from_file("tile1.txt");
     Carc_Pawn *pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
               *architect=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_2,CPC_BLUE),PAWN_ARCHITECT);
 
@@ -354,7 +339,6 @@ void test_tile_add_pawn(){
                 && CBT_get_node_from_loc(tile_start,CTL_SOUTH)->pawn==NULL
                 && architect->owner->nb_pawns[PAWN_ARCHITECT]==NB_ARCHITECT_PAWNS_PER_PLAYER);
 
-    free(tile_start_str);
     CBT_free_tile(tile_empty);
     CBT_free_tile(tile_start);
     CPPlayer_free_player(pawn->owner);
@@ -365,8 +349,7 @@ void test_tile_add_pawn(){
 
 void test_tile_rm_pawn(){
     printf("test_tile_rm_pawn results: ");
-    char* tile_start_str=CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile *tile_start=CBT_new_tile_from_file(tile_start_str);
+    Carc_Tile *tile_start=CBT_new_tile_from_file("tile1.txt");
     Carc_Pawn *pawn1=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
               *pawn2=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_2,CPC_BLUE),PAWN_NORMAL);
 
@@ -398,7 +381,6 @@ void test_tile_rm_pawn(){
     CPPlayer_free_player(pawn2->owner);
     CPPawn_free_pawn(pawn1);
     CPPawn_free_pawn(pawn2);
-    free(tile_start_str);
     CBT_free_tile(tile_start);
 }
 

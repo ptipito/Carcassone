@@ -197,11 +197,20 @@ Carc_Tile* CBT_new_empty_tile(){
     tile->center.node_type = -1;
     tile->center.pawn = NULL;
     tile->rotation = CTTT_NONE;
+    for(i=0;i<TILE_FILENAME_MAX_LEN;i++){
+        tile->name[0] = '\0';
+    }
+
     return tile;
 }
 
 Carc_Tile* CBT_new_tile_from_file(char* filename){
-    FILE* tile_file = fopen(filename, "r");
+    ///Create a tile from the file given in input. WARNING: The input should be the filename without the path
+    //Get tile file path
+    char *file_fullpath = CBT_get_tile_file_path(filename);
+    FILE* tile_file = fopen(file_fullpath, "r");
+    free(file_fullpath);
+    //Create tile
     Carc_Tile* tile = CBT_new_empty_tile();
     Carc_Tile_Location loc, neighbor_loc;
     Carc_Construction_Type type;
@@ -217,11 +226,22 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
          node_type[3],
          cur_neighbor[3],
          cur_char = EOF;
-
+    //Init temp arrays
     for(i=0;i<cur_loc_len;i++){cur_loc[i] = '\0';}
     for(i=0;i<cur_neigh_len;i++){cur_neighbor[i] = '\0';}
     for(i=0;i<node_type_len;i++){node_type[i] = '\0';}
 
+    //Set name field of the tile
+    i=0;
+    while(i<TILE_FILENAME_MAX_LEN){
+        tile->name[i] = filename[i];
+        if(filename[i]=='\0'){
+            i = TILE_FILENAME_MAX_LEN;//end loop
+        }
+        i++;
+    }
+
+    //Parse the tile nodes and connections
     i = 0;
     do{
         cur_char = fgetc(tile_file);
@@ -424,7 +444,6 @@ int CBT_tile_node_cmp(Carc_Tile_Node n1, Carc_Tile_Node n2){
 
 int CBT_tile_cmp(Carc_Tile* t1, Carc_Tile* t2){
     ///Comparison on structure level, without considering pawn info
-    ///TODO include comparison on rotations
     int result, i=0, j=0;
     if(t1==NULL || t2 == NULL){
         result = !(t1==t2);

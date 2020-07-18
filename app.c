@@ -23,9 +23,7 @@ Carc_App* Carc_App_init(){
     Carcassone->window_layout = CDL_initialize_game_layout(window);///TODO: Modify to give controls as inputs to be filled
 
     //Init game
-    char* tile_path=CBT_get_tile_file_path(APP_START_TILE);
-    Carcassone->game = CGG_initiate_game(tile_path,2);//init with 2 players and change on user interaction
-    free(tile_path);
+    Carcassone->game = CGG_initiate_game(APP_START_TILE,2);//init with 2 players and change on user interaction
 
     return Carcassone;
 }
@@ -52,12 +50,11 @@ int Carc_App_run(Carc_App* app){
 
     CDMap_display_grid(display);
 
-    SDL_Surface *cloister = CDUtils_get_view(VT_TILE,"cloister.jpg");
+    SDL_Surface *cloister = CDUtils_get_view(VT_TILE,"cloister_path.jpg");
     if(cloister==NULL)
         printf("cloister not loaded\n");
-    char* cloister_path=CBT_get_tile_file_path("cloister_path.txt");
-    app->game->turn.tile = CBT_new_tile_from_file(cloister_path);
-    free(cloister_path);
+
+    app->game->turn.tile = CBT_new_tile_from_file("cloister_path.txt");
 
     SDL_Texture* cur_tile_tex=CDDetails_show_tile(display,cloister);
     SDL_Rect cur_tile_pos = CDUtils_init_rect(display->map_pos.w + display->details_pos.w/2-tile_size/2,
@@ -65,7 +62,6 @@ int Carc_App_run(Carc_App* app){
                                       tile_size,
                                       tile_size
                                       );
-    ///TODO: replace cur_angle handling with getting the information from the tile struct in app->game->turn
     int x=0, y=0;
     while(!done){
         SDL_WaitEvent(&event);

@@ -233,10 +233,8 @@ void test_macro_const_add_to_list(){
 void test_macro_const_get_tile_constructions(){
     ///TODO: add tests with Garden and Path ends when resources available
     printf("test_macro_const_get_tile_constructions results: ");
-    char *start_tile_str=CBT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_str=CBT_get_tile_file_path("cloister_path.txt");
-    Carc_Tile *start_tile=CBT_new_tile_from_file(start_tile_str),
-              *cloister_tile=CBT_new_tile_from_file(cloister_tile_str);
+    Carc_Tile *start_tile=CBT_new_tile_from_file("tile1.txt"),
+              *cloister_tile=CBT_new_tile_from_file("cloister_path.txt");
     Carc_Macro_Construct_List* test_res=NULL;
     Carc_Tile_Node *center=CBT_get_node_from_loc(start_tile,CTL_CENTER);
 
@@ -261,8 +259,6 @@ void test_macro_const_get_tile_constructions(){
            && CBMC_get_node_construct(test_res,&center)==NULL
            );
 
-    free(start_tile_str);
-    free(cloister_tile_str);
     CBT_free_tile(start_tile);
     CBT_free_tile(cloister_tile);
     CBMCList_free(test_res);
@@ -468,10 +464,8 @@ void test_macro_const_enrich_with(){
 
 void test_macro_const_merge(){
     printf("test_macro_const_merge results: ");
-    char *start_tile_path=CBT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path=CBT_get_tile_file_path("cloister_path.txt");
-    Carc_Playboard_Node *start_node=CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_path),CBP_Location_new(0,0)),
-                        *cloister_node=CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),CBP_Location_new(0,0));
+    Carc_Playboard_Node *start_node=CBP_new_playboard_node(CBT_new_tile_from_file("tile1.txt"),CBP_Location_new(0,0)),
+                        *cloister_node=CBP_new_playboard_node(CBT_new_tile_from_file("cloister_path.txt"),CBP_Location_new(0,0));
     CBT_turn(cloister_node->node,CTTT_RIGHT);
     Carc_Tile_Node *start_path_connect = CBT_get_node_from_loc(start_node->node,CTL_EAST),
                     *cloister_path_connect = CBT_get_node_from_loc(cloister_node->node,CTL_WEST);
@@ -553,8 +547,6 @@ void test_macro_const_merge(){
     CPPlayer_free_player(pawn->owner);
     CPPawn_free_pawn(pawn);
     CBP_free_playboard_node(cloister_node);
-    free(start_tile_path);
-    free(cloister_tile_path);
     CBMCList_free(cloister_constructs);
     start_path->rim = NULL;//Avoid issue on freeing because rim already freed on the test with start_path2
     CBMCList_free(start_constructs);
@@ -629,8 +621,7 @@ void test_macro_const_list_is_in(){
 
 void test_macro_get_tile_constructs_per_node(){
     printf("CBMC_get_tile_constructs_per_node results: ");
-    char* str_start_tile=CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile* tile=CBT_new_tile_from_file(str_start_tile);
+    Carc_Tile* tile=CBT_new_tile_from_file("tile1.txt");
     Carc_Macro_Construct_List *test_list=CBMC_get_tile_macro_constructions(tile);
     //Test null inputs
     printf("%d\n",CBMC_get_tile_constructs_per_node(NULL,NULL)==NULL);
@@ -656,7 +647,6 @@ void test_macro_get_tile_constructs_per_node(){
     free(test_res);
     CBT_free_tile(tile);
     CBMCList_free(test_list);
-    free(str_start_tile);
 }
 
 

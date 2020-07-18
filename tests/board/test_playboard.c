@@ -95,8 +95,7 @@ void test_location_cmp(){
 void test_new_playboard_node(){
     printf("test_new_playboard_node results: ");
 
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile* test_tile = CBT_new_tile_from_file(tile_path);
+    Carc_Tile* test_tile = CBT_new_tile_from_file("tile1.txt");
     Carc_Playboard_Location test_loc = CBP_Location_new(0,1);
     Carc_Playboard_Node *test_node = CBP_new_playboard_node(test_tile,test_loc),
                         *test_node2 = CBP_new_playboard_node(NULL,test_loc);
@@ -122,13 +121,11 @@ void test_new_playboard_node(){
 
     CBP_free_playboard_node(test_node);
     CBP_free_playboard_node(test_node2);
-    free(tile_path);
 }
 
 void test_node_cmp(){
     printf("test_node_equality results: ");
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile *tile = CBT_new_tile_from_file(tile_path);
+    Carc_Tile *tile = CBT_new_tile_from_file("tile1.txt");
     Carc_Playboard_Node *n1 = CBP_new_playboard_node(NULL,CBP_Location_new(0,0)),
                         *n2 = CBP_new_playboard_node(tile,CBP_Location_new(0,0));
 
@@ -157,14 +154,12 @@ void test_node_cmp(){
     CBP_free_playboard_node(n1);
     n2->node=NULL;//avoid double free of tile (n1 and n2 have the same pointer in "node")
     CBP_free_playboard_node(n2);
-    free(tile_path);
 }
 
 void test_connect_is_possible(){
     printf("test CBP_connect_is_possible results: ");
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile *origin_tile = CBT_new_tile_from_file(tile_path),
-              *tile2 = CBT_new_tile_from_file(tile_path);
+    Carc_Tile *origin_tile = CBT_new_tile_from_file("tile1.txt"),
+              *tile2 = CBT_new_tile_from_file("tile1.txt");
 
 
     Carc_Playboard_Location loc;
@@ -184,14 +179,11 @@ void test_connect_is_possible(){
     printf("%d",CBP_connect_is_possible(node1,CPCS_LEFT,origin)==1);
 
     CBT_free_tile(origin_tile);
-    CBT_free_tile(tile2);
-    free(tile_path);
 }
 
 void test_init_playboard(){
     printf("test_init_playboard results: ");
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Tile* start_tile = CBT_new_tile_from_file(tile_path);
+    Carc_Tile* start_tile = CBT_new_tile_from_file("tile1.txt");
     Carc_Playboard_Node* start_node = CBP_new_playboard_node(start_tile,CBP_Location_new(0,0));
     Carc_Playboard_Origin* playboard = CBP_init_playboard(start_tile);
 
@@ -204,7 +196,6 @@ void test_init_playboard(){
     CBP_free_playboard(playboard);
     start_node->node = NULL;//Avoiding double free
     CBP_free_playboard_node(start_node);
-    free(tile_path);
 }
 
 void test_get_opposite_side(){
@@ -236,8 +227,7 @@ void test_get_neighbor_loc(){
 
 void test_create_neighbor_for(){
     printf("test_create_neighbor_for results: ");
-    char* tile_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Playboard_Node* start_node = CBP_new_playboard_node(CBT_new_tile_from_file(tile_path),CBP_Location_new(0,0));
+    Carc_Playboard_Node* start_node = CBP_new_playboard_node(CBT_new_tile_from_file("tile1.txt"),CBP_Location_new(0,0));
     Carc_Playboard_Node* neigh1 = CBP_create_rim_neigh_for(&start_node,CPCS_UP);
     printf("%d",neigh1!=NULL && CBP_get_neighbor(neigh1,CPCS_DOWN)==start_node);
     Carc_Playboard_Node* neigh2 = CBP_create_rim_neigh_for(&start_node,CPCS_LEFT);
@@ -248,9 +238,8 @@ void test_create_neighbor_for(){
 
 void test_playboard_add_pawn_in(){
     printf("test_playboard_add_pawn_in results: ");
-    char* tile_start_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node *node_empty=CBP_new_empty_playboard_node(CBP_Location_new(0,2)),
-              *node_start=CBP_new_playboard_node(CBT_new_tile_from_file(tile_start_str),CBP_Location_new(0,0));
+              *node_start=CBP_new_playboard_node(CBT_new_tile_from_file("tile1.txt"),CBP_Location_new(0,0));
     Carc_Pawn* pawn=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL);
 
     //Tile init without pawn tested in tile init tests
@@ -269,7 +258,6 @@ void test_playboard_add_pawn_in(){
     printf("%d",CBP_add_pawn_in(pawn,node_start,CTL_SOUTH)==-1
                 && CBT_get_node_from_loc(node_start->node,CTL_SOUTH)->pawn==NULL);
 
-    free(tile_start_str);
     CBP_free_playboard_node(node_empty);
     CBP_free_playboard_node(node_start);
     CPPlayer_free_player(pawn->owner);
@@ -278,9 +266,8 @@ void test_playboard_add_pawn_in(){
 
 void test_playboard_rm_pawn_in(){
     printf("test_playboard_rm_pawn_in results: ");
-    char* tile_start_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Playboard_Node *node_empty=CBP_new_empty_playboard_node(CBP_Location_new(0,2)),
-              *node_start=CBP_new_playboard_node(CBT_new_tile_from_file(tile_start_str),CBP_Location_new(0,0));
+              *node_start=CBP_new_playboard_node(CBT_new_tile_from_file("tile1.txt"),CBP_Location_new(0,0));
     Carc_Pawn *pawn1=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_1,CPC_BLACK),PAWN_NORMAL),
               *pawn2=CPPawn_new_pawn(CPPlayer_init_player(PLAYER_2,CPC_BLUE),PAWN_NORMAL);
 
@@ -312,7 +299,6 @@ void test_playboard_rm_pawn_in(){
     printf("%d",CBP_rm_pawn_in(node_start,CTL_NORTH)==0
                 && node_start->node->border[CTL_NORTH].pawn==NULL);
 
-    free(tile_start_str);
     CBP_free_playboard_node(node_empty);
     CBP_free_playboard_node(node_start);
     CPPlayer_free_player(pawn1->owner);

@@ -2,12 +2,11 @@
 
 void test_game_initiate(){
     printf("test_game_initiate results: ");
-    char* start_tile_str = CBT_get_tile_file_path("tile1.txt");
     int i, boolean=1;
 
     //Test playboard and rim init properly
-    Carc_Game* game = CGG_initiate_game(start_tile_str,2);
-    Carc_Playboard_Origin* origin = CBP_init_playboard(CBT_new_tile_from_file(start_tile_str));
+    Carc_Game* game = CGG_initiate_game("tile1.txt",2);
+    Carc_Playboard_Origin* origin = CBP_init_playboard(CBT_new_tile_from_file("tile1.txt"));
     printf("%d",CBP_node_cmp(game->playboard->node,origin->node)==0);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,1))!=NULL);
     printf("%d",CB_Rim_find_by_location(game->playable,CBP_Location_new(0,-1))!=NULL);
@@ -49,22 +48,19 @@ void test_game_initiate(){
 
     //Test creating with invalid number of players
     printf("\n");
-    printf("%d\n",CGG_initiate_game(start_tile_str,1)==NULL);
-    printf("%d\n",CGG_initiate_game(start_tile_str,0)==NULL);
-    printf("%d\n",CGG_initiate_game(start_tile_str,NB_MAX_PLAYERS+1)==NULL);
+    printf("%d\n",CGG_initiate_game("tile1.txt",1)==NULL);
+    printf("%d\n",CGG_initiate_game("tile1.txt",0)==NULL);
+    printf("%d\n",CGG_initiate_game("tile1.txt",NB_MAX_PLAYERS+1)==NULL);
 
     CGG_free_game(game);
-    free(start_tile_str);
 }
 
 void test_game_rim_to_playboard_update_one_side(){
     printf("test_game_rim_to_playboard_update_one_side results: ");
     int update_result=0;
-    char *tile1_path = CBT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_path = CBT_get_tile_file_path("cloister_path.txt");
-    Carc_Game* game = CGG_initiate_game(tile1_path,2);
+    Carc_Game* game = CGG_initiate_game("tile1.txt",2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
-    Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file(cloister_tile_path),
+    Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file("cloister_path.txt"),
                                                           play_in),
                         *empty_node = CBP_new_empty_playboard_node(CBP_Location_new(15,26));
 
@@ -100,17 +96,14 @@ void test_game_rim_to_playboard_update_one_side(){
     CGG_free_game(game);
     CBP_free_playboard_node(empty_node);
     CBP_free_playboard_node(cloister);//To be removed when free_playboard is completed
-    free(tile1_path);
-    free(cloister_tile_path);
 }
 
 void test_game_node_transfer_rim_to_playboard(){
     printf("test_game_node_transfer_rim_to_playboard results:\n");
     int update_result=0;
-    char* tile1_path = CBT_get_tile_file_path("tile1.txt");
-    Carc_Game* game = CGG_initiate_game(tile1_path,2);
+    Carc_Game* game = CGG_initiate_game("tile1.txt",2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
-    Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file("ressources/gameset/tiles/cloister_path.txt"),
+    Carc_Playboard_Node *cloister = CBP_new_playboard_node(CBT_new_tile_from_file("cloister_path.txt"),
                                                           play_in),
                         *empty_node = CBP_new_empty_playboard_node(CBP_Location_new(15,26));
 
@@ -142,17 +135,14 @@ void test_game_node_transfer_rim_to_playboard(){
     CGG_free_game(game);
     CBP_free_playboard_node(empty_node);
     CBP_free_playboard_node(cloister);//To be removed when free_playboard is completed
-    free(tile1_path);
 }
 
 void test_game_play_tile_in(){
     printf("test_game_play_tile_in results: ");
-    char *start_tile_str = CBT_get_tile_file_path("tile1.txt"),
-         *cloister_tile_str = CBT_get_tile_file_path("cloister_path.txt");
-    Carc_Game* game = CGG_initiate_game(start_tile_str,2);
+    Carc_Game* game = CGG_initiate_game("tile1.txt",2);
     Carc_Playboard_Location play_in = CBP_Location_new(0,-1);
-    Carc_Tile* cloister_tile = CBT_new_tile_from_file(cloister_tile_str);
-    Carc_Playboard_Node *origin_node = CBP_new_playboard_node(CBT_new_tile_from_file(start_tile_str),CBP_Location_new(0,0)),
+    Carc_Tile* cloister_tile = CBT_new_tile_from_file("cloister_path.txt");
+    Carc_Playboard_Node *origin_node = CBP_new_playboard_node(CBT_new_tile_from_file("tile1.txt"),CBP_Location_new(0,0)),
                         *curr_node=NULL;
     Carc_Playboard_Node* node_played = CGG_play_tile_in(game,play_in,cloister_tile);
 
@@ -237,17 +227,14 @@ void test_game_play_tile_in(){
     CBP_free_playboard_node(CBP_get_neighbor(game->playboard->node,CPCS_DOWN));//To be removed when CBP_free_playboard is complete
     CGG_free_game(game);
     CBP_free_playboard_node(origin_node);
-    free(start_tile_str);
-    free(cloister_tile_str);
 }
 
 void test_game_play_pawn_in(){
     printf("test_game_play_pawn_in results: \n");
-    char *start_tile_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Player* player=CPPlayer_init_player(PLAYER_1,CPC_BLACK);
     Carc_Pawn* pawn=NULL, *pawn2=NULL;
     Carc_Tile_Location loc=CTL_CENTER;
-    Carc_Game* game=CGG_initiate_game(start_tile_str,2);
+    Carc_Game* game=CGG_initiate_game("tile1.txt",2);
     Carc_Playboard_Node* start_node=game->playboard->node;
     Carc_Tile* start_tile=start_node->node;
     Carc_Macro_Construct** arr_start_constructs=CBMC_get_tile_constructs_per_node(game->constructs,start_tile);
@@ -300,12 +287,10 @@ void test_game_play_pawn_in(){
 
     CPPlayer_free_player(player);
     CGG_free_game(game);
-    free(start_tile_str);
 }
 
 void test_game_can_play_pawn_in(){
     printf("test_game_can_play_pawn_in results: \n");
-    char *start_tile_str=CBT_get_tile_file_path("tile1.txt");
     Carc_Player *player1=CPPlayer_init_player(PLAYER_1,CPC_BLACK),
                 *player2=CPPlayer_init_player(PLAYER_2,CPC_YELLOW);
     Carc_Pawn *pawn=CPPawn_new_pawn(player1,PAWN_NORMAL),
@@ -314,7 +299,7 @@ void test_game_can_play_pawn_in(){
               *pawn4=CPPawn_new_pawn(player1,PAWN_PIG),
               *pawn5=CPPawn_new_pawn(player1,PAWN_BISHOP),
               *pawn6=CPPawn_new_pawn(player2,PAWN_DOUBLE);
-    Carc_Game* game=CGG_initiate_game(start_tile_str,2);
+    Carc_Game* game=CGG_initiate_game("tile1.txt",2);
     Carc_Playboard_Node* start_node=game->playboard->node;
 
     //Test null inputs
@@ -447,15 +432,12 @@ void test_game_can_play_pawn_in(){
     CPPawn_free_pawn(pawn5);
     CPPawn_free_pawn(pawn6);
     CGG_free_game(game);
-    free(start_tile_str);
 }
 
 void test_game_merge_constructs_with_neighbor(){
     printf("test_game_merge_constructs_with_neighbor results: \n");
-    char *cloister_path=CBT_get_tile_file_path("cloister_path.txt"),
-    *start_tile_path=CBT_get_tile_file_path("tile1.txt");
-    Carc_Game* game=CGG_initiate_game(start_tile_path,3);
-    Carc_Tile* tile_cloister=CBT_new_tile_from_file(cloister_path);
+    Carc_Game* game=CGG_initiate_game("tile1.txt",3);
+    Carc_Tile* tile_cloister=CBT_new_tile_from_file("cloister_path.txt");
     Carc_Macro_Construct_List* cloister_constructs=CBMC_get_tile_macro_constructions(tile_cloister);
 
     Carc_Playboard_Node* cloister=CBP_new_playboard_node(tile_cloister,CBP_Location_new(0,-1));
@@ -514,7 +496,7 @@ void test_game_merge_constructs_with_neighbor(){
            );
 
     //Test merging cloister_path with starting tile on path side. (Merge 2 fields of starting tile into one thanks to field of cloister_path)
-    Carc_Tile* tile_cloister2=CBT_new_tile_from_file(cloister_path);
+    Carc_Tile* tile_cloister2=CBT_new_tile_from_file("cloister_path.txt");
     CBT_turn(tile_cloister2,CTTT_RIGHT);
     Carc_Macro_Construct_List* cloister_constructs2=CBMC_get_tile_macro_constructions(tile_cloister2);
     Carc_Playboard_Node* cloister2=CBP_new_playboard_node(tile_cloister2,CBP_Location_new(1,0));
@@ -591,18 +573,14 @@ void test_game_merge_constructs_with_neighbor(){
     //Free operations can be performed without double free
     CGG_free_game(game);
     CBMCList_free(cloister_constructs);
-    free(cloister_path);
-    free(start_tile_path);
     CBP_free_playboard_node(cloister);
     CBP_free_playboard_node(cloister2);
 }
 
 void test_game_update_constructs(){
     printf("test_game_update_constructs results: ");
-    char *cloister_path=CBT_get_tile_file_path("cloister_path.txt"),
-         *start_tile_path=CBT_get_tile_file_path("tile1.txt");
-    Carc_Game* game=CGG_initiate_game(start_tile_path,3);
-    Carc_Tile *tile_cloister=CBT_new_tile_from_file(cloister_path),
+    Carc_Game* game=CGG_initiate_game("tile1.txt",3);
+    Carc_Tile *tile_cloister=CBT_new_tile_from_file("cloister_path.txt"),
               *start_tile=game->playboard->node->node;
     Carc_Playboard_Node* node_cloister=CBP_new_playboard_node(tile_cloister,CBP_Location_new(0,-1));
     node_cloister->neighbors[CPCS_UP] = &(game->playboard->node);
@@ -660,8 +638,8 @@ void test_game_update_constructs(){
 
 
     //Test when several neighbors
-    Carc_Tile *tile_cloister2=CBT_new_tile_from_file(cloister_path),
-              *tile_cloister3=CBT_new_tile_from_file(cloister_path);
+    Carc_Tile *tile_cloister2=CBT_new_tile_from_file("cloister_path.txt"),
+              *tile_cloister3=CBT_new_tile_from_file("cloister_path.txt");
     CBT_turn(tile_cloister2,CTTT_RIGHT);
     Carc_Playboard_Node *node_cloister2=CBP_new_playboard_node(tile_cloister2,CBP_Location_new(1,0)),
                         *node_cloister3=CBP_new_playboard_node(tile_cloister3,CBP_Location_new(1,-1));
@@ -739,8 +717,6 @@ void test_game_update_constructs(){
     ///TODO add a test with 2 neighbors without merging their constructions when resources are available (e.g. one has a city, the other a path)
 
     CGG_free_game(game);
-    free(cloister_path);
-    free(start_tile_path);
     CBP_free_playboard_node(node_cloister);
 }
 

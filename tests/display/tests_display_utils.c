@@ -65,9 +65,9 @@ void test_display_utils_get_view(){
     printf("test_display_utils_get_view result: ");
     SDL_Surface *test_surface=NULL;
 
-    test_surface = CDUtils_get_view(VT_CONTROL,"cloister.jpg");
+    test_surface = CDUtils_get_view(VT_CONTROL,"cloister_path.jpg");
     printf("%d",test_surface==NULL);
-    test_surface = CDUtils_get_view(VT_TILE,"cloister.jpg");
+    test_surface = CDUtils_get_view(VT_TILE,"cloister_cloister_path.jpg");
     printf("%d",test_surface!=NULL);
     test_surface = CDUtils_get_view(VT_TILE,"turn_right.jpg");
     printf("%d",test_surface==NULL);

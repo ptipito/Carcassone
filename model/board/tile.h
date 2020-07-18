@@ -15,6 +15,7 @@
 #define TILE_NR_LOCATIONS 13
 #define TILE_FOLDER "ressources/gameset/tiles/"
 #define TILE_FULL_PATH_MAX_LEN 50
+#define TILE_FILENAME_MAX_LEN 24
 
 //Possible locations on a tile. Each corner is represented by 2 locations to take into account city borders
 typedef enum {CTL_NORTH_WEST, CTL_NORTH, CTL_NORTH_EAST,
@@ -62,6 +63,7 @@ typedef struct Carc_Tile {
     Carc_Tile_Node center;
     Carc_Tile_Location center_connexions[TILE_NR_BORDER_LOCATIONS];
     Carc_Tile_Turn_Type rotation;//Rotation of the tile in regards to the definition file
+    char name[TILE_FILENAME_MAX_LEN];//The name of the tile for fetching resources of the tile
 } Carc_Tile;
 
 Carc_Tile* CBT_new_tile_from_file(char*);
