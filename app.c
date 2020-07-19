@@ -46,22 +46,22 @@ int Carc_App_run(Carc_App* app){
     int done=0;
     Carc_Layout* display = app->window_layout;
     Carc_Game* game = app->game;
-    int tile_size = CDUtils_get_tile_size_in_pixels(display->tile_size);
+    SDL_Rect mouse_pos;
 
     CDMap_display_grid(display);
 
-    SDL_Surface *cloister = CDUtils_get_view(VT_TILE,"cloister_path.jpg");
+    SDL_Surface *cloister = CDUtils_get_view(VT_TILE,"cloister_path");
     if(cloister==NULL)
         printf("cloister not loaded\n");
 
     app->game->turn.tile = CBT_new_tile_from_file("cloister_path.txt");
 
-    SDL_Texture* cur_tile_tex=CDDetails_show_tile(display,cloister);
-    SDL_Rect cur_tile_pos = CDUtils_init_rect(display->map_pos.w + display->details_pos.w/2-tile_size/2,
-                                      display->details_pos.h/2-tile_size/2,
-                                      tile_size,
-                                      tile_size
-                                      );
+    SDL_Rect cur_tile_pos = CDDetails_show_tile(display,cloister);
+    app->controls[CCDETAILS_CUR_TILE].pos = cur_tile_pos;
+    app->controls[CCDETAILS_TURN_LEFT].pos = CDDetails_show_turn_control(display,cur_tile_pos,CDTT_LEFT);
+    app->controls[CCDETAILS_TURN_RIGHT].pos = CDDetails_show_turn_control(display,cur_tile_pos,CDTT_RIGHT);
+    app->controls[CCDETAILS_TURN_180].pos = CDDetails_show_turn_control(display,cur_tile_pos,CDTT_UPDOWN);
+
     int x=0, y=0;
     while(!done){
         SDL_WaitEvent(&event);
@@ -81,30 +81,19 @@ int Carc_App_run(Carc_App* app){
             case SDL_MOUSEBUTTONDOWN:
                 x = event.button.x;
                 y = event.button.y;
-                if(x < display->map_pos.w){
+                mouse_pos = CDUtils_init_rect(x,y,0,0);
+                if(CDUtils_pos_in_rect(mouse_pos,display->map_pos)){
                     CDMap_insert_tile(cloister,x,y,display,CBT_turn_type_to_degrees(game->turn.tile->rotation));
                 } else{
                     x %= display->map_pos.w;
-                    if(x >= display->details_pos.w/2-tile_size/2 - 20 - 5
-                       && x<= display->details_pos.w/2-tile_size/2 - 5
-                       && y >= display->details_pos.h/2 - tile_size/2 - 25/3
-                       && y <= display->details_pos.h/2 - tile_size/2 - 25/3 +25
-                       ){
-                        CCD_turn_left(*display,game,cur_tile_tex,&cur_tile_pos);
+                    if(CDUtils_pos_in_rect(mouse_pos,app->controls[CCDETAILS_TURN_LEFT].pos)){
+                        CCD_turn(CTTT_LEFT,*display,game,&cur_tile_pos);
                        }
-                    if(x >= display->details_pos.w/2+tile_size/2 + 5
-                       && x <= display->details_pos.w/2+tile_size/2 + 5 +20
-                       && y >= display->details_pos.h/2 - tile_size/2 - 25/3
-                       && y <= display->details_pos.h/2 - tile_size/2 - 25/3 +25
-                       ){
-                        CCD_turn_right(*display,game,cur_tile_tex,&cur_tile_pos);
+                    if(CDUtils_pos_in_rect(mouse_pos,app->controls[CCDETAILS_TURN_RIGHT].pos)){
+                        CCD_turn(CTTT_RIGHT,*display,game,&cur_tile_pos);
                        }
-                    if(x >= display->details_pos.w/2 - 20/2
-                       && x <= display->details_pos.w/2+20/2
-                       && y >= display->details_pos.h/2 + tile_size/2 + 5
-                       && y <= display->details_pos.h/2 + tile_size/2 + 5 +20
-                       ){
-                        CCD_turn_180(*display,game,cur_tile_tex,&cur_tile_pos);
+                    if(CDUtils_pos_in_rect(mouse_pos,app->controls[CCDETAILS_TURN_180].pos)){
+                        CCD_turn(CTTT_UPDOWN,*display,game,&cur_tile_pos);
                        }
                 }
                 break;
@@ -115,7 +104,6 @@ int Carc_App_run(Carc_App* app){
     }
 
     SDL_FreeSurface(cloister);
-    SDL_DestroyTexture(cur_tile_tex);
     Carc_App_end(app);
     return FUNC_SUCCESS;
 }

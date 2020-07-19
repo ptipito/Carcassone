@@ -56,11 +56,11 @@ SDL_Rect CDUtils_get_slot_upper_left(int x, int y, Carc_Tile_Size tile_size){
     return result;
 }
 
-int CDUtils_pos_in_surface(SDL_Rect pos, SDL_Surface surface){
+int CDUtils_pos_in_rect(SDL_Rect pos, SDL_Rect screen){
     int result=1;
-    if(pos.x < 0 || pos.y < 0)
+    if(pos.x < screen.x || pos.y < screen.y)
         result = 0;
-    if(pos.x >= surface.w || pos.y >= surface.h)
+    if(pos.x >= screen.x + screen.w || pos.y >= screen.y + screen.h)
         result = 0;
 
     return result;
@@ -68,7 +68,7 @@ int CDUtils_pos_in_surface(SDL_Rect pos, SDL_Surface surface){
 
 SDL_Surface* CDUtils_get_view(Carc_Utils_View_Type type, char* filename){
     char path_of_tile_view[IMAGE_PATH_MAX_LEN+1] = {'\0'};
-    int folder_len=0;
+    int folder_len=0, filename_len=strlen(filename);
     switch(type){
         case VT_CONTROL:
             strncat(path_of_tile_view,VIEW_CONTROL_FOLDER,IMAGE_PATH_MAX_LEN);
@@ -84,6 +84,7 @@ SDL_Surface* CDUtils_get_view(Carc_Utils_View_Type type, char* filename){
             break;
     }
     strncat(path_of_tile_view,filename,IMAGE_PATH_MAX_LEN-folder_len);
+    strncat(path_of_tile_view,VIEW_IMAGE_EXTENSION,IMAGE_PATH_MAX_LEN-folder_len-filename_len);
 
     return IMG_Load(path_of_tile_view);
 }

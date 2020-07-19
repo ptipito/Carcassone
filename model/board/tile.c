@@ -234,9 +234,13 @@ Carc_Tile* CBT_new_tile_from_file(char* filename){
     //Set name field of the tile
     i=0;
     while(i<TILE_FILENAME_MAX_LEN){
-        tile->name[i] = filename[i];
-        if(filename[i]=='\0'){
-            i = TILE_FILENAME_MAX_LEN;//end loop
+        if(filename[i]=='.'){
+            i = TILE_FILENAME_MAX_LEN;//end loop (remove file extension)
+        }
+        else{
+            tile->name[i] = filename[i];
+            if(filename[i]=='\0')
+                i = TILE_FILENAME_MAX_LEN;//end loop
         }
         i++;
     }

@@ -33,7 +33,7 @@ void CDMap_insert_tile(SDL_Surface *surface, int x, int y, Carc_Layout *layout, 
     pos.h = surface->h;
     surface = SDL_ConvertSurfaceFormat(surface,SDL_PIXELFORMAT_RGB888,0);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(layout->renderer,surface);
-    if(CDUtils_pos_in_surface(pos, *(layout->map_surface))){///TODO? Replace surface use with checking with the map_pos width and height?
+    if(CDUtils_pos_in_rect(pos, layout->map_pos)){
         SDL_SetRenderTarget(layout->renderer,layout->map_texture);
         SDL_RenderCopyEx(layout->renderer, texture, NULL, &pos,rot_angle,NULL,SDL_FLIP_NONE);
     }

@@ -9,7 +9,7 @@
 #include "display/map_surface.h"
 #include "control/details_controls.h"
 
-#define APP_START_TILE "tile1.txt"
+#define APP_START_TILE "cloister_path.txt"
 
 #define APP_NR_CONTROLS 8 //Correspond of the nr of values for the below enum
 typedef enum {

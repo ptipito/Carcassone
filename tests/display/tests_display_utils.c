@@ -38,42 +38,44 @@ void test_display_utils_get_tile_size_in_pixels(){
     printf("%d",CDUtils_get_tile_size_in_pixels(BIG_TILE)==60);
 }
 
-void test_display_utils_pos_in_surface(){
-    printf("test_display_utils_pos_in_surface result: ");
-    SDL_Surface *surface = SDL_CreateRGBSurface(0,80,90,32,0,0,0,0);
+void test_display_utils_pos_in_rect(){
+    printf("test_display_utils_pos_in_rect result: ");
+    SDL_Rect rect;
+    rect.x = 5;
+    rect.y = 10;
+    rect.w = 80;
+    rect.h = 90;
     SDL_Rect pos;
-    pos.x = 50;
+    pos.x = 55;
+    pos.y = 110;
+    printf("%d",CDUtils_pos_in_rect(pos,rect)==0);
+    pos.y = 50;
+    printf("%d",CDUtils_pos_in_rect(pos,rect)==1);
     pos.y = 100;
-    printf("%d",CDUtils_pos_in_surface(pos,*surface)==0);
-    pos.y = 45;
-    printf("%d",CDUtils_pos_in_surface(pos,*surface)==1);
-    pos.y = 90;
-    printf("%d",CDUtils_pos_in_surface(pos,*surface)==0);
-    pos.x = 0;
-    pos.y = 0;
-    printf("%d",CDUtils_pos_in_surface(pos,*surface)==1);
-    pos.x = 80;
-    printf("%d",CDUtils_pos_in_surface(pos,*surface)==0);
-    pos.x = 1000;
-    pos.y = 520;
-    printf("%d",CDUtils_pos_in_surface(pos,*surface)==0);
-
-    SDL_FreeSurface(surface);
+    printf("%d",CDUtils_pos_in_rect(pos,rect)==0);
+    pos.x = 5;
+    pos.y = 10;
+    printf("%d",CDUtils_pos_in_rect(pos,rect)==1);
+    pos.x = 85;
+    printf("%d",CDUtils_pos_in_rect(pos,rect)==0);
+    pos.x = 1005;
+    pos.y = 530;
+    printf("%d",CDUtils_pos_in_rect(pos,rect)==0);
 }
 
 void test_display_utils_get_view(){
     printf("test_display_utils_get_view result: ");
     SDL_Surface *test_surface=NULL;
 
-    test_surface = CDUtils_get_view(VT_CONTROL,"cloister_path.jpg");
+    test_surface = CDUtils_get_view(VT_CONTROL,"cloister_path");
     printf("%d",test_surface==NULL);
-    test_surface = CDUtils_get_view(VT_TILE,"cloister_cloister_path.jpg");
+    test_surface = CDUtils_get_view(VT_TILE,"cloister_path");
     printf("%d",test_surface!=NULL);
-    test_surface = CDUtils_get_view(VT_TILE,"turn_right.jpg");
+    test_surface = CDUtils_get_view(VT_TILE,"turn_right");
     printf("%d",test_surface==NULL);
-    test_surface = CDUtils_get_view(VT_CONTROL,"turn_right.jpg");
+    test_surface = CDUtils_get_view(VT_CONTROL,"turn_right");
     printf("%d",test_surface!=NULL);
-    test_surface = CDUtils_get_view(VT_PAWN,"turn_right.jpg");
+    test_surface = CDUtils_get_view(VT_PAWN,"turn_right");
     printf("%d",test_surface==NULL);
     /*TODO add valid tests for pawn when pawns ressources are available*/
 }
